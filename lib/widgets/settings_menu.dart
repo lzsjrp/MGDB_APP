@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class SettingsOptions extends StatelessWidget {
+class SettingsMenu extends StatelessWidget {
   final VoidCallback onPressed;
   final String buttonText;
   final String title;
   final String description;
 
-  const SettingsOptions({
+  const SettingsMenu({
     super.key,
     required this.onPressed,
     required this.buttonText,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:androidapp/widgets/SettingsOptions.dart';
+import 'package:androidapp/widgets/settings_menu.dart';
 import 'package:androidapp/controllers/session_controller.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
@@ -80,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-          SettingsOptions(
+          SettingsMenu(
             onPressed: userToken == null
                 ? () {
                     if (isConnected) {

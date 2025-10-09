@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 
-import 'pages/explore.dart';
-import 'pages/downloads.dart';
-import 'pages/favorites.dart';
-import 'pages/settings.dart';
+import 'pages/explore_page.dart';
+import 'pages/downloads_page.dart';
+import 'pages/favorites_page.dart';
+import 'pages/settings_page.dart';
 
 void main() {
   runApp(
