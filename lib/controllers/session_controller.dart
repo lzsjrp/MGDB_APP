@@ -31,10 +31,7 @@ class SessionController {
 
       if (token != null) {
         await SessionController().saveToken(token);
-
-        final userData = await SessionController.getUser(token);
-
-        await SessionController().saveUser(json.encode(userData));
+        await SessionController.getUser(token);
 
         onSuccess();
       } else {
@@ -98,6 +95,7 @@ class SessionController {
     );
 
     if (response.statusCode == 200) {
+      await SessionController().saveUser(response.body);
       return json.decode(response.body);
     } else {
       throw Exception('Error ${response.statusCode}');
