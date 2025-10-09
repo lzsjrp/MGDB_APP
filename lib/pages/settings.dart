@@ -66,10 +66,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isConnected = context.read<ConnectivityProvider>().isConnected;
     if (_isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     return Scaffold(
       body: ListView(
         children: [
@@ -83,12 +83,18 @@ class _SettingsPageState extends State<SettingsPage> {
           SettingsOptions(
             onPressed: userToken == null
                 ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );
+                    if (isConnected) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('Você está sem conexão com a internet')));
+                    }
                   }
                 : () {
                     ScaffoldMessenger.of(
