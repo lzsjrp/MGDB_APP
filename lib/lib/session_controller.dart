@@ -16,8 +16,11 @@ class SessionController {
   Future<void> deleteToken() async {
     await storage.delete(key: 'jwt_token');
   }
+
   static Future<dynamic> getSession(String jwt) async {
-    final response = await http.get(Uri.parse('https://lzsjrp-mgdb.vercel.app/api/session'));
+    final response = await http.get(
+      Uri.parse('https://lzsjrp-mgdb.vercel.app/api/session'),
+    );
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -25,6 +28,7 @@ class SessionController {
       throw Exception('Error ${response.statusCode}');
     }
   }
+
   static Future<dynamic> createSession(String email, String password) async {
     final url = Uri.parse('https://lzsjrp-mgdb.vercel.app/api/session');
     final response = await http.post(

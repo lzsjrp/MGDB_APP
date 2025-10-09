@@ -23,9 +23,7 @@ class MyApp extends StatelessWidget {
           surface: Color(0xFF111620),
         ),
         scaffoldBackgroundColor: Color(0xFF111620),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF111620),
-        ),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF111620)),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: Color(0xFF1a2231),
           selectedItemColor: Colors.white,
@@ -69,22 +67,16 @@ class _Home extends State<Home> {
           });
         },
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Explorar"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: "Explorar"
+            icon: Icon(Icons.favorite),
+            label: "Favoritos",
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              label: "Favoritos"
+            icon: Icon(Icons.bookmark_added),
+            label: "Downloads",
           ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_added),
-              label: "Downloads"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Menu"
-          )
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Menu"),
         ],
       ),
     );

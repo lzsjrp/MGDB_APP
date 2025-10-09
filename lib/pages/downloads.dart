@@ -5,10 +5,6 @@ class DownloadsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text("Downloads"),
-      ),
-    );
+    return Scaffold(body: Center(child: Text("Downloads")));
   }
 }

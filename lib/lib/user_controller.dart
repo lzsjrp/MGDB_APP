@@ -16,8 +16,11 @@ class UserController {
   Future<void> deleteUser() async {
     await storage.delete(key: 'user_data');
   }
+
   static Future<dynamic> getUser(String jwt) async {
-    final response = await http.get(Uri.parse('mgdb-api-sigma.vercel.app/api/users'));
+    final response = await http.get(
+      Uri.parse('https://lzsjrp-mgdb.vercel.app/api/users'),
+    );
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
@@ -25,8 +28,13 @@ class UserController {
       throw Exception('Error ${response.statusCode}');
     }
   }
-  static Future<dynamic> createUser(String email, String name,String password) async {
-    final url = Uri.parse('mgdb-api-sigma.vercel.app/api/users');
+
+  static Future<dynamic> createUser(
+    String email,
+    String name,
+    String password,
+  ) async {
+    final url = Uri.parse('https://lzsjrp-mgdb.vercel.app/api/users');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
