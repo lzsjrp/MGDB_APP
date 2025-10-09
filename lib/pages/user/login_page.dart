@@ -1,4 +1,5 @@
 import 'package:androidapp/pages/user/register_page.dart';
+import 'package:androidapp/controllers/session_controller.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -33,10 +34,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Login',
-                style: TextStyle(fontSize: 24),
-              ),
+              const Text('Login', style: TextStyle(fontSize: 24)),
               const SizedBox(height: 30),
               TextField(
                 controller: emailController,
@@ -77,7 +75,41 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const Spacer(),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      final email = emailController.text.trim();
+                      final password = passwordController.text.trim();
+
+                      if (email.isEmpty || password.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Email ou senha inválidos'),
+                          ),
+                        );
+                        return;
+                      }
+                      SessionController().login(
+                        context,
+                        email,
+                        password,
+                        () {
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Login realizado com sucesso'),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        },
+                        () {
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Falha ao iniciar a sessão'),
+                            ),
+                          );
+                        },
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF29638A),
                     ),

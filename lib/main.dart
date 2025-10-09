@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           surface: Color(0xFF111620),
         ),
         scaffoldBackgroundColor: Color(0xFF111620),
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF111620)),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1a2231)),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: Color(0xFF1a2231),
           selectedItemColor: Colors.white,
@@ -63,7 +63,7 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text("App")),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

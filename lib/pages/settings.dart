@@ -12,6 +12,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String? userToken;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
@@ -21,17 +22,37 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _checkUser() async {
     String? token = await SessionController().readToken();
+
+    Map<String, dynamic>? user;
+    if (token != null) {
+      try {
+        final response = await SessionController.getUser(token);
+        if (response is Map<String, dynamic>) {
+          user = response;
+        }
+      } catch (e) {
+        user = null;
+      }
+    }
+
     setState(() {
       userToken = token;
+      userData = user;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Configurações")),
       body: ListView(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 20, left: 20),
+            child: const Text(
+              'Configurações',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
           SettingsOptions(
             onPressed: userToken == null
                 ? () {
@@ -47,31 +68,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       context,
                     ).showSnackBar(const SnackBar(content: Text('Ação')));
                   },
-            buttonText: userToken == null ? "Logar" : "Deslogar",
+            buttonText: userToken == null ? "Login" : "Desconectar",
             title: userToken == null
                 ? "Você não está logado"
-                : "Usuário logado",
-            description: "Descrição",
-          ),
-          SettingsOptions(
-            onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Ação')));
-            },
-            buttonText: "Ação",
-            title: "Configuração 2",
-            description: "Descrição",
-          ),
-          SettingsOptions(
-            onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Ação')));
-            },
-            buttonText: "Ação",
-            title: "Configuração 1",
-            description: "Descrição",
+                : (userData?['name'] ?? "Usuário"),
+            description: userToken == null
+                ? "Descrição"
+                : (userData?['email'] ?? "Email"),
           ),
         ],
       ),
