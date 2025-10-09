@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:androidapp/providers/connectivity_provider.dart';
 
 import 'pages/explore.dart';
 import 'pages/downloads.dart';
@@ -6,7 +8,12 @@ import 'pages/favorites.dart';
 import 'pages/settings.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ConnectivityProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -47,10 +54,10 @@ class _Home extends State<Home> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    ExplorePage(),
-    FavoritesPage(),
-    DownloadsPage(),
-    SettingsPage(),
+    const ExplorePage(),
+    const FavoritesPage(),
+    const DownloadsPage(),
+    const SettingsPage(),
   ];
 
   @override
