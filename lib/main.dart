@@ -9,8 +9,10 @@ import 'pages/settings.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ConnectivityProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+      ],
       child: const MyApp(),
     ),
   );
