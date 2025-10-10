@@ -1,11 +1,14 @@
 import 'package:androidapp/pages/books/book_page.dart';
 import 'package:androidapp/controllers/book_controller.dart';
+import 'package:androidapp/pages/books/create_book_page.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:androidapp/pages/settings_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+
+import '../widgets/books_gridview.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -101,107 +104,13 @@ class _ExplorePageState extends State<ExplorePage> {
           ),
           body: Stack(
             children: [
-              GridView.builder(
-                padding: EdgeInsets.fromLTRB(15, 8, 15, 80),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.65,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 5,
-                ),
-                itemCount: booksData?['data']?.length ?? 0,
-                itemBuilder: (context, index) {
-                  var book = booksData['data'][index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BookDetailsPage(bookId: book['id']),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      color: Color(0xFF1a2231),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(10),
-                            ),
-                            child:
-                                (book['cover'] != null &&
-                                    book['cover']['imageUrl'] != null)
-                                ? Container(
-                                    width: double.infinity,
-                                    height: 240,
-                                    color: Color(0xFF232A3A),
-                                    child: CachedNetworkImage(
-                                      imageUrl: book['cover']['imageUrl'],
-                                      fit: BoxFit.cover,
-                                      progressIndicatorBuilder:
-                                          (
-                                            context,
-                                            url,
-                                            downloadProgress,
-                                          ) => Center(
-                                            child: CircularProgressIndicator(
-                                              value: downloadProgress.progress,
-                                            ),
-                                          ),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(
-                                            Icons.error,
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                                  )
-                                : Container(
-                                    width: double.infinity,
-                                    height: 240,
-                                    color: Color(0xFF232A3A),
-                                    child: Icon(
-                                      Icons.book,
-                                      color: Colors.white70,
-                                      size: 40,
-                                    ),
-                                  ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    book['title'] ?? '',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Text(
-                                    book['author'] ?? '',
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+              BooksGridView(
+                books: booksData?['data'] ?? [],
+                onBookTap: (bookId) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BookDetailsPage(bookId: bookId),
                     ),
                   );
                 },
