@@ -5,6 +5,7 @@ import 'package:androidapp/pages/settings_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -78,158 +79,185 @@ class _ExplorePageState extends State<ExplorePage> {
       return Center(child: CircularProgressIndicator());
     }
 
-    List<dynamic> books = booksData?['data'] ?? [];
-    int totalPages = booksData?['totalPages'] ?? 1;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Explorar'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.60,
-                crossAxisSpacing: 5,
-                mainAxisSpacing: 5,
+    return MaxWidthBox(
+      maxWidth: 1200,
+      child: ResponsiveScaledBox(
+        width: 450,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Explorar'),
+            actions: [
+              IconButton(icon: Icon(Icons.search), onPressed: () {}),
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                  );
+                },
               ),
-              itemCount: books.length,
-              itemBuilder: (context, index) {
-                var book = books[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            BookDetailsPage(bookId: book['id']),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    color: Color(0xFF1a2231),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(10),
+            ],
+          ),
+          body: Stack(
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  padding: EdgeInsets.fromLTRB(15, 8, 15, 80),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.65,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 5,
+                  ),
+                  itemCount: booksData?['data']?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    var book = booksData['data'][index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BookDetailsPage(bookId: book['id']),
                           ),
-                          child:
-                              (book['cover'] != null &&
-                                  book['cover']['imageUrl'] != null)
-                              ? Container(
-                                  width: double.infinity,
-                                  height: 240,
-                                  color: Color(0xFF232A3A),
-                                  child: CachedNetworkImage(
-                                    imageUrl: book['cover']['imageUrl'],
-                                    fit: BoxFit.cover,
-                                    progressIndicatorBuilder:
-                                        (context, url, downloadProgress) =>
-                                            Center(
+                        );
+                      },
+                      child: Card(
+                        color: Color(0xFF1a2231),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(10),
+                              ),
+                              child:
+                                  (book['cover'] != null &&
+                                      book['cover']['imageUrl'] != null)
+                                  ? Container(
+                                      width: double.infinity,
+                                      height: 240,
+                                      color: Color(0xFF232A3A),
+                                      child: CachedNetworkImage(
+                                        imageUrl: book['cover']['imageUrl'],
+                                        fit: BoxFit.cover,
+                                        progressIndicatorBuilder:
+                                            (
+                                              context,
+                                              url,
+                                              downloadProgress,
+                                            ) => Center(
                                               child: CircularProgressIndicator(
                                                 value:
                                                     downloadProgress.progress,
                                               ),
                                             ),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error, color: Colors.white),
-                                  ),
-                                )
-                              : Container(
-                                  width: double.infinity,
-                                  height: 240,
-                                  color: Color(0xFF232A3A),
-                                  child: Icon(
-                                    Icons.book,
-                                    color: Colors.white70,
-                                    size: 40,
-                                  ),
-                                ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
-                          ),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  book['title'] ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  book['author'] ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                                        errorWidget: (context, url, error) =>
+                                            Icon(
+                                              Icons.error,
+                                              color: Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                  : Container(
+                                      width: double.infinity,
+                                      height: 240,
+                                      color: Color(0xFF232A3A),
+                                      child: Icon(
+                                        Icons.book,
+                                        color: Colors.white70,
+                                        size: 40,
+                                      ),
+                                    ),
                             ),
-                          ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      book['title'] ?? '',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      book['author'] ?? '',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xCC1D263A),
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black45,
+                          blurRadius: 5,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: currentPage > 1
+                              ? () => fetchBooks(currentPage - 1, isConnected)
+                              : null,
+                          child: Text('Voltar'),
+                        ),
+                        SizedBox(width: 20),
+                        Text(
+                          'Página $currentPage/${booksData?['totalPages'] ?? 1}',
+                          style: TextStyle(color: Colors.grey[400]),
+                        ),
+                        SizedBox(width: 20),
+                        TextButton(
+                          onPressed:
+                              currentPage < (booksData?['totalPages'] ?? 1)
+                              ? () => fetchBooks(currentPage + 1, isConnected)
+                              : null,
+                          child: Text('Próximo'),
                         ),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          Container(
-            color: Color(0xFF1D263A),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: currentPage > 1
-                      ? () => fetchBooks(currentPage - 1, isConnected)
-                      : null,
-                  child: Text('Voltar'),
                 ),
-                SizedBox(width: 20),
-                Text('Página $currentPage/$totalPages', style: TextStyle(color: Colors.grey[400]),),
-                SizedBox(width: 20),
-                TextButton(
-                  onPressed: currentPage < totalPages
-                      ? () => fetchBooks(currentPage + 1, isConnected)
-                      : null,
-                  child: Text('Próximo'),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
