@@ -106,9 +106,31 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.grey[300],
                               ),
                             ),
-                            Text(author, style: TextStyle(fontSize: 16)),
+                            Text(
+                              author,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              (bookData!['description'] != null &&
+                                      bookData!['description']
+                                          .toString()
+                                          .isNotEmpty)
+                                  ? bookData!['description']
+                                  : 'Sem descrição',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[400],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -152,8 +174,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     itemBuilder: (context, index) {
                       final chapter = chapters[index];
                       return ListTile(
-                        title: Text(chapter['title'] ?? 'Sem título'),
-                        subtitle: Text('Capítulo ${chapter['number'] ?? '-'}'),
+                        title: Text('Capítulo ${chapter['number'] ?? '-'}'),
+                        subtitle: Text(chapter['title'] ?? 'Sem título'),
                         onTap: () {},
                       );
                     },

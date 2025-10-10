@@ -207,7 +207,7 @@ class _ExplorePageState extends State<ExplorePage> {
             ),
           ),
           Container(
-            color: Color(0xFF232A3A),
+            color: Color(0xFF1D263A),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -218,7 +218,7 @@ class _ExplorePageState extends State<ExplorePage> {
                   child: Text('Voltar'),
                 ),
                 SizedBox(width: 20),
-                Text('Página $currentPage/$totalPages'),
+                Text('Página $currentPage/$totalPages', style: TextStyle(color: Colors.grey[400]),),
                 SizedBox(width: 20),
                 TextButton(
                   onPressed: currentPage < totalPages
