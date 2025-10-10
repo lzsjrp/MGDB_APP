@@ -3,7 +3,7 @@ import 'package:androidapp/widgets/settings_menu.dart';
 import 'package:androidapp/providers/session_provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:androidapp/pages/user/login_page.dart';
+import 'package:androidapp/pages/user/login_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -64,11 +64,10 @@ class _SettingsPageState extends State<SettingsPage> {
             onPressed: userData == null
                 ? () {
                     if (isConnected) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => const LoginDialog(),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -86,10 +85,10 @@ class _SettingsPageState extends State<SettingsPage> {
             buttonText: userData == null ? "Login" : "Desconectar",
             title: userData == null
                 ? "Você não está logado"
-                : (userData?['name'] ?? "Usuário"),
+                : (userData['name'] ?? "Usuário"),
             description: userData == null
                 ? "Descrição"
-                : (userData?['email'] ?? "Email"),
+                : (userData['email'] ?? "Email"),
           ),
         ],
       ),

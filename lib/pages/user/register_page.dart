@@ -20,6 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
           padding: const EdgeInsets.all(24),
           margin: const EdgeInsets.symmetric(horizontal: 24),
           decoration: BoxDecoration(
+            color: Color(0xFF1a2231),
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
               BoxShadow(
