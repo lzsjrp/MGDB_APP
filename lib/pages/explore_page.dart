@@ -18,8 +18,9 @@ class _ExplorePageState extends State<ExplorePage> {
   dynamic booksData;
   bool _loading = true;
   String _error = '';
+  bool _fetching = false;
 
-  void fetchBooks(int page, bool isConnected) async {
+  Future<void> fetchBooks(int page, bool isConnected) async {
     if (!mounted) return;
     setState(() {
       _loading = true;
@@ -28,12 +29,14 @@ class _ExplorePageState extends State<ExplorePage> {
     try {
       if (isConnected) {
         var data = await BookController.getList(page.toString());
+        if (!mounted) return;
         setState(() {
           booksData = data;
           currentPage = data['page'] ?? page;
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
       });
@@ -48,8 +51,14 @@ class _ExplorePageState extends State<ExplorePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
-    if (isConnected) {
-      fetchBooks(currentPage, isConnected);
+    if (isConnected && !_fetching) {
+      _fetching = true;
+      fetchBooks(
+        currentPage,
+        isConnected,
+      ).whenComplete(() => _fetching = false);
+    } else {
+      _loading = false;
     }
   }
 
@@ -57,11 +66,17 @@ class _ExplorePageState extends State<ExplorePage> {
   Widget build(BuildContext context) {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
-    if (_loading) return Center(child: CircularProgressIndicator());
+    if (!isConnected && !_loading) {
+      return Center(child: Text('Sem conexão com a internet'));
+    }
 
-    if (!isConnected) return Center(child: Text('Sem conexão com a internet'));
+    if (_error.isNotEmpty) {
+      return Center(child: Text(_error));
+    }
 
-    if (_error.isNotEmpty) return Center(child: Text(_error));
+    if (_loading) {
+      return Center(child: CircularProgressIndicator());
+    }
 
     List<dynamic> books = booksData?['data'] ?? [];
     int totalPages = booksData?['totalPages'] ?? 1;
@@ -151,8 +166,16 @@ class _ExplorePageState extends State<ExplorePage> {
                                   child: CachedNetworkImage(
                                     imageUrl: book['cover']['imageUrl'],
                                     fit: BoxFit.cover,
-                                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                    errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.white),
+                                    progressIndicatorBuilder:
+                                        (context, url, downloadProgress) =>
+                                            Center(
+                                              child: CircularProgressIndicator(
+                                                value:
+                                                    downloadProgress.progress,
+                                              ),
+                                            ),
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error, color: Colors.white),
                                   ),
                                 )
                               : Container(
