@@ -86,6 +86,11 @@ class _ExplorePageState extends State<ExplorePage> {
         title: Text('Explorar'),
         actions: [
           IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
