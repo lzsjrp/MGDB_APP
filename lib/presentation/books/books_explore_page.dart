@@ -1,13 +1,14 @@
-import 'package:androidapp/pages/books/book_page.dart';
-import 'package:androidapp/controllers/book_controller.dart';
+import 'package:androidapp/core/theme/app_colors.dart';
+import 'package:androidapp/presentation/books/books_page.dart';
+import 'package:androidapp/services/books_service.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
-import 'package:androidapp/pages/settings_page.dart';
+import 'package:androidapp/presentation/settings/settings_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import '../widgets/books_gridview.dart';
-import '../widgets/create_book_dialog.dart';
+import 'widgets/books_list_widget.dart';
+import 'dialogs/books_create_dialog.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -143,11 +144,11 @@ class _ExplorePageState extends State<ExplorePage> {
                   alignment: Alignment.center,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color(0xCC1D263A),
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black45,
+                          color: AppColors.primary,
                           blurRadius: 5,
                           offset: Offset(0, 2),
                         ),

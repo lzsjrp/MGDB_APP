@@ -1,6 +1,8 @@
-import 'package:androidapp/controllers/book_controller.dart';
+import 'package:androidapp/services/books_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
+import '../../core/theme/app_colors.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final String bookId;
@@ -58,7 +60,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     }
 
     if (_loading) {
-      return Center(child: CircularProgressIndicator());
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -98,7 +100,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         : Container(
                             width: 160,
                             height: 260,
-                            color: Color(0xFF232A3A),
+                            color: AppColors.secondary,
                             child: Icon(Icons.book, size: 60),
                           ),
                   ),
@@ -149,24 +151,12 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2c9163),
-                      foregroundColor: Colors.white,
-                      iconColor: Colors.white,
-                      iconSize: 22,
-                    ),
                     icon: Icon(Icons.download),
                     label: Text("Baixar"),
                   ),
                   SizedBox(width: 12),
                   ElevatedButton.icon(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFad3448),
-                      foregroundColor: Colors.white,
-                      iconColor: Colors.white,
-                      iconSize: 22,
-                    ),
                     icon: Icon(Icons.favorite),
                     label: Text("Favoritar"),
                   ),

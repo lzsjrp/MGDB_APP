@@ -1,5 +1,5 @@
-import 'package:androidapp/pages/user/register_page.dart';
-import 'package:androidapp/controllers/session_controller.dart';
+import 'package:androidapp/presentation/settings/register_page.dart';
+import 'package:androidapp/services/session_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginDialog extends StatefulWidget {

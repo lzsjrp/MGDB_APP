@@ -1,13 +1,16 @@
 import 'dart:ffi';
-import 'package:androidapp/controllers/session_controller.dart';
+import 'package:androidapp/services/session_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:androidapp/core/constants/app_constants.dart';
 import 'dart:convert';
 
 class BookController {
   static Future<dynamic> getList(String page) async {
-    final uri = Uri.https('lzsjrp-mgdb.vercel.app', '/api/title', {
-      'page': page,
-    });
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleRoute,
+      {'page': page},
+    );
 
     final response = await http.get(uri);
 
@@ -19,7 +22,10 @@ class BookController {
   }
 
   static Future<dynamic> getTitle(String titleId) async {
-    final uri = Uri.https('lzsjrp-mgdb.vercel.app', '/api/title/$titleId');
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleById(titleId),
+    );
 
     final response = await http.get(uri);
 
@@ -37,7 +43,10 @@ class BookController {
   ) async {
     final jwt = await SessionController().readToken();
     if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https('lzsjrp-mgdb.vercel.app', '/api/title');
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleRoute,
+    );
 
     final response = await http.post(
       uri,
@@ -58,7 +67,10 @@ class BookController {
   static Future<dynamic> deleteTitle(String titleId) async {
     final jwt = await SessionController().readToken();
     if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https('lzsjrp-mgdb.vercel.app', '/api/title/$titleId');
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleById(titleId),
+    );
 
     final response = await http.delete(
       uri,
@@ -77,8 +89,8 @@ class BookController {
 
   static Future<dynamic> getChapters(String titleId) async {
     final uri = Uri.https(
-      'lzsjrp-mgdb.vercel.app',
-      '/api/title/$titleId/chapters',
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleChapters(titleId),
     );
 
     final response = await http.get(uri);
@@ -92,8 +104,8 @@ class BookController {
 
   static Future<dynamic> getChapter(String titleId, String chapterId) async {
     final uri = Uri.https(
-      'lzsjrp-mgdb.vercel.app',
-      '/api/title/$titleId/chapters/$chapterId',
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleChapterById(titleId, chapterId),
     );
 
     final response = await http.get(uri);
@@ -115,8 +127,8 @@ class BookController {
     final jwt = await SessionController().readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
-      'lzsjrp-mgdb.vercel.app',
-      '/api/title/$titleId/chapters',
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleChapters(titleId),
     );
 
     final response = await http.post(
@@ -144,8 +156,8 @@ class BookController {
     final jwt = await SessionController().readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
-      'lzsjrp-mgdb.vercel.app',
-      '/api/title/$titleId/chapters/$chapterId',
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleChapterById(titleId, chapterId),
     );
 
     final response = await http.delete(
@@ -165,8 +177,8 @@ class BookController {
 
   static Future<dynamic> getCover(String titleId, String chapterId) async {
     final uri = Uri.https(
-      'lzsjrp-mgdb.vercel.app',
-      '/api/title/$titleId/cover',
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.titleCover(titleId),
     );
 
     final response = await http.get(uri);

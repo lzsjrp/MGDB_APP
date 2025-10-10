@@ -1,12 +1,13 @@
+import 'package:androidapp/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:androidapp/providers/session_provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import 'pages/explore_page.dart';
-import 'pages/downloads_page.dart';
-import 'pages/favorites_page.dart';
+import 'presentation/books/books_explore_page.dart';
+import 'presentation/books/downloads/books_downloads_page.dart';
+import 'presentation/books/downloads/books_favorites_page.dart';
 
 void main() {
   runApp(
@@ -27,21 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color(0xFF111620),
-          brightness: Brightness.dark,
-          surface: Color(0xFF111620),
-        ),
-        scaffoldBackgroundColor: Color(0xFF111620),
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1a2231)),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Color(0xFF1a2231),
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed,
-        ),
-      ),
+      theme: AppTheme.darkTheme,
       builder: (context, child) => ResponsiveBreakpoints.builder(
         child: child!,
         breakpoints: [

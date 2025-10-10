@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../../../core/theme/app_colors.dart';
+
 class BooksGridView extends StatelessWidget {
   final List<dynamic> books;
   final void Function(String bookId) onBookTap;
@@ -44,7 +46,7 @@ class BooksGridView extends StatelessWidget {
                       ? Container(
                           width: double.infinity,
                           height: 240,
-                          color: Color(0xFF232A3A),
+                          color: AppColors.secondary,
                           child: CachedNetworkImage(
                             imageUrl: book['cover']['imageUrl'],
                             fit: BoxFit.cover,
@@ -61,10 +63,10 @@ class BooksGridView extends StatelessWidget {
                       : Container(
                           width: double.infinity,
                           height: 240,
-                          color: Color(0xFF232A3A),
+                          color: AppColors.background,
                           child: Icon(
                             Icons.book,
-                            color: Colors.white70,
+                            color: AppColors.onPrimary,
                             size: 40,
                           ),
                         ),
@@ -79,14 +81,14 @@ class BooksGridView extends StatelessWidget {
                         Text(
                           book['title'] ?? '',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.onPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
                           ),
                         ),
                         Text(
                           book['author'] ?? '',
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          style: TextStyle(color: Colors.white70, fontSize: 15),
                         ),
                       ],
                     ),

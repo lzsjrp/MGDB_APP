@@ -3,6 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
+import '../core/constants/app_constants.dart';
+
 final storage = const FlutterSecureStorage();
 
 class SessionController {
@@ -43,8 +45,12 @@ class SessionController {
   }
 
   static Future<dynamic> getSession(String jwt) async {
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.sessionRoute,
+    );
     final response = await http.get(
-      Uri.parse('https://lzsjrp-mgdb.vercel.app/api/session'),
+      uri,
       headers: {
         'Authorization': 'Bearer $jwt',
         'Content-Type': 'application/json',
@@ -59,9 +65,12 @@ class SessionController {
   }
 
   static Future<dynamic> createSession(String email, String password) async {
-    final url = Uri.parse('https://lzsjrp-mgdb.vercel.app/api/session');
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.sessionRoute,
+    );
     final response = await http.post(
-      url,
+      uri,
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'email': email, 'password': password}),
     );
@@ -86,8 +95,12 @@ class SessionController {
   }
 
   static Future<dynamic> getUser(String jwt) async {
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.usersRoute,
+    );
     final response = await http.get(
-      Uri.parse('https://lzsjrp-mgdb.vercel.app/api/users'),
+      uri,
       headers: {
         'Authorization': 'Bearer $jwt',
         'Content-Type': 'application/json',
@@ -107,9 +120,12 @@ class SessionController {
     String name,
     String password,
   ) async {
-    final url = Uri.parse('https://lzsjrp-mgdb.vercel.app/api/users');
+    final uri = Uri.https(
+      ApiUrls.baseUrl,
+      ApiUrls.apiPath + ApiUrls.usersRoute,
+    );
     final response = await http.post(
-      url,
+      uri,
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'email': email, 'password': password, 'name': name}),
     );

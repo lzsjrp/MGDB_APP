@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:androidapp/controllers/session_controller.dart';
+import 'package:androidapp/services/session_service.dart';
 import 'dart:convert';
 
 class UserProvider extends ChangeNotifier {
