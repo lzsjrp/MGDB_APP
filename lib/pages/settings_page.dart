@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:androidapp/widgets/settings_menu.dart';
-import 'package:androidapp/controllers/session_controller.dart';
+import 'package:androidapp/providers/session_provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:androidapp/pages/user/login_page.dart';
-import 'dart:convert';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,7 +13,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  String? userToken;
   Map<String, dynamic>? userData;
   bool _isLoading = true;
 
@@ -27,46 +25,23 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _checkUser() async {
     setState(() => _isLoading = true);
 
-    final isConnected = context.read<ConnectivityProvider>().isConnected;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    String? token;
-    Map<String, dynamic>? user;
-
-    if (isConnected) {
-      token = await SessionController().readToken();
-      if (token != null) {
-        try {
-          final response = await SessionController.getUser(token);
-          if (response is Map<String, dynamic>) {
-            user = response;
-          }
-        } catch (e) {
-          user = null;
-        }
-      }
-    } else {
-      final userJson = await SessionController().readUser();
-      if (userJson != null) {
-        final parsed = json.decode(userJson);
-        if (parsed is Map<String, dynamic>) {
-          user = parsed;
-          token = await SessionController().readToken();
-        } else {
-          user = null;
-        }
-      }
-    }
+    await userProvider.loadUser();
 
     setState(() {
-      userToken = token;
-      userData = user;
+      userData = userProvider.userData;
       _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isConnected = context.read<ConnectivityProvider>().isConnected;
+    final userProvider = context.watch<UserProvider>();
+    final isConnected = context.watch<ConnectivityProvider>().isConnected;
+
+    final userData = userProvider.userData;
+
     if (_isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -86,7 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: [
           SettingsMenu(
-            onPressed: userToken == null
+            onPressed: userData == null
                 ? () {
                     if (isConnected) {
                       Navigator.push(
@@ -108,11 +83,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       context,
                     ).showSnackBar(const SnackBar(content: Text('Ação')));
                   },
-            buttonText: userToken == null ? "Login" : "Desconectar",
-            title: userToken == null
+            buttonText: userData == null ? "Login" : "Desconectar",
+            title: userData == null
                 ? "Você não está logado"
                 : (userData?['name'] ?? "Usuário"),
-            description: userToken == null
+            description: userData == null
                 ? "Descrição"
                 : (userData?['email'] ?? "Email"),
           ),
