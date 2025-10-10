@@ -98,30 +98,6 @@ class _ExplorePageState extends State<ExplorePage> {
       ),
       body: Column(
         children: [
-          if (books.length > 8)
-            Container(
-              color: Color(0xFF232A3A),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: currentPage > 1
-                        ? () => fetchBooks(currentPage - 1, isConnected)
-                        : null,
-                    child: Text('Voltar'),
-                  ),
-                  SizedBox(width: 20),
-                  Text('Página $currentPage/$totalPages'),
-                  SizedBox(width: 20),
-                  TextButton(
-                    onPressed: currentPage < totalPages
-                        ? () => fetchBooks(currentPage + 1, isConnected)
-                        : null,
-                    child: Text('Próximo'),
-                  ),
-                ],
-              ),
-            ),
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
