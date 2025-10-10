@@ -3,7 +3,7 @@ import 'package:androidapp/widgets/settings_menu.dart';
 import 'package:androidapp/providers/session_provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:androidapp/pages/user/login_dialog.dart';
+import 'package:androidapp/widgets/login_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

@@ -1,14 +1,13 @@
 import 'package:androidapp/pages/books/book_page.dart';
 import 'package:androidapp/controllers/book_controller.dart';
-import 'package:androidapp/pages/books/create_book_page.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:androidapp/pages/settings_page.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import '../widgets/books_gridview.dart';
+import '../widgets/create_book_dialog.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -66,6 +65,21 @@ class _ExplorePageState extends State<ExplorePage> {
     }
   }
 
+  Future<void> createTitleOperation() async {
+    final result = await showDialog(
+      context: context,
+      builder: (_) => const CreateBookDialog(),
+    );
+    if (result != null) {
+      final bookId = result['book']['id'];
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => BookDetailsPage(bookId: bookId)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
@@ -91,6 +105,12 @@ class _ExplorePageState extends State<ExplorePage> {
             title: Text('Explorar'),
             actions: [
               IconButton(icon: Icon(Icons.search), onPressed: () {}),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () async {
+                  createTitleOperation();
+                },
+              ),
               IconButton(
                 icon: Icon(Icons.settings),
                 onPressed: () {
