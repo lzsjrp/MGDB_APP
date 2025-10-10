@@ -5,7 +5,6 @@ import 'package:androidapp/providers/connectivity_provider.dart';
 import 'pages/explore_page.dart';
 import 'pages/downloads_page.dart';
 import 'pages/favorites_page.dart';
-import 'pages/settings_page.dart';
 
 void main() {
   runApp(
@@ -59,13 +58,11 @@ class _Home extends State<Home> {
     const ExplorePage(),
     const FavoritesPage(),
     const DownloadsPage(),
-    const SettingsPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("App")),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -76,16 +73,15 @@ class _Home extends State<Home> {
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Explorar"),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explorar"),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: "Favoritos",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_added),
+            icon: Icon(Icons.cloud_download),
             label: "Downloads",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Menu"),
         ],
       ),
     );

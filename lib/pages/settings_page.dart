@@ -71,15 +71,20 @@ class _SettingsPageState extends State<SettingsPage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Configurações'),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
       body: ListView(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 20, left: 20),
-            child: Text(
-              'Configurações',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
           SettingsMenu(
             onPressed: userToken == null
                 ? () {
@@ -91,9 +96,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       );
                     } else {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(const SnackBar(content: Text('Você está sem conexão com a internet')));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Você está sem conexão com a internet'),
+                        ),
+                      );
                     }
                   }
                 : () {
