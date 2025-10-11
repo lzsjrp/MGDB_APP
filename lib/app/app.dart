@@ -12,11 +12,17 @@ import '../shared/widgets/bottom_navigation_bar.dart';
 import '../providers/theme_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/connectivity_provider.dart';
+import '../providers/api_config_provider.dart';
+
 import 'injectable.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
+
+  final apiConfigProvider = getIt<ApiConfigProvider>();
+  await apiConfigProvider.loadBaseUrl();
+
   runApp(
     MultiProvider(
       providers: [
@@ -26,6 +32,9 @@ void main() {
         ),
         ChangeNotifierProvider<ConnectivityProvider>.value(
           value: getIt<ConnectivityProvider>(),
+        ),
+        ChangeNotifierProvider<ApiConfigProvider>.value(
+          value: apiConfigProvider,
         ),
       ],
       child: const MyApp(),
@@ -39,9 +48,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final apiConfigProvider = context.watch<ApiConfigProvider>();
 
     return MaterialApp(
       title: 'App',
+      key: ValueKey(apiConfigProvider.baseUrl),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,

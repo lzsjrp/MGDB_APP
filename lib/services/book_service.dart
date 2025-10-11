@@ -2,19 +2,23 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:injectable/injectable.dart';
-import '../app/injectable.dart';
+import '../providers/api_config_provider.dart';
 
 import 'package:androidapp/core/constants/app_constants.dart';
 import 'package:androidapp/services/session_service.dart';
 
 @injectable
 class BookService {
-  final sessionService = getIt<SessionService>();
+  final SessionService sessionService;
+  final ApiConfigProvider apiConfigProvider;
+
+  BookService(this.sessionService, this.apiConfigProvider);
 
   Future<dynamic> getList(String page) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleRoute,
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.titleRoute,
       {'page': page},
     );
 
@@ -28,9 +32,10 @@ class BookService {
   }
 
   Future<dynamic> getTitle(String titleId) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleById(titleId),
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.titleById(titleId),
     );
 
     final response = await http.get(uri);
@@ -43,11 +48,12 @@ class BookService {
   }
 
   Future<dynamic> createTitle(String title, String author, String type) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleRoute,
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.titleRoute,
     );
 
     final response = await http.post(
@@ -67,11 +73,12 @@ class BookService {
   }
 
   Future<dynamic> deleteTitle(String titleId) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleById(titleId),
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.titleById(titleId),
     );
 
     final response = await http.delete(

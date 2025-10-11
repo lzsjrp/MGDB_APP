@@ -1,27 +1,26 @@
 class ApiUrls {
-  static const baseUrl = "lzsjrp-mgdb.vercel.app";
-  static const apiPath = "/api";
-  static const versionRoute = "/";
-  static const sessionRoute = "/session";
-  static const usersRoute = "/users";
-  static const titleRoute = "/title";
+  final String baseUrl;
 
-  static String userById(String userId) {
-    return "$usersRoute/$userId";
-  }
+  ApiUrls({required this.baseUrl});
 
-  static String titleById(String titleId) {
-    return "$titleRoute/$titleId";
-  }
+  String get apiPath => "/api";
 
-  static String titleCover(String titleId) {
-    return "$titleRoute/$titleId/cover";
-  }
-  static String titleChapters(String titleId) {
-    return "$titleRoute/$titleId/chapters";
-  }
+  String get versionRoute => "/";
 
-  static String titleChapterById(String titleId, String chapterId) {
-    return "$titleRoute/$titleId/chapters/$chapterId";
-  }
+  String get sessionRoute => "/session";
+
+  String get usersRoute => "/users";
+
+  String get titleRoute => "/title";
+
+  String userById(String userId) => "$usersRoute/$userId";
+
+  String titleById(String titleId) => "$titleRoute/$titleId";
+
+  String titleCover(String titleId) => "$titleRoute/$titleId/cover";
+
+  String titleChapters(String titleId) => "$titleRoute/$titleId/chapters";
+
+  String titleChapterById(String titleId, String chapterId) =>
+      "$titleRoute/$titleId/chapters/$chapterId";
 }

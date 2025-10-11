@@ -5,9 +5,14 @@ import 'dart:convert';
 import '../core/constants/app_constants.dart';
 
 import 'package:injectable/injectable.dart';
+import '../providers/api_config_provider.dart';
 
 @injectable
 class SessionService {
+  final ApiConfigProvider apiConfigProvider;
+
+  SessionService(this.apiConfigProvider);
+
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   static const String _keyJwt = 'user_jwt';
   static const String _keyUserData = 'user_data';
@@ -50,9 +55,10 @@ class SessionService {
   }
 
   Future<dynamic> getSession(String jwt) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.sessionRoute,
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.sessionRoute,
     );
     final response = await http.get(
       uri,
@@ -70,9 +76,10 @@ class SessionService {
   }
 
   Future<dynamic> createSession(String email, String password) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.sessionRoute,
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.sessionRoute,
     );
     final response = await http.post(
       uri,
@@ -88,9 +95,10 @@ class SessionService {
   }
 
   Future<dynamic> getUser(String jwt) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.usersRoute,
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.usersRoute,
     );
     final response = await http.get(
       uri,
@@ -101,7 +109,7 @@ class SessionService {
     );
 
     if (response.statusCode == 200) {
-      await SessionService().saveUser(response.body);
+      await saveUser(response.body);
       return json.decode(response.body);
     } else {
       throw Exception('Error ${response.statusCode}');
@@ -109,9 +117,10 @@ class SessionService {
   }
 
   Future<dynamic> createUser(String email, String name, String password) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.usersRoute,
+      apiUrls.baseUrl,
+      apiUrls.apiPath + apiUrls.usersRoute,
     );
     final response = await http.post(
       uri,

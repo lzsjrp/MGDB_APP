@@ -9,6 +9,8 @@ import 'package:androidapp/providers/theme_provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../providers/api_config_provider.dart';
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -17,7 +19,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   Map<String, dynamic>? userData;
   bool _isLoading = true;
 
@@ -101,6 +102,47 @@ class _SettingsPageState extends State<SettingsPage> {
             buttonText: "Alterar",
             title: "Tema",
             description: "Alterar o tema do aplicativo",
+          ),
+          SettingsMenu(
+            onPressed: () async {
+              final apiConfigProvider = Provider.of<ApiConfigProvider>(
+                context,
+                listen: false,
+              );
+              final TextEditingController controller = TextEditingController(
+                text: apiConfigProvider.baseUrl,
+              );
+              await showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Customizar Servidor"),
+                  content: TextField(
+                    controller: controller,
+                    decoration: InputDecoration(labelText: "URL"),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text("Cancelar"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (controller.text.isNotEmpty) {
+                          apiConfigProvider.updateBaseUrl(
+                            controller.text.trim(),
+                          );
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: Text("Salvar"),
+                    ),
+                  ],
+                ),
+              );
+            },
+            buttonText: "Alterar",
+            title: "Servidor",
+            description: "Endereço do servidor para conexão",
           ),
         ],
       ),
