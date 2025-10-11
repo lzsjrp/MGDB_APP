@@ -1,8 +1,9 @@
-import 'package:androidapp/services/books_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../core/theme/app_colors.dart';
+import 'package:androidapp/services/book_service.dart';
+import 'package:androidapp/services/chapter_service.dart';
+import 'package:androidapp/core/theme/app_colors.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final String bookId;
@@ -31,8 +32,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       _error = '';
     });
     try {
-      final bookResponse = await BookController.getTitle(widget.bookId);
-      final chaptersResponse = await BookController.getChapters(widget.bookId);
+      final bookResponse = await BookService.getTitle(widget.bookId);
+      final chaptersResponse = await ChapterService.getChapters(widget.bookId);
 
       setState(() {
         bookData = bookResponse['book'];

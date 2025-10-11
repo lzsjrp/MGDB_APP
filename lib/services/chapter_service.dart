@@ -1,92 +1,9 @@
-import 'dart:ffi';
 import 'package:androidapp/services/session_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:androidapp/core/constants/app_constants.dart';
 import 'dart:convert';
 
-class BookController {
-  static Future<dynamic> getList(String page) async {
-    final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleRoute,
-      {'page': page},
-    );
-
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
-    }
-  }
-
-  static Future<dynamic> getTitle(String titleId) async {
-    final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleById(titleId),
-    );
-
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
-    }
-  }
-
-  static Future<dynamic> createTitle(
-    String title,
-    String author,
-    String type,
-  ) async {
-    final jwt = await SessionController().readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleRoute,
-    );
-
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwt',
-      },
-      body: json.encode({'title': title, 'author': author, 'type': type}),
-    );
-
-    if (response.statusCode == 201) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
-    }
-  }
-
-  static Future<dynamic> deleteTitle(String titleId) async {
-    final jwt = await SessionController().readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https(
-      ApiUrls.baseUrl,
-      ApiUrls.apiPath + ApiUrls.titleById(titleId),
-    );
-
-    final response = await http.delete(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwt',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
-    }
-  }
-
+class ChapterService {
   static Future<dynamic> getChapters(String titleId) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
@@ -120,8 +37,8 @@ class BookController {
   static Future<dynamic> createChapter(
     String titleId,
     String titleText,
-    Int chapterNumber,
-    Int volumeNuber,
+    int chapterNumber,
+    int volumeNumber,
     String? volumeTitle,
   ) async {
     final jwt = await SessionController().readToken();
@@ -140,7 +57,7 @@ class BookController {
       body: json.encode({
         'title': titleText,
         'number': chapterNumber,
-        'volume': volumeNuber,
+        'volume': volumeNumber,
         'volumeTitle': volumeTitle,
       }),
     );
@@ -175,7 +92,7 @@ class BookController {
     }
   }
 
-  static Future<dynamic> getCover(String titleId, String chapterId) async {
+  static Future<dynamic> getCover(String titleId) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.titleCover(titleId),

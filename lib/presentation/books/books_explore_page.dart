@@ -1,11 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+
 import 'package:androidapp/core/theme/app_colors.dart';
 import 'package:androidapp/presentation/books/books_page.dart';
-import 'package:androidapp/services/books_service.dart';
+import 'package:androidapp/services/book_service.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:androidapp/presentation/settings/settings_page.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 
 import 'widgets/books_list_widget.dart';
 import 'dialogs/books_create_dialog.dart';
@@ -32,7 +33,7 @@ class _ExplorePageState extends State<ExplorePage> {
     });
     try {
       if (isConnected) {
-        var data = await BookController.getList(page.toString());
+        var data = await BookService.getList(page.toString());
         if (!mounted) return;
         setState(() {
           booksData = data;

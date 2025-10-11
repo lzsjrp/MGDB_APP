@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:androidapp/services/books_service.dart';
+import 'package:androidapp/services/book_service.dart';
 
 class CreateBookDialog extends StatefulWidget {
   const CreateBookDialog({super.key});
@@ -26,7 +26,7 @@ class _CreateBookDialogState extends State<CreateBookDialog> {
     });
 
     try {
-      final response = await BookController.createTitle(
+      final response = await BookService.createTitle(
         _titleController.text,
         _authorController.text,
         _typeController,
