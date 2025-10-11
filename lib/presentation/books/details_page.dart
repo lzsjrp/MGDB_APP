@@ -1,3 +1,5 @@
+import 'package:androidapp/presentation/books/readers/manga_reader.dart';
+import 'package:androidapp/presentation/books/readers/web_novel_reader.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -55,6 +57,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     final coverUrl = bookData?['cover']?['imageUrl'] ?? '';
     final title = bookData?['title'];
     final author = bookData?['author'];
+    final type = bookData?['type'];
 
     if (_error.isNotEmpty) {
       return Center(child: Text(_error));
@@ -177,10 +180,37 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               itemCount: chapters.length,
               itemBuilder: (context, index) {
                 final chapter = chapters[index];
+                final chapterNumber = chapter['number'] ?? '-';
+                final chapterId = chapter['id'] ?? '-';
+
                 return ListTile(
-                  title: Text('Capítulo ${chapter['number'] ?? '-'}'),
+                  title: Text('Capítulo $chapterNumber'),
                   subtitle: Text(chapter['title'] ?? 'Sem título'),
-                  onTap: () {},
+                  onTap: () {
+                    if (type == 'MANGA') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MangaReader(chapterId: chapterId),
+                        ),
+                      );
+                    } else if (type == 'WEB_NOVEL') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              WebNovelReader(chapterId: chapterId),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Tipo de livro desconhecido'),
+                        ),
+                      );
+                    }
+                  },
                 );
               },
             ),

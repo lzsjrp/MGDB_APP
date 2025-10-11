@@ -5,9 +5,9 @@ import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:androidapp/providers/session_provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import 'presentation/books/books_explore_page.dart';
-import 'presentation/books/downloads/books_downloads_page.dart';
-import 'presentation/books/downloads/books_favorites_page.dart';
+import 'presentation/books/explore_page.dart';
+import 'presentation/books/downloads/downloads_page.dart';
+import 'presentation/books/favorites/favorites_page.dart';
 
 void main() {
   runApp(

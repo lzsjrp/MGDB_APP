@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'package:androidapp/core/theme/app_colors.dart';
-import 'package:androidapp/presentation/books/books_page.dart';
+import 'package:androidapp/presentation/books/details_page.dart';
 import 'package:androidapp/services/book_service.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:androidapp/presentation/settings/settings_page.dart';
