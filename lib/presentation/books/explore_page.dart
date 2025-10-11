@@ -11,7 +11,6 @@ import 'package:androidapp/services/book_service.dart';
 import 'package:provider/provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 
-import '../../core/theme/custom/pagination_theme.dart';
 import 'widgets/books_list_widget.dart';
 import 'dialogs/books_create_dialog.dart';
 
@@ -37,6 +36,7 @@ class _ExplorePageState extends State<ExplorePage> {
       _loading = true;
       _error = '';
     });
+
     try {
       if (isConnected) {
         var data = await bookService.getList(page.toString());
@@ -51,11 +51,12 @@ class _ExplorePageState extends State<ExplorePage> {
       setState(() {
         _error = e.toString();
       });
-    } finally {
-      setState(() {
-        _loading = false;
-      });
     }
+
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+    });
   }
 
   @override
@@ -91,7 +92,6 @@ class _ExplorePageState extends State<ExplorePage> {
   @override
   Widget build(BuildContext context) {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
-    final paginationTheme = Theme.of(context).extension<PaginationThemeData>()!;
 
     if (!isConnected && !_loading) {
       return Center(child: Text('Sem conexão com a internet'));
