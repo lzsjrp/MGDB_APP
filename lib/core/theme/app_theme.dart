@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import './custom/pagination_theme.dart';
 import './custom/gridview_theme.dart';
+import 'custom/bottom_navbar_theme.dart';
 
 class AppTheme {
   static ThemeData buildTheme(AppColors colors) {
@@ -69,6 +70,20 @@ class AppTheme {
         contentTextStyle: TextStyle(color: colors.onPrimary, fontSize: 16),
       ),
       extensions: <ThemeExtension<dynamic>>[
+        BottomNavBarThemeData(
+          backgroundColor: colors.secondary,
+          iconColor: colors.unselectedItem,
+          activeIconColor: colors.selectedItem,
+          tabBackgroundColor: Colors.transparent,
+          labelStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+          tabBorderRadius: 100.0,
+          gap: 7,
+          iconSize: 24,
+        ),
         GridViewThemeData(
           cardColor: colors.secondary,
           cardBackgroundColor: colors.secondary,

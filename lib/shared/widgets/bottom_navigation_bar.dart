@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+
+import '../../core/theme/custom/bottom_navbar_theme.dart';
 
 class AppBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -12,17 +15,22 @@ class AppBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: currentIndex,
-      onTap: onTap,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explorar"),
-        BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Favoritos"),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.cloud_download),
-          label: "Downloads",
-        ),
+    final theme = Theme.of(context).extension<BottomNavBarThemeData>()!;
+    return GNav(
+      gap: theme.gap,
+      iconSize: theme.iconSize,
+      backgroundColor: theme.backgroundColor,
+      color: theme.iconColor,
+      activeColor: theme.activeIconColor,
+      textStyle: theme.labelStyle,
+      tabBorderRadius: theme.tabBorderRadius,
+      selectedIndex: currentIndex,
+      padding: theme.padding,
+      onTabChange: onTap,
+      tabs: const [
+        GButton(icon: Icons.explore, text: 'Explorar'),
+        GButton(icon: Icons.favorite, text: 'Favoritos'),
+        GButton(icon: Icons.download, text: 'Downloads'),
       ],
     );
   }

@@ -44,6 +44,7 @@ dependencies:
   injectable: ^2.5.2
   get_it: ^8.2.0
   shared_preferences: ^2.5.3
+  google_nav_bar: ^5.0.7
 
 dev_dependencies:
   injectable_generator: ^2.5.2
