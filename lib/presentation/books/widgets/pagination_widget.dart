@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/custom/pagination_theme.dart';
+
 class PaginationWidget extends StatelessWidget {
   final int currentPage;
   final int totalPages;
   final VoidCallback? onPrevious;
   final VoidCallback? onNext;
-  final Color backgroundColor;
-  final BorderRadius borderRadius;
-  final List<BoxShadow> boxShadow;
-  final TextStyle textStyle;
 
   const PaginationWidget({
     super.key,
@@ -16,14 +14,11 @@ class PaginationWidget extends StatelessWidget {
     required this.totalPages,
     this.onPrevious,
     this.onNext,
-    required this.backgroundColor,
-    required this.borderRadius,
-    required this.boxShadow,
-    required this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
+    final paginationTheme = Theme.of(context).extension<PaginationThemeData>()!;
     return Positioned(
       bottom: 20,
       left: 0,
@@ -32,9 +27,9 @@ class PaginationWidget extends StatelessWidget {
         alignment: Alignment.center,
         child: Container(
           decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: borderRadius,
-            boxShadow: boxShadow,
+            color: paginationTheme.backgroundColor,
+            borderRadius: paginationTheme.borderRadius,
+            boxShadow: paginationTheme.boxShadow,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -46,7 +41,7 @@ class PaginationWidget extends StatelessWidget {
               const SizedBox(width: 20),
               Text(
                 'Página $currentPage/$totalPages',
-                style: textStyle,
+                style: paginationTheme.textStyle,
               ),
               const SizedBox(width: 20),
               TextButton(
