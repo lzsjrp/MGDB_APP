@@ -31,8 +31,8 @@ class AppBottomNavigationBar extends StatelessWidget {
           selectedIndex: currentIndex,
           onTabChange: onTap,
           tabs: const [
-            GButton(icon: Icons.explore, text: 'Explorar'),
             GButton(icon: Icons.favorite, text: 'Favoritos'),
+            GButton(icon: Icons.explore, text: 'Explorar'),
             GButton(icon: Icons.download, text: 'Downloads'),
             GButton(icon: Icons.people, text: 'Forum'),
           ],
