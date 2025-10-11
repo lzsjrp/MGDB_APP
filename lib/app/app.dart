@@ -16,8 +16,16 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider<UserProvider>.value(
+          value: getIt<UserProvider>(),
+        ),
+        ChangeNotifierProvider<ConnectivityProvider>.value(
+          value: getIt<ConnectivityProvider>(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
@@ -30,31 +38,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<UserProvider>.value(
-          value: getIt<UserProvider>(),
-        ),
-        ChangeNotifierProvider<ConnectivityProvider>.value(
-          value: getIt<ConnectivityProvider>(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'App',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-        builder: (context, child) => ResponsiveBreakpoints.builder(
-          child: child!,
-          breakpoints: [
-            const Breakpoint(start: 0, end: 450, name: MOBILE),
-            const Breakpoint(start: 451, end: 800, name: TABLET),
-            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-          ],
-        ),
-        home: const Home(),
+    return MaterialApp(
+      title: 'App',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      builder: (context, child) => ResponsiveBreakpoints.builder(
+        child: child!,
+        breakpoints: [
+          const Breakpoint(start: 0, end: 450, name: MOBILE),
+          const Breakpoint(start: 451, end: 800, name: TABLET),
+          const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+          const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+        ],
       ),
+      home: const Home(),
     );
   }
 }
