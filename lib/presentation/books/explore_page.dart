@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import 'package:androidapp/core/theme/app_colors.dart';
 import 'package:androidapp/presentation/books/details_page.dart';
 import 'package:androidapp/presentation/settings/settings_page.dart';
 
@@ -11,6 +10,7 @@ import 'package:androidapp/services/book_service.dart';
 import 'package:provider/provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 
+import '../../core/theme/custom/pagination_theme.dart';
 import 'widgets/books_list_widget.dart';
 import 'dialogs/books_create_dialog.dart';
 
@@ -22,7 +22,6 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-
   final bookService = getIt<BookService>();
 
   int currentPage = 1;
@@ -91,6 +90,7 @@ class _ExplorePageState extends State<ExplorePage> {
   @override
   Widget build(BuildContext context) {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
+    final paginationTheme = Theme.of(context).extension<PaginationThemeData>()!;
 
     if (!isConnected && !_loading) {
       return Center(child: Text('Sem conexão com a internet'));
@@ -151,38 +151,31 @@ class _ExplorePageState extends State<ExplorePage> {
                   alignment: Alignment.center,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary,
-                          blurRadius: 5,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+                      color: paginationTheme.backgroundColor,
+                      borderRadius: paginationTheme.borderRadius,
+                      boxShadow: paginationTheme.boxShadow,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
                           onPressed: currentPage > 1
                               ? () => fetchBooks(currentPage - 1, isConnected)
                               : null,
-                          child: Text('Voltar'),
+                          child: const Text('Voltar'),
                         ),
-                        SizedBox(width: 20),
+                        const SizedBox(width: 20),
                         Text(
                           'Página $currentPage/${booksData?['totalPages'] ?? 1}',
-                          style: TextStyle(color: Colors.grey[400]),
+                          style: paginationTheme.textStyle,
                         ),
-                        SizedBox(width: 20),
+                        const SizedBox(width: 20),
                         TextButton(
                           onPressed:
                               currentPage < (booksData?['totalPages'] ?? 1)
                               ? () => fetchBooks(currentPage + 1, isConnected)
                               : null,
-                          child: Text('Próximo'),
+                          child: const Text('Próximo'),
                         ),
                       ],
                     ),

@@ -45,7 +45,7 @@ class SettingsMenu extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF29638A),
+                textStyle: const TextStyle(inherit: true),
               ),
               child: Text(buttonText),
             ),

@@ -7,6 +7,7 @@ import 'package:androidapp/presentation/books/explore_page.dart';
 import 'package:androidapp/presentation/books/downloads/downloads_page.dart';
 import 'package:androidapp/presentation/books/favorites/favorites_page.dart';
 
+import '../providers/theme_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/connectivity_provider.dart';
 import 'injectable.dart';
@@ -14,7 +15,12 @@ import 'injectable.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -22,6 +28,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<UserProvider>.value(
@@ -33,7 +41,9 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'App',
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
         builder: (context, child) => ResponsiveBreakpoints.builder(
           child: child!,
           breakpoints: [

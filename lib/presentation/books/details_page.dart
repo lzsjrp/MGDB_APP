@@ -9,6 +9,8 @@ import '../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
 import 'package:androidapp/services/chapter_service.dart';
 
+import '../../core/theme/custom/gridview_theme.dart';
+
 class BookDetailsPage extends StatefulWidget {
   final String bookId;
 
@@ -19,7 +21,6 @@ class BookDetailsPage extends StatefulWidget {
 }
 
 class _BookDetailsPageState extends State<BookDetailsPage> {
-
   final bookService = getIt<BookService>();
   final chapterService = getIt<ChapterService>();
 
@@ -60,6 +61,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).extension<GridViewThemeData>()!;
     final coverUrl = bookData?['cover']?['imageUrl'] ?? '';
     final title = bookData?['title'];
     final titleId = bookData?['id'];
@@ -111,7 +113,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         : Container(
                             width: 160,
                             height: 260,
-                            color: AppColors.secondary,
+                            color: theme.cardBackgroundColor,
                             child: Icon(Icons.book, size: 60),
                           ),
                   ),
@@ -128,7 +130,6 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[300],
                           ),
                         ),
                         Text(
@@ -136,7 +137,6 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[300],
                           ),
                         ),
                         SizedBox(height: 5),

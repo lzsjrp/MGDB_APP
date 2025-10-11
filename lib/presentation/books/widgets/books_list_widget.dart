@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/custom/gridview_theme.dart';
 
 class BooksGridView extends StatelessWidget {
   final List<dynamic> books;
@@ -15,6 +15,7 @@ class BooksGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).extension<GridViewThemeData>()!;
     return GridView.builder(
       padding: EdgeInsets.fromLTRB(15, 8, 15, 80),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -31,7 +32,7 @@ class BooksGridView extends StatelessWidget {
             onBookTap(book['id']);
           },
           child: Card(
-            color: Color(0xFF1a2231),
+            color: theme.cardColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -46,7 +47,7 @@ class BooksGridView extends StatelessWidget {
                       ? Container(
                           width: double.infinity,
                           height: 240,
-                          color: AppColors.secondary,
+                          color: theme.cardBackgroundColor,
                           child: CachedNetworkImage(
                             imageUrl: book['cover']['imageUrl'],
                             fit: BoxFit.cover,
@@ -63,10 +64,10 @@ class BooksGridView extends StatelessWidget {
                       : Container(
                           width: double.infinity,
                           height: 240,
-                          color: AppColors.background,
+                          color: theme.cardBackgroundColor,
                           child: Icon(
                             Icons.book,
-                            color: AppColors.onPrimary,
+                            color: theme.placeholderIconColor,
                             size: 40,
                           ),
                         ),
@@ -83,16 +84,9 @@ class BooksGridView extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
-                          style: TextStyle(
-                            color: AppColors.onPrimary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+                          style: theme.titleStyle,
                         ),
-                        Text(
-                          book['author'] ?? '',
-                          style: TextStyle(color: Colors.white70, fontSize: 15),
-                        ),
+                        Text(book['author'] ?? '', style: theme.authorStyle),
                       ],
                     ),
                   ),

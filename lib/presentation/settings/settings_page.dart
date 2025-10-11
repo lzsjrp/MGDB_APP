@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:androidapp/core/common_widgets/popup_widget.dart';
+import 'package:androidapp/shared/widgets/popup_widget.dart';
 import 'package:androidapp/presentation/settings/widgets/settings_menu_widget.dart';
 import 'package:androidapp/presentation/settings/dialogs/login_dialog.dart';
 
 import 'package:androidapp/providers/user_provider.dart';
+import 'package:androidapp/providers/theme_provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
     final userData = userProvider.userData;
@@ -91,6 +93,14 @@ class _SettingsPageState extends State<SettingsPage> {
             description: userData == null
                 ? "Descrição"
                 : (userData['email'] ?? "Email"),
+          ),
+          SettingsMenu(
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
+            buttonText: "Alterar",
+            title: "Tema",
+            description: "Alter o tema do aplicativo",
           ),
         ],
       ),
