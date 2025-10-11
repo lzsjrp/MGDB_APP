@@ -6,20 +6,34 @@ import '../core/constants/app_constants.dart';
 
 import 'package:injectable/injectable.dart';
 
-final storage = const FlutterSecureStorage();
-
 @injectable
 class SessionService {
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  static const String _keyJwt = 'user_jwt';
+  static const String _keyUserData = 'user_data';
+
   Future<void> saveToken(String token) async {
-    await storage.write(key: 'jwt_token', value: token);
+    await _secureStorage.write(key: _keyJwt, value: token);
   }
 
   Future<String?> readToken() async {
-    return await storage.read(key: 'jwt_token');
+    return await _secureStorage.read(key: _keyJwt);
   }
 
   Future<void> deleteToken() async {
-    await storage.delete(key: 'jwt_token');
+    await _secureStorage.delete(key: _keyJwt);
+  }
+
+  Future<void> saveUser(String token) async {
+    await _secureStorage.write(key: _keyUserData, value: token);
+  }
+
+  Future<String?> readUser() async {
+    return await _secureStorage.read(key: _keyUserData);
+  }
+
+  Future<void> deleteUser() async {
+    await _secureStorage.delete(key: _keyUserData);
   }
 
   Future<Map<String, dynamic>> login(String email, String password) async {
@@ -71,18 +85,6 @@ class SessionService {
     } else {
       throw Exception('Error ${response.statusCode}');
     }
-  }
-
-  Future<void> saveUser(String token) async {
-    await storage.write(key: 'user_data', value: token);
-  }
-
-  Future<String?> readUser() async {
-    return await storage.read(key: 'user_data');
-  }
-
-  Future<void> deleteUser() async {
-    await storage.delete(key: 'user_data');
   }
 
   Future<dynamic> getUser(String jwt) async {

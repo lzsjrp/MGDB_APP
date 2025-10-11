@@ -17,6 +17,7 @@ import '../providers/theme_provider.dart' as _i522;
 import '../providers/user_provider.dart' as _i26;
 import '../services/book_service.dart' as _i490;
 import '../services/chapter_service.dart' as _i193;
+import '../services/downloads_service.dart' as _i708;
 import '../services/favorites_service.dart' as _i211;
 import '../services/session_service.dart' as _i984;
 
@@ -34,6 +35,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i193.ChapterService>(() => _i193.ChapterService());
     gh.factory<_i211.FavoritesService>(() => _i211.FavoritesService());
     gh.factory<_i984.SessionService>(() => _i984.SessionService());
+    gh.factory<_i708.DownloadsService>(() => _i708.DownloadsService());
     return this;
   }
 }
