@@ -100,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
             buttonText: "Alterar",
             title: "Tema",
-            description: "Alter o tema do aplicativo",
+            description: "Alterar o tema do aplicativo",
           ),
         ],
       ),
