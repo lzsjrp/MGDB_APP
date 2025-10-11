@@ -32,38 +32,31 @@ class BooksGridView extends StatelessWidget {
             onBookTap(book['id']);
           },
           child: Card(
-            color: theme.cardColor,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            elevation: 6,
+            shadowColor: Colors.black45,
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                Positioned.fill(
                   child:
                       (book['cover'] != null &&
                           book['cover']['imageUrl'] != null)
-                      ? Container(
-                          width: double.infinity,
-                          height: 240,
-                          color: theme.cardBackgroundColor,
-                          child: CachedNetworkImage(
-                            imageUrl: book['cover']['imageUrl'],
-                            fit: BoxFit.cover,
-                            progressIndicatorBuilder:
-                                (context, url, downloadProgress) => Center(
-                                  child: CircularProgressIndicator(
-                                    value: downloadProgress.progress,
-                                  ),
+                      ? CachedNetworkImage(
+                          imageUrl: book['cover']['imageUrl'],
+                          fit: BoxFit.cover,
+                          progressIndicatorBuilder: (context, url, progress) =>
+                              Center(
+                                child: CircularProgressIndicator(
+                                  value: progress.progress,
                                 ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error, color: Colors.white),
-                          ),
+                              ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error, color: Colors.white),
                         )
                       : Container(
-                          width: double.infinity,
-                          height: 240,
                           color: theme.cardBackgroundColor,
                           child: Icon(
                             Icons.book,
@@ -72,23 +65,52 @@ class BooksGridView extends StatelessWidget {
                           ),
                         ),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          book['title'] ?? '',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: false,
-                          style: theme.titleStyle,
-                        ),
-                        Text(book['author'] ?? '', style: theme.authorStyle),
-                      ],
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 80,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(12),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.7),
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
+                  ),
+                ),
+                Positioned(
+                  left: 10,
+                  right: 10,
+                  bottom: 10,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        book['title'] ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.titleStyle.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        book['author'] ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.authorStyle.copyWith(
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

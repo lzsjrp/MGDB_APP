@@ -71,7 +71,7 @@ class AppTheme {
       extensions: <ThemeExtension<dynamic>>[
         GridViewThemeData(
           cardColor: colors.secondary,
-          cardBackgroundColor: colors.surface,
+          cardBackgroundColor: colors.secondary,
           titleStyle: TextStyle(
             color: colors.onPrimary,
             fontWeight: FontWeight.w600,
