@@ -80,6 +80,9 @@ class BooksGridView extends StatelessWidget {
                       children: [
                         Text(
                           book['title'] ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
                           style: TextStyle(
                             color: AppColors.onPrimary,
                             fontWeight: FontWeight.w600,
