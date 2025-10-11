@@ -25,10 +25,23 @@ class _MangaReaderState extends State<MangaReader> {
   bool _loading = true;
   String _error = '';
 
+  int? chapterNumber;
+
+  late PageController _pageController;
+  int _currentPage = 0;
+  bool _appBarVisible = true;
+
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
     _loadChapter();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadChapter() async {
@@ -40,6 +53,7 @@ class _MangaReaderState extends State<MangaReader> {
       if (!mounted) return;
       setState(() {
         chapterData = data['chapter'];
+        chapterNumber = chapterData?['number'];
         _loading = false;
       });
     } catch (e) {
@@ -51,12 +65,36 @@ class _MangaReaderState extends State<MangaReader> {
     }
   }
 
+  void _goToPreviousPage() {
+    if (_currentPage > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _goToNextPage() {
+    final images = chapterData?['images'] as List<dynamic>? ?? [];
+    if (_currentPage < images.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _toggleAppBar() {
+    setState(() {
+      _appBarVisible = !_appBarVisible;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     if (_error.isNotEmpty) {
       return Scaffold(body: Center(child: Text('Erro: $_error')));
     }
@@ -64,19 +102,66 @@ class _MangaReaderState extends State<MangaReader> {
     final images = chapterData?['images'] as List<dynamic>? ?? [];
 
     return Scaffold(
-      body: ListView.builder(
-        itemCount: images.length,
-        itemBuilder: (context, index) {
-          final image = images[index];
-          return CachedNetworkImage(
-            imageUrl: image['imageUrl'],
-            placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) =>
-                const Center(child: Text('Erro ao carregar a imagem')),
-            fit: BoxFit.contain,
-          );
-        },
+      appBar: _appBarVisible
+          ? AppBar(
+              title: Text("Capítulo $chapterNumber"),
+              automaticallyImplyLeading: false,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            )
+          : null,
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _toggleAppBar,
+        child: PageView.builder(
+          controller: _pageController,
+          reverse: true,
+          itemCount: images.length,
+          onPageChanged: (index) {
+            setState(() {
+              _currentPage = index;
+            });
+          },
+          itemBuilder: (context, index) {
+            final image = images[index];
+            return InteractiveViewer(
+              minScale: 1.0,
+              maxScale: 5.0,
+              child: CachedNetworkImage(
+                imageUrl: image['imageUrl'],
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) =>
+                    const Center(child: Text('Erro ao carregar a imagem')),
+                fit: BoxFit.contain,
+              ),
+            );
+          },
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.only(bottom: 50),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton.icon(
+              onPressed: _goToNextPage,
+              icon: const Icon(Icons.navigate_before_rounded),
+              label: const Text('Próximo'),
+            ),
+            ElevatedButton.icon(
+              onPressed: _goToPreviousPage,
+              icon: const Icon(Icons.navigate_next_rounded),
+              label: const Text('Voltar'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -40,7 +40,7 @@ class AppColorsDark implements AppColors {
   @override
   Brightness brightness = Brightness.dark;
   @override
-  Color surface = const Color(0xFF111620);
+  Color surface = const Color(0xFF161D2C);
   @override
   Color selectedItem = const Color(0xFFC24E60);
   @override

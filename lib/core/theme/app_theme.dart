@@ -35,7 +35,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder()),
       buttonTheme: ButtonThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        buttonColor: colors.onSurface,
+        buttonColor: colors.surface,
         textTheme: ButtonTextTheme.primary,
       ),
       textButtonTheme: TextButtonThemeData(
@@ -50,7 +50,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colors.surface,
+          backgroundColor: colors.secondary,
           foregroundColor: colors.onPrimary,
           elevation: 4,
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
