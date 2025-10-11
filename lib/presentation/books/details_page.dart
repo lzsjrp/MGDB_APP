@@ -56,6 +56,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   Widget build(BuildContext context) {
     final coverUrl = bookData?['cover']?['imageUrl'] ?? '';
     final title = bookData?['title'];
+    final titleId = bookData?['id'];
     final author = bookData?['author'];
     final type = bookData?['type'];
 
@@ -115,6 +116,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       children: [
                         Text(
                           title,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -137,6 +141,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                       .isNotEmpty)
                               ? bookData!['description']
                               : 'Sem descrição',
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -191,8 +198,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              MangaReader(chapterId: chapterId),
+                          builder: (context) => MangaReader(
+                            chapterId: chapterId,
+                            titleId: titleId,
+                          ),
                         ),
                       );
                     } else if (type == 'WEB_NOVEL') {
