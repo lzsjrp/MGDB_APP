@@ -1,4 +1,4 @@
-import 'package:androidapp/presentation/settings/register_page.dart';
+import 'package:androidapp/presentation/settings/dialogs/register_dialog.dart';
 import 'package:androidapp/services/session_service.dart';
 import 'package:flutter/material.dart';
 
@@ -48,11 +48,9 @@ class _LoginDialogState extends State<LoginDialog> {
                 children: [
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterPage(),
-                        ),
+                      showDialog(
+                        context: context,
+                        builder: (context) => const RegisterDialog(),
                       );
                     },
                     child: const Text('Registrar'),
