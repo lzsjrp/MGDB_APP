@@ -8,6 +8,7 @@ import 'package:androidapp/presentation/books/readers/web_novel_reader.dart';
 import '../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
 import 'package:androidapp/services/chapter_service.dart';
+import '../../services/favorites_service.dart';
 
 import '../../core/theme/custom/gridview_theme.dart';
 
@@ -23,11 +24,13 @@ class BookDetailsPage extends StatefulWidget {
 class _BookDetailsPageState extends State<BookDetailsPage> {
   final bookService = getIt<BookService>();
   final chapterService = getIt<ChapterService>();
+  final favoritesService = getIt<FavoritesService>();
 
   Map<String, dynamic>? bookData;
   List<dynamic> chapters = [];
   bool _loading = true;
   String _error = '';
+  bool _isFavorite = false;
 
   @override
   void initState() {
@@ -44,9 +47,12 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       final bookResponse = await bookService.getTitle(widget.bookId);
       final chaptersResponse = await chapterService.getChapters(widget.bookId);
 
+      bool isFav = await favoritesService.isFavorite(widget.bookId);
+
       setState(() {
         bookData = bookResponse['book'];
         chapters = chaptersResponse['chapters'] ?? [];
+        _isFavorite = isFav;
       });
     } catch (e) {
       setState(() {
@@ -57,6 +63,17 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         _loading = false;
       });
     }
+  }
+
+  Future<void> _toggleFavorite() async {
+    if (_isFavorite) {
+      await favoritesService.removeFavorite(widget.bookId);
+    } else {
+      await favoritesService.addFavorite(widget.bookId);
+    }
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
   }
 
   @override
@@ -173,8 +190,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   ),
                   SizedBox(width: 12),
                   ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.favorite),
+                    onPressed: _toggleFavorite,
+                    icon: Icon(
+                      _isFavorite ? Icons.favorite : Icons.favorite_border,
+                    ),
                     label: Text("Favoritar"),
                   ),
                 ],

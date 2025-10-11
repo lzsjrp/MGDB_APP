@@ -21,7 +21,7 @@ class DiscussPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(child: Text("Forum")),
+      body: Center(child: Text("Não implementado")),
     );
   }
 }

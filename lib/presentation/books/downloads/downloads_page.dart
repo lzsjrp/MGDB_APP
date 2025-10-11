@@ -21,7 +21,7 @@ class DownloadsPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(child: Text("Downloads")),
+      body: Center(child: Text("Não implementado")),
     );
   }
 }
