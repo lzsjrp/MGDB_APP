@@ -34,7 +34,7 @@ class AppColorsDark implements AppColors {
   @override
   Color primary = const Color(0xFF111620);
   @override
-  Color secondary = const Color(0xFF1a2231);
+  Color secondary = const Color(0xff232e42);
   @override
   Color error = const Color(0xFFC24E60);
   @override

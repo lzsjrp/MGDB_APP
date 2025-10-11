@@ -16,22 +16,28 @@ class AppBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<BottomNavBarThemeData>()!;
-    return GNav(
-      gap: theme.gap,
-      iconSize: theme.iconSize,
-      backgroundColor: theme.backgroundColor,
-      color: theme.iconColor,
-      activeColor: theme.activeIconColor,
-      textStyle: theme.labelStyle,
-      tabBorderRadius: theme.tabBorderRadius,
-      selectedIndex: currentIndex,
-      padding: theme.padding,
-      onTabChange: onTap,
-      tabs: const [
-        GButton(icon: Icons.explore, text: 'Explorar'),
-        GButton(icon: Icons.favorite, text: 'Favoritos'),
-        GButton(icon: Icons.download, text: 'Downloads'),
-      ],
+
+    return Container(
+      color: theme.backgroundColor,
+      child: SafeArea(
+        child: GNav(
+          gap: theme.gap,
+          iconSize: theme.iconSize,
+          backgroundColor: theme.backgroundColor,
+          color: theme.iconColor,
+          activeColor: theme.activeIconColor,
+          textStyle: theme.labelStyle,
+          tabBorderRadius: theme.tabBorderRadius,
+          selectedIndex: currentIndex,
+          onTabChange: onTap,
+          tabs: const [
+            GButton(icon: Icons.explore, text: 'Explorar'),
+            GButton(icon: Icons.favorite, text: 'Favoritos'),
+            GButton(icon: Icons.download, text: 'Downloads'),
+            GButton(icon: Icons.people, text: 'Forum'),
+          ],
+        ),
+      ),
     );
   }
 }
