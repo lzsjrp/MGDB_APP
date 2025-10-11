@@ -6,6 +6,7 @@ import 'package:androidapp/core/theme/app_theme.dart';
 import 'package:androidapp/presentation/books/explore_page.dart';
 import 'package:androidapp/presentation/books/downloads/downloads_page.dart';
 import 'package:androidapp/presentation/books/favorites/favorites_page.dart';
+import '../shared/widgets/bottom_navigation_bar.dart';
 
 import '../providers/theme_provider.dart';
 import '../providers/user_provider.dart';
@@ -77,25 +78,13 @@ class _Home extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
+      bottomNavigationBar: AppBottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explorar"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: "Favoritos",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.cloud_download),
-            label: "Downloads",
-          ),
-        ],
       ),
     );
   }
