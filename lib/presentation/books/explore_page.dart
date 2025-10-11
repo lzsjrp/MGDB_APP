@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'package:androidapp/core/theme/app_colors.dart';
 import 'package:androidapp/presentation/books/details_page.dart';
-import 'package:androidapp/services/book_service.dart';
-import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:androidapp/presentation/settings/settings_page.dart';
+
+import '../../app/injectable.dart';
+import 'package:androidapp/services/book_service.dart';
+
+import 'package:provider/provider.dart';
+import 'package:androidapp/providers/connectivity_provider.dart';
 
 import 'widgets/books_list_widget.dart';
 import 'dialogs/books_create_dialog.dart';
@@ -19,6 +22,9 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
+
+  final bookService = getIt<BookService>();
+
   int currentPage = 1;
   dynamic booksData;
   bool _loading = true;
@@ -33,7 +39,7 @@ class _ExplorePageState extends State<ExplorePage> {
     });
     try {
       if (isConnected) {
-        var data = await BookService.getList(page.toString());
+        var data = await bookService.getList(page.toString());
         if (!mounted) return;
         setState(() {
           booksData = data;

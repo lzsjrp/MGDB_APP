@@ -1,10 +1,17 @@
-import 'package:androidapp/services/session_service.dart';
 import 'package:http/http.dart' as http;
-import 'package:androidapp/core/constants/app_constants.dart';
 import 'dart:convert';
 
+import 'package:injectable/injectable.dart';
+import '../app/injectable.dart';
+
+import 'package:androidapp/core/constants/app_constants.dart';
+import 'package:androidapp/services/session_service.dart';
+
+@injectable
 class BookService {
-  static Future<dynamic> getList(String page) async {
+  final sessionService = getIt<SessionService>();
+
+  Future<dynamic> getList(String page) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.titleRoute,
@@ -20,7 +27,7 @@ class BookService {
     }
   }
 
-  static Future<dynamic> getTitle(String titleId) async {
+  Future<dynamic> getTitle(String titleId) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.titleById(titleId),
@@ -35,12 +42,8 @@ class BookService {
     }
   }
 
-  static Future<dynamic> createTitle(
-    String title,
-    String author,
-    String type,
-  ) async {
-    final jwt = await SessionController().readToken();
+  Future<dynamic> createTitle(String title, String author, String type) async {
+    final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
       ApiUrls.baseUrl,
@@ -63,8 +66,8 @@ class BookService {
     }
   }
 
-  static Future<dynamic> deleteTitle(String titleId) async {
-    final jwt = await SessionController().readToken();
+  Future<dynamic> deleteTitle(String titleId) async {
+    final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
       ApiUrls.baseUrl,

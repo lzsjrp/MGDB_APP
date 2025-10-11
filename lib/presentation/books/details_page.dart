@@ -1,11 +1,13 @@
-import 'package:androidapp/presentation/books/readers/manga_reader.dart';
-import 'package:androidapp/presentation/books/readers/web_novel_reader.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:androidapp/core/theme/app_colors.dart';
+import 'package:androidapp/presentation/books/readers/manga_reader.dart';
+import 'package:androidapp/presentation/books/readers/web_novel_reader.dart';
+
+import '../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
 import 'package:androidapp/services/chapter_service.dart';
-import 'package:androidapp/core/theme/app_colors.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final String bookId;
@@ -17,6 +19,10 @@ class BookDetailsPage extends StatefulWidget {
 }
 
 class _BookDetailsPageState extends State<BookDetailsPage> {
+
+  final bookService = getIt<BookService>();
+  final chapterService = getIt<ChapterService>();
+
   Map<String, dynamic>? bookData;
   List<dynamic> chapters = [];
   bool _loading = true;
@@ -34,8 +40,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       _error = '';
     });
     try {
-      final bookResponse = await BookService.getTitle(widget.bookId);
-      final chaptersResponse = await ChapterService.getChapters(widget.bookId);
+      final bookResponse = await bookService.getTitle(widget.bookId);
+      final chaptersResponse = await chapterService.getChapters(widget.bookId);
 
       setState(() {
         bookData = bookResponse['book'];

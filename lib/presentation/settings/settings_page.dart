@@ -1,10 +1,12 @@
-import 'package:androidapp/core/common_widgets/popup_widget.dart';
 import 'package:flutter/material.dart';
+
+import 'package:androidapp/core/common_widgets/popup_widget.dart';
 import 'package:androidapp/presentation/settings/widgets/settings_menu_widget.dart';
-import 'package:androidapp/providers/session_provider.dart';
+import 'package:androidapp/presentation/settings/dialogs/login_dialog.dart';
+
+import 'package:androidapp/providers/user_provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:androidapp/presentation/settings/dialogs/login_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,6 +16,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+
   Map<String, dynamic>? userData;
   bool _isLoading = true;
 

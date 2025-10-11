@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+import 'package:injectable/injectable.dart';
+
+@injectable
 class ConnectivityProvider extends ChangeNotifier {
   bool _isConnected = false;
 

@@ -1,10 +1,17 @@
-import 'package:androidapp/services/session_service.dart';
 import 'package:http/http.dart' as http;
-import 'package:androidapp/core/constants/app_constants.dart';
 import 'dart:convert';
 
+import 'package:injectable/injectable.dart';
+import '../app/injectable.dart';
+
+import 'package:androidapp/core/constants/app_constants.dart';
+import 'package:androidapp/services/session_service.dart';
+
+@injectable
 class ChapterService {
-  static Future<dynamic> getChapters(String titleId) async {
+  final sessionService = getIt<SessionService>();
+
+  Future<dynamic> getChapters(String titleId) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.titleChapters(titleId),
@@ -19,7 +26,7 @@ class ChapterService {
     }
   }
 
-  static Future<dynamic> getChapter(String titleId, String chapterId) async {
+  Future<dynamic> getChapter(String titleId, String chapterId) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.titleChapterById(titleId, chapterId),
@@ -34,14 +41,14 @@ class ChapterService {
     }
   }
 
-  static Future<dynamic> createChapter(
+  Future<dynamic> createChapter(
     String titleId,
     String titleText,
     int chapterNumber,
     int volumeNumber,
     String? volumeTitle,
   ) async {
-    final jwt = await SessionController().readToken();
+    final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
       ApiUrls.baseUrl,
@@ -69,8 +76,8 @@ class ChapterService {
     }
   }
 
-  static Future<dynamic> deleteChapter(String titleId, String chapterId) async {
-    final jwt = await SessionController().readToken();
+  Future<dynamic> deleteChapter(String titleId, String chapterId) async {
+    final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
     final uri = Uri.https(
       ApiUrls.baseUrl,
@@ -92,7 +99,7 @@ class ChapterService {
     }
   }
 
-  static Future<dynamic> getCover(String titleId) async {
+  Future<dynamic> getCover(String titleId) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.titleCover(titleId),

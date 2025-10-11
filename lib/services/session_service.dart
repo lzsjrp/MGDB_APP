@@ -1,13 +1,15 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import '../core/constants/app_constants.dart';
 
+import 'package:injectable/injectable.dart';
+
 final storage = const FlutterSecureStorage();
 
-class SessionController {
+@injectable
+class SessionService {
   Future<void> saveToken(String token) async {
     await storage.write(key: 'jwt_token', value: token);
   }
@@ -20,31 +22,20 @@ class SessionController {
     await storage.delete(key: 'jwt_token');
   }
 
-  Future<void> login(
-    BuildContext context,
-    String email,
-    String password,
-    VoidCallback onSuccess,
-    VoidCallback onError,
-  ) async {
-    try {
-      final response = await SessionController.createSession(email, password);
-      final token = response['session']?['token'] as String?;
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final response = await createSession(email, password);
+    final token = response['session']?['token'] as String?;
 
-      if (token != null) {
-        await SessionController().saveToken(token);
-        await SessionController.getUser(token);
+    if (token == null) throw Exception('Token inválido');
 
-        onSuccess();
-      } else {
-        onError();
-      }
-    } catch (e) {
-      onError();
-    }
+    await saveToken(token);
+    final userData = await getUser(token);
+    await saveUser(json.encode(userData));
+
+    return userData;
   }
 
-  static Future<dynamic> getSession(String jwt) async {
+  Future<dynamic> getSession(String jwt) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.sessionRoute,
@@ -64,7 +55,7 @@ class SessionController {
     }
   }
 
-  static Future<dynamic> createSession(String email, String password) async {
+  Future<dynamic> createSession(String email, String password) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.sessionRoute,
@@ -94,7 +85,7 @@ class SessionController {
     await storage.delete(key: 'user_data');
   }
 
-  static Future<dynamic> getUser(String jwt) async {
+  Future<dynamic> getUser(String jwt) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.usersRoute,
@@ -108,18 +99,14 @@ class SessionController {
     );
 
     if (response.statusCode == 200) {
-      await SessionController().saveUser(response.body);
+      await SessionService().saveUser(response.body);
       return json.decode(response.body);
     } else {
       throw Exception('Error ${response.statusCode}');
     }
   }
 
-  static Future<dynamic> createUser(
-    String email,
-    String name,
-    String password,
-  ) async {
+  Future<dynamic> createUser(String email, String name, String password) async {
     final uri = Uri.https(
       ApiUrls.baseUrl,
       ApiUrls.apiPath + ApiUrls.usersRoute,

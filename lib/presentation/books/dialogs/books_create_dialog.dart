@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
 
 class CreateBookDialog extends StatefulWidget {
@@ -9,6 +11,8 @@ class CreateBookDialog extends StatefulWidget {
 }
 
 class _CreateBookDialogState extends State<CreateBookDialog> {
+  final bookService = getIt<BookService>();
+
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _authorController = TextEditingController();
@@ -26,7 +30,7 @@ class _CreateBookDialogState extends State<CreateBookDialog> {
     });
 
     try {
-      final response = await BookService.createTitle(
+      final response = await bookService.createTitle(
         _titleController.text,
         _authorController.text,
         _typeController,
@@ -55,7 +59,6 @@ class _CreateBookDialogState extends State<CreateBookDialog> {
 
   @override
   Widget build(BuildContext context) {
-
     if (_loading) {
       return Center(child: CircularProgressIndicator());
     }

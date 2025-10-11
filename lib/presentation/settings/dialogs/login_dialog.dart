@@ -1,6 +1,10 @@
-import 'package:androidapp/presentation/settings/dialogs/register_dialog.dart';
-import 'package:androidapp/services/session_service.dart';
 import 'package:flutter/material.dart';
+
+import 'package:androidapp/presentation/settings/dialogs/register_dialog.dart';
+
+import 'package:provider/provider.dart';
+
+import '../../../providers/user_provider.dart';
 
 class LoginDialog extends StatefulWidget {
   const LoginDialog({super.key});
@@ -10,7 +14,24 @@ class LoginDialog extends StatefulWidget {
 }
 
 class _LoginDialogState extends State<LoginDialog> {
-  
+  Future<void> _handleLogin(String email, String password) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    await userProvider.login(email, password);
+
+    if (!mounted) return;
+
+    if (userProvider.errorMessage == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Logado com sucesso!')));
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(userProvider.errorMessage!)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
@@ -69,28 +90,7 @@ class _LoginDialogState extends State<LoginDialog> {
                         );
                         return;
                       }
-                      SessionController().login(
-                        context,
-                        email,
-                        password,
-                        () {
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Login realizado com sucesso'),
-                            ),
-                          );
-                          Navigator.pop(context);
-                        },
-                        () {
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Falha ao iniciar a sessão'),
-                            ),
-                          );
-                        },
-                      );
+                      _handleLogin(email, password);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF29638A),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:androidapp/services/chapter_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
+import '../../../app/injectable.dart';
+import 'package:androidapp/services/chapter_service.dart';
 
 class MangaReader extends StatefulWidget {
   final String chapterId;
@@ -17,6 +19,8 @@ class MangaReader extends StatefulWidget {
 }
 
 class _MangaReaderState extends State<MangaReader> {
+  final chapterService = getIt<ChapterService>();
+
   Map<String, dynamic>? chapterData;
   bool _loading = true;
   String _error = '';
@@ -29,7 +33,7 @@ class _MangaReaderState extends State<MangaReader> {
 
   Future<void> _loadChapter() async {
     try {
-      final data = await ChapterService.getChapter(
+      final data = await chapterService.getChapter(
         widget.titleId,
         widget.chapterId,
       );
@@ -54,9 +58,7 @@ class _MangaReaderState extends State<MangaReader> {
     }
 
     if (_error.isNotEmpty) {
-      return Scaffold(
-        body: Center(child: Text('Erro: $_error')),
-      );
+      return Scaffold(body: Center(child: Text('Erro: $_error')));
     }
 
     final images = chapterData?['images'] as List<dynamic>? ?? [];
