@@ -1,3 +1,4 @@
+import 'package:androidapp/presentation/books/widgets/pagination_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
@@ -143,44 +144,15 @@ class _ExplorePageState extends State<ExplorePage> {
                   );
                 },
               ),
-              Positioned(
-                bottom: 20,
-                left: 0,
-                right: 0,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: paginationTheme.backgroundColor,
-                      borderRadius: paginationTheme.borderRadius,
-                      boxShadow: paginationTheme.boxShadow,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton(
-                          onPressed: currentPage > 1
-                              ? () => fetchBooks(currentPage - 1, isConnected)
-                              : null,
-                          child: const Text('Voltar'),
-                        ),
-                        const SizedBox(width: 20),
-                        Text(
-                          'Página $currentPage/${booksData?['totalPages'] ?? 1}',
-                          style: paginationTheme.textStyle,
-                        ),
-                        const SizedBox(width: 20),
-                        TextButton(
-                          onPressed:
-                              currentPage < (booksData?['totalPages'] ?? 1)
-                              ? () => fetchBooks(currentPage + 1, isConnected)
-                              : null,
-                          child: const Text('Próximo'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              PaginationWidget(
+                currentPage: currentPage,
+                totalPages: booksData?['totalPages'] ?? 1,
+                onPrevious: () => fetchBooks(currentPage - 1, isConnected),
+                onNext: () => fetchBooks(currentPage + 1, isConnected),
+                backgroundColor: paginationTheme.backgroundColor,
+                borderRadius: paginationTheme.borderRadius,
+                boxShadow: paginationTheme.boxShadow,
+                textStyle: paginationTheme.textStyle,
               ),
             ],
           ),
