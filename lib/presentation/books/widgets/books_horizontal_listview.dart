@@ -26,15 +26,18 @@ class BooksHorizontalListView extends StatelessWidget {
         itemCount: books.length + 1,
         itemBuilder: (context, index) {
           if (index == books.length) {
+            if (onLoadMore == null) {
+              return SizedBox.shrink();
+            }
             return Container(
-              width: 200,
-              margin: EdgeInsets.only(right: 5),
+              width: 100,
+              margin: EdgeInsets.only(right: 0),
               child: Center(
                 child: isLoading
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: onLoadMore,
-                        child: Text('Carregar mais'),
+                        child: Icon(Icons.refresh_sharp),
                       ),
               ),
             );
