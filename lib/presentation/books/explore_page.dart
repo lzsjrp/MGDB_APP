@@ -1,9 +1,9 @@
-import 'package:androidapp/presentation/books/widgets/pagination_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'package:androidapp/presentation/books/details_page.dart';
 import 'package:androidapp/presentation/settings/settings_page.dart';
+import 'package:androidapp/presentation/books/widgets/pagination_widget.dart';
 
 import '../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
@@ -100,9 +100,7 @@ class _ExplorePageState extends State<ExplorePage> {
           children: [
             Icon(Icons.wifi_off, size: 40, color: Colors.grey),
             SizedBox(height: 16),
-            Text(
-              'Sem internet',
-            ),
+            Text('Sem internet'),
           ],
         ),
       );
@@ -116,32 +114,32 @@ class _ExplorePageState extends State<ExplorePage> {
       return Center(child: CircularProgressIndicator());
     }
 
-    return MaxWidthBox(
-      maxWidth: 1200,
-      child: ResponsiveScaledBox(
-        width: 450,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Explorar'),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.library_books),
-                onPressed: () async {
-                  createTitleOperation();
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsPage()),
-                  );
-                },
-              ),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Explorar'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.library_books),
+            onPressed: () async {
+              createTitleOperation();
+            },
           ),
-          body: Stack(
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsPage()),
+              );
+            },
+          ),
+        ],
+      ),
+      body: MaxWidthBox(
+        maxWidth: 1200,
+        child: ResponsiveScaledBox(
+          width: 450,
+          child: Stack(
             children: [
               BooksGridView(
                 books: booksData?['data'] ?? [],
