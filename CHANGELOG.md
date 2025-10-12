@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/lzsjrp/androidapp/compare/v1.0.0...v1.0.1) (2025-10-12)
+
+
+### Bug Fixes
+
+* upload apk to release tag ([3d60358](https://github.com/lzsjrp/androidapp/commit/3d60358802fdff76a874fcc1fc1de8b94b655f04))
+
 # 1.0.0 (2025-10-12)
 
 
