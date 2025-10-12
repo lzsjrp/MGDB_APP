@@ -6,15 +6,12 @@ plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
   - "@semantic-release/changelog"
-  - name: "semantic-release-pub"
-    publishPub: false
-    updateBuildNumber: true
-  - name: "@semantic-release/exec"
-    prepareCmd: |
-      flutter build apk --release --target lib/app/app.dart
-  - name: "@semantic-release/git"
-    assets:
-      - "pubspec.yaml"
-  - name: "@semantic-release/github"
-    assets:
-      - path: build/app/outputs/flutter-apk/app-release.apk
+  - - "semantic-release-pub"
+    - publishPub: false
+      updateBuildNumber: true
+  - - "@semantic-release/exec"
+    - prepareCmd: "flutter build apk --release --target lib/app/app.dart"
+  - "@semantic-release/github"
+  - - "@semantic-release/git"
+    - assets: ["pubspec.yaml"]
+      message: "chore(release): ${nextRelease.version}"
