@@ -1,21 +1,22 @@
-import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
-import '../core/constants/app_constants.dart';
-
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
+
+import '../core/constants/app_constants.dart';
 import '../providers/api_config_provider.dart';
 
 @injectable
 class SessionService {
   final ApiConfigProvider apiConfigProvider;
-
-  SessionService(this.apiConfigProvider);
-
+  final Dio _dio;
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
   static const String _keyJwt = 'user_jwt';
   static const String _keyUserData = 'user_data';
+
+  SessionService(this.apiConfigProvider) : _dio = Dio();
 
   Future<void> saveToken(String token) async {
     await _secureStorage.write(key: _keyJwt, value: token);
@@ -29,8 +30,8 @@ class SessionService {
     await _secureStorage.delete(key: _keyJwt);
   }
 
-  Future<void> saveUser(String token) async {
-    await _secureStorage.write(key: _keyUserData, value: token);
+  Future<void> saveUser(String userData) async {
+    await _secureStorage.write(key: _keyUserData, value: userData);
   }
 
   Future<String?> readUser() async {
@@ -50,88 +51,83 @@ class SessionService {
     await saveToken(token);
     final userData = await getUser(token);
     await saveUser(json.encode(userData));
-
     return userData;
   }
 
   Future<dynamic> getSession(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.sessionRoute,
-    );
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $jwt',
-        'Content-Type': 'application/json',
-      },
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.sessionRoute}';
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $jwt',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
   Future<dynamic> createSession(String email, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.sessionRoute,
-    );
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'password': password}),
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.sessionRoute}';
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.post(
+        url,
+        data: {'email': email, 'password': password},
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
   Future<dynamic> getUser(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.usersRoute,
-    );
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $jwt',
-        'Content-Type': 'application/json',
-      },
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.usersRoute}';
 
-    if (response.statusCode == 200) {
-      await saveUser(response.body);
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $jwt',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      await saveUser(json.encode(response.data));
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
   Future<dynamic> createUser(String email, String name, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.usersRoute,
-    );
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'password': password, 'name': name}),
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.usersRoute}';
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.post(
+        url,
+        data: {'email': email, 'password': password, 'name': name},
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 }

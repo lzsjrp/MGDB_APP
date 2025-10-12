@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:androidapp/presentation/settings/settings_page.dart';
 
 import '../../../app/injectable.dart';
+import '../../../services/book_service.dart';
 import '../../../services/favorites_service.dart';
+import '../details_page.dart';
+import '../widgets/books_gridview_list.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -13,8 +17,10 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritesPage extends State<FavoritesPage> {
   final favoritesService = getIt<FavoritesService>();
+  final bookService = getIt<BookService>();
 
   Set<String> favoriteBookIds = {};
+  dynamic favoriteBooksData = [];
   bool isLoading = true;
 
   @override
@@ -24,9 +30,26 @@ class _FavoritesPage extends State<FavoritesPage> {
   }
 
   Future<void> loadFavorites() async {
+    setState(() {
+      isLoading = true;
+    });
     final favorites = await favoritesService.getFavoritesSet();
+
+    List<dynamic> booksDataList = [];
+    for (var bookId in favorites) {
+      try {
+        final data = await bookService.getTitle(bookId);
+        if (data != null) {
+          booksDataList.add(data['book']);
+        }
+      } catch (e) {
+        // Do nothing
+      }
+    }
+
     setState(() {
       favoriteBookIds = favorites;
+      favoriteBooksData = booksDataList;
       isLoading = false;
     });
   }
@@ -53,24 +76,27 @@ class _FavoritesPage extends State<FavoritesPage> {
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : favoriteBookIds.isEmpty
-          ? const Center(child: Text('Nenhum favorito encontrado'))
-          : ListView.builder(
-              itemCount: favoriteBookIds.length,
-              itemBuilder: (context, index) {
-                final bookId = favoriteBookIds.elementAt(index);
-                return ListTile(
-                  title: Text(bookId),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => removeFavorite(bookId),
-                  ),
-                  onTap: () {},
-                );
-              },
-            ),
+      body: MaxWidthBox(
+        maxWidth: 1200,
+        child: ResponsiveScaledBox(
+          width: 450,
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : favoriteBooksData.isEmpty
+              ? const Center(child: Text('Nenhum favorito encontrado'))
+              : BooksGridView(
+                  books: favoriteBooksData,
+                  onBookTap: (bookId) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BookDetailsPage(bookId: bookId),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ),
     );
   }
 }

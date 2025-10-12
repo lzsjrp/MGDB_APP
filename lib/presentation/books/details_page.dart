@@ -233,8 +233,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              WebNovelReader(chapterId: chapterId),
+                          builder: (context) => WebNovelReader(
+                            chapterId: chapterId,
+                            titleId: titleId,
+                          ),
                         ),
                       );
                     } else {
