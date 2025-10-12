@@ -48,13 +48,22 @@ class BooksGridView extends StatelessWidget {
                           imageUrl: book['cover']['imageUrl'],
                           fit: BoxFit.cover,
                           progressIndicatorBuilder: (context, url, progress) =>
-                              Center(
-                                child: CircularProgressIndicator(
-                                  value: progress.progress,
+                              Container(
+                                color: theme.cardBackgroundColor,
+                                child: Icon(
+                                  Icons.book,
+                                  color: theme.placeholderIconColor,
+                                  size: 40,
                                 ),
                               ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error, color: Colors.white),
+                          errorWidget: (context, url, error) => Container(
+                            color: theme.cardBackgroundColor,
+                            child: Icon(
+                              Icons.book,
+                              color: theme.placeholderIconColor,
+                              size: 40,
+                            ),
+                          ),
                         )
                       : Container(
                           color: theme.cardBackgroundColor,
@@ -79,7 +88,7 @@ class BooksGridView extends StatelessWidget {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.black.withValues(alpha: 0.7),
+                          Colors.black.withValues(alpha: 0.9),
                           Colors.transparent,
                         ],
                       ),
@@ -95,19 +104,11 @@ class BooksGridView extends StatelessWidget {
                     children: [
                       Text(
                         book['title'] ?? '',
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.titleStyle.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        book['author'] ?? '',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.authorStyle.copyWith(
-                          color: Colors.white70,
                         ),
                       ),
                     ],

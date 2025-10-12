@@ -11,7 +11,7 @@ import 'package:androidapp/services/book_service.dart';
 import 'package:provider/provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 
-import 'widgets/books_list_widget.dart';
+import 'widgets/books_gridview_list.dart';
 import 'dialogs/books_create_dialog.dart';
 
 class ExplorePage extends StatefulWidget {
@@ -94,7 +94,18 @@ class _ExplorePageState extends State<ExplorePage> {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
     if (!isConnected && !_loading) {
-      return Center(child: Text('Sem conexão com a internet'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.wifi_off, size: 40, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'Sem internet',
+            ),
+          ],
+        ),
+      );
     }
 
     if (_error.isNotEmpty) {
@@ -113,9 +124,8 @@ class _ExplorePageState extends State<ExplorePage> {
           appBar: AppBar(
             title: Text('Explorar'),
             actions: [
-              IconButton(icon: Icon(Icons.search), onPressed: () {}),
               IconButton(
-                icon: Icon(Icons.add),
+                icon: Icon(Icons.library_books),
                 onPressed: () async {
                   createTitleOperation();
                 },
