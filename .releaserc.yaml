@@ -10,7 +10,7 @@ plugins:
     publishPub: false
     updateBuildNumber: true
   - name: "@semantic-release/exec"
-    publishCmd: |
+    prepareCmd: |
       flutter build apk --release --target lib/app/app.dart
   - name: "@semantic-release/git"
     assets:
