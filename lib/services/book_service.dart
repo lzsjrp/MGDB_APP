@@ -1,9 +1,7 @@
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import '../providers/api_config_provider.dart';
 
+import '../providers/api_config_provider.dart';
 import 'package:androidapp/core/constants/app_constants.dart';
 import 'package:androidapp/services/session_service.dart';
 
@@ -11,39 +9,35 @@ import 'package:androidapp/services/session_service.dart';
 class BookService {
   final SessionService sessionService;
   final ApiConfigProvider apiConfigProvider;
+  final Dio _dio;
 
-  BookService(this.sessionService, this.apiConfigProvider);
+  BookService(this.sessionService, this.apiConfigProvider) : _dio = Dio();
 
   Future<dynamic> getList(String page) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleRoute,
-      {'page': page},
-    );
 
-    final response = await http.get(uri);
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleRoute}';
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.get(url, queryParameters: {'page': page});
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
   Future<dynamic> getTitle(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleById(titleId),
-    );
 
-    final response = await http.get(uri);
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleById(titleId)}';
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
@@ -51,24 +45,24 @@ class BookService {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleRoute,
-    );
 
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwt',
-      },
-      body: json.encode({'title': title, 'author': author, 'type': type}),
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleRoute}';
 
-    if (response.statusCode == 201) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $jwt',
+          },
+        ),
+        data: {'title': title, 'author': author, 'type': type},
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
@@ -76,23 +70,23 @@ class BookService {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleById(titleId),
-    );
 
-    final response = await http.delete(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwt',
-      },
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleById(titleId)}';
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.delete(
+        url,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $jwt',
+          },
+        ),
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 }

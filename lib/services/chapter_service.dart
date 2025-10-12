@@ -1,9 +1,7 @@
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import '../providers/api_config_provider.dart';
 
+import '../providers/api_config_provider.dart';
 import 'package:androidapp/core/constants/app_constants.dart';
 import 'package:androidapp/services/session_service.dart';
 
@@ -11,38 +9,33 @@ import 'package:androidapp/services/session_service.dart';
 class ChapterService {
   final SessionService sessionService;
   final ApiConfigProvider apiConfigProvider;
+  final Dio _dio;
 
-  ChapterService(this.sessionService, this.apiConfigProvider);
+  ChapterService(this.sessionService, this.apiConfigProvider) : _dio = Dio();
 
   Future<dynamic> getChapters(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleChapters(titleId),
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapters(titleId)}';
 
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
   Future<dynamic> getChapter(String titleId, String chapterId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleChapterById(titleId, chapterId),
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapterById(titleId, chapterId)}';
 
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
@@ -56,29 +49,29 @@ class ChapterService {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleChapters(titleId),
-    );
 
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwt',
-      },
-      body: json.encode({
-        'title': titleText,
-        'number': chapterNumber,
-        'volume': volumeNumber,
-        'volumeTitle': volumeTitle,
-      }),
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapters(titleId)}';
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $jwt',
+          },
+        ),
+        data: {
+          'title': titleText,
+          'number': chapterNumber,
+          'volume': volumeNumber,
+          'volumeTitle': volumeTitle,
+        },
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
@@ -86,39 +79,36 @@ class ChapterService {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleChapterById(titleId, chapterId),
-    );
 
-    final response = await http.delete(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwt',
-      },
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapterById(titleId, chapterId)}';
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.delete(
+        url,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $jwt',
+          },
+        ),
+      );
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
   Future<dynamic> getCover(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final uri = Uri.https(
-      apiUrls.baseUrl,
-      apiUrls.apiPath + apiUrls.titleCover(titleId),
-    );
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleCover(titleId)}';
 
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error ${response.statusCode}');
+    try {
+      final response = await _dio.get(url);
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 }
