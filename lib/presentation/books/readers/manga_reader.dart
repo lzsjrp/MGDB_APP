@@ -145,24 +145,35 @@ class _MangaReaderState extends State<MangaReader> {
           },
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(bottom: 50),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton.icon(
-              onPressed: _goToNextPage,
-              icon: const Icon(Icons.navigate_before_rounded),
-              label: const Text('Próximo'),
-            ),
-            ElevatedButton.icon(
-              onPressed: _goToPreviousPage,
-              icon: const Icon(Icons.navigate_next_rounded),
-              label: const Text('Voltar'),
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: _appBarVisible
+          ? SafeArea(
+              child: SizedBox(
+                height: 60,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _goToNextPage,
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: const Text('Próximo'),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _goToPreviousPage,
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: const Text('Voltar'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : null,
     );
   }
 }
