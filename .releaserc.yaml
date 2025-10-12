@@ -5,7 +5,10 @@ plugins:
   - name: "@semantic-release/exec"
     publishCmd: "flutter build apk --target lib/app/app.dart"
   - "@semantic-release/git"
-  - "@semantic-release/github"
+  - name: "@semantic-release/github"
+    assets:
+      - path: "build/app/outputs/apk/release/app-release.apk"
+        label: "APK"
 
 branches:
   - main
