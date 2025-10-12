@@ -1,15 +1,20 @@
+branches:
+  - main
+  - dev
+
 plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
   - "@semantic-release/changelog"
+  - name: "semantic-release-pub"
+    publishPub: false
+    updateBuildNumber: true
   - name: "@semantic-release/exec"
-    publishCmd: "flutter build apk --target lib/app/app.dart"
-  - "@semantic-release/git"
+    publishCmd: |
+      flutter build apk --release --target lib/app/app.dart
+  - name: "@semantic-release/git"
+    assets:
+      - "pubspec.yaml"
   - name: "@semantic-release/github"
     assets:
-      - path: "build/app/outputs/apk/release/app-release.apk"
-        label: "APK"
-
-branches:
-  - main
-  - dev
+      - path: build/app/outputs/flutter-apk/app-release.apk
