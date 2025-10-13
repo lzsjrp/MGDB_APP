@@ -12,12 +12,30 @@ class ChapterService {
   final ApiConfigProvider apiConfigProvider;
   final Dio _dio;
 
-  ChapterService(this.sessionService, this.apiConfigProvider) : _dio = Dio();
+  ChapterService(this.sessionService, this.apiConfigProvider) : _dio = Dio() {
+    _dio.options
+      ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
+      ..headers = {'Content-Type': 'application/json'};
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await sessionService.readToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+        onError: (DioException e, handler) {
+          return handler.next(e);
+        },
+      ),
+    );
+  }
 
   Future<ChapterListResponse> getChapters(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapters(titleId)}';
+    final url = apiUrls.titleChapters(titleId);
 
     try {
       final response = await _dio.get(url);
@@ -29,8 +47,7 @@ class ChapterService {
 
   Future<Chapter> getChapter(String titleId, String chapterId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapterById(titleId, chapterId)}';
+    final url = apiUrls.titleChapterById(titleId, chapterId);
 
     try {
       final response = await _dio.get(url);
@@ -51,21 +68,11 @@ class ChapterService {
     String? volumeTitle,
   ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final jwt = await sessionService.readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapters(titleId)}';
+    final url = apiUrls.titleChapters(titleId);
 
     try {
       final response = await _dio.post(
         url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $jwt',
-          },
-        ),
         data: {
           'title': titleText,
           'number': chapterNumber,
@@ -84,22 +91,10 @@ class ChapterService {
     String chapterId,
   ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final jwt = await sessionService.readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapterById(titleId, chapterId)}';
+    final url = apiUrls.titleChapterById(titleId, chapterId);
 
     try {
-      final response = await _dio.delete(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $jwt',
-          },
-        ),
-      );
+      final response = await _dio.delete(url);
       return ChapterDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');

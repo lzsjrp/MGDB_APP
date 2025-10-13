@@ -12,13 +12,30 @@ class BookService {
   final ApiConfigProvider apiConfigProvider;
   final Dio _dio;
 
-  BookService(this.sessionService, this.apiConfigProvider) : _dio = Dio();
+  BookService(this.sessionService, this.apiConfigProvider) : _dio = Dio() {
+    _dio.options
+      ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
+      ..headers = {'Content-Type': 'application/json'};
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await sessionService.readToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+        onError: (DioException e, handler) {
+          return handler.next(e);
+        },
+      ),
+    );
+  }
 
   Future<BookListResponse> getList(String page) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleRoute}';
+    final url = apiUrls.titleRoute;
 
     try {
       final response = await _dio.get(url, queryParameters: {'page': page});
@@ -30,9 +47,7 @@ class BookService {
 
   Future<Book> getTitle(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleById(titleId)}';
+    final url = apiUrls.titleById(titleId);
 
     try {
       final response = await _dio.get(url);
@@ -51,21 +66,11 @@ class BookService {
     String type,
   ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final jwt = await sessionService.readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleRoute}';
+    final url = apiUrls.titleRoute;
 
     try {
       final response = await _dio.post(
         url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $jwt',
-          },
-        ),
         data: {'title': title, 'author': author, 'type': type},
       );
       return BookDefaultResponse.fromJson(response.data);
@@ -76,22 +81,10 @@ class BookService {
 
   Future<BookDefaultResponse> deleteTitle(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final jwt = await sessionService.readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleById(titleId)}';
+    final url = apiUrls.titleById(titleId);
 
     try {
-      final response = await _dio.delete(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $jwt',
-          },
-        ),
-      );
+      final response = await _dio.delete(url);
       return BookDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
@@ -100,8 +93,7 @@ class BookService {
 
   Future<Cover> getCover(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleCover(titleId)}';
+    final url = apiUrls.titleCover(titleId);
 
     try {
       final response = await _dio.get(url);

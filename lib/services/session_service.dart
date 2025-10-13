@@ -17,7 +17,26 @@ class SessionService {
   static const String _keyJwt = 'user_jwt';
   static const String _keyUserData = 'user_data';
 
-  SessionService(this.apiConfigProvider) : _dio = Dio();
+  SessionService(this.apiConfigProvider) : _dio = Dio() {
+    _dio.options
+      ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
+      ..headers = {'Content-Type': 'application/json'};
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await readToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+        onError: (DioException e, handler) {
+          return handler.next(e);
+        },
+      ),
+    );
+  }
 
   Future<void> saveToken(String token) async {
     await _secureStorage.write(key: _keyJwt, value: token);
@@ -54,19 +73,10 @@ class SessionService {
 
   Future<SessionResponse> getSession(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.sessionRoute}';
+    final url = apiUrls.sessionRoute;
 
     try {
-      final response = await _dio.get(
-        url,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $jwt',
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
+      final response = await _dio.get(url);
       return SessionResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
@@ -75,14 +85,12 @@ class SessionService {
 
   Future<SessionResponse> createSession(String email, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.sessionRoute}';
+    final url = apiUrls.sessionRoute;
 
     try {
       final response = await _dio.post(
         url,
         data: {'email': email, 'password': password},
-        options: Options(headers: {'Content-Type': 'application/json'}),
       );
       return SessionResponse.fromJson(response.data);
     } on DioException catch (e) {
@@ -92,19 +100,10 @@ class SessionService {
 
   Future<User> getUser(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.usersRoute}';
+    final url = apiUrls.usersRoute;
 
     try {
-      final response = await _dio.get(
-        url,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $jwt',
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
+      final response = await _dio.get(url);
       await saveUser(json.encode(response.data));
       return User.fromJson(response.data);
     } on DioException catch (e) {
@@ -114,14 +113,12 @@ class SessionService {
 
   Future<User> createUser(String email, String name, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.usersRoute}';
+    final url = apiUrls.usersRoute;
 
     try {
       final response = await _dio.post(
         url,
         data: {'email': email, 'password': password, 'name': name},
-        options: Options(headers: {'Content-Type': 'application/json'}),
       );
       return User.fromJson(response.data);
     } on DioException catch (e) {
