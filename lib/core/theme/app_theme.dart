@@ -13,7 +13,7 @@ class AppTheme {
         primary: colors.primary,
         secondary: colors.secondary,
         surface: colors.surface,
-        error: colors.error,
+        error: colors.accent,
         onPrimary: colors.onPrimary,
         onSecondary: colors.onSecondary,
         onSurface: colors.onSurface,
@@ -37,15 +37,15 @@ class AppTheme {
         labelStyle: TextStyle(color: colors.onPrimary, fontSize: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colors.error),
+          borderSide: BorderSide(color: colors.accent),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colors.error),
+          borderSide: BorderSide(color: colors.accent),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colors.error, width: 2),
+          borderSide: BorderSide(color: colors.accent, width: 2),
         ),
       ),
       buttonTheme: ButtonThemeData(

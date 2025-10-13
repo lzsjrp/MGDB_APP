@@ -5,7 +5,7 @@ abstract class AppColors {
 
   Color get secondary;
 
-  Color get error;
+  Color get accent;
 
   Brightness get brightness;
 
@@ -36,7 +36,7 @@ class AppColorsDark implements AppColors {
   @override
   Color secondary = const Color(0xff232e42);
   @override
-  Color error = const Color(0xFFC24E60);
+  Color accent = const Color(0xFFC24E60);
   @override
   Brightness brightness = Brightness.dark;
   @override
@@ -67,7 +67,7 @@ class AppColorsLight implements AppColors {
   @override
   Color secondary = Colors.grey.shade200;
   @override
-  Color error = Colors.red;
+  Color accent = Colors.red;
   @override
   Brightness brightness = Brightness.light;
   @override
