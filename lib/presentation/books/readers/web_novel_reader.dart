@@ -1,3 +1,4 @@
+import 'package:androidapp/models/chapter_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app/injectable.dart';
@@ -20,7 +21,7 @@ class WebNovelReader extends StatefulWidget {
 class _WebNovelReaderState extends State<WebNovelReader> {
   final chapterService = getIt<ChapterService>();
 
-  Map<String, dynamic>? chapterData;
+  Chapter? chapterData;
   bool _loading = true;
   String _error = '';
 
@@ -44,9 +45,9 @@ class _WebNovelReaderState extends State<WebNovelReader> {
       );
       if (!mounted) return;
       setState(() {
-        chapterData = data['chapter'];
-        chapterNumber = chapterData?['number'];
-        content = chapterData?['content'] as String?;
+        chapterData = data;
+        chapterNumber = chapterData?.number;
+        content = chapterData?.content;
         lines = content?.split(r'\n') ?? [];
         _loading = false;
       });

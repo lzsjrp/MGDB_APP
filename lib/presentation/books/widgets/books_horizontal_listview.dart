@@ -1,9 +1,10 @@
+import 'package:androidapp/models/book_model.dart';
 import 'package:flutter/material.dart';
 
 import './book_card.dart';
 
 class BooksHorizontalListView extends StatelessWidget {
-  final List<dynamic> books;
+  final List<Book> books;
   final void Function(String bookId) onBookTap;
   final bool isLoading;
   final VoidCallback? onLoadMore;
@@ -49,7 +50,7 @@ class BooksHorizontalListView extends StatelessWidget {
             child: BookCard(
               book: book,
               onTap: () {
-                onBookTap(book['id']);
+                onBookTap(book.id);
               },
             ),
           );

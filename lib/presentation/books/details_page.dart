@@ -1,3 +1,5 @@
+import 'package:androidapp/models/book_model.dart';
+import 'package:androidapp/models/chapter_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -25,8 +27,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   final chapterService = getIt<ChapterService>();
   final favoritesService = getIt<FavoritesService>();
 
-  Map<String, dynamic>? bookData;
-  List<dynamic> chapters = [];
+  Book? bookData;
+  List<ChapterListItem>? chapters;
   bool _loading = true;
   String _error = '';
   bool _isFavorite = false;
@@ -49,8 +51,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       bool isFav = await favoritesService.isFavorite(widget.bookId);
 
       setState(() {
-        bookData = bookResponse['book'];
-        chapters = chaptersResponse['chapters'] ?? [];
+        bookData = bookResponse;
+        chapters = chaptersResponse.chapters;
         _isFavorite = isFav;
       });
     } catch (e) {
@@ -78,11 +80,14 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
-    final coverUrl = bookData?['cover']?['imageUrl'] ?? '';
-    final title = bookData?['title'];
-    final titleId = bookData?['id'];
-    final author = bookData?['author'];
-    final type = bookData?['type'];
+    final coverUrl = bookData?.cover?.imageUrl ?? '';
+    final title = bookData?.title ?? 'Sem título';
+    final author = bookData?.author ?? 'Autor desconhecido';
+    final titleId = bookData?.id ?? '';
+    final type = bookData?.type ?? '';
+    final description = bookData?.description.isNotEmpty == true
+        ? bookData?.description
+        : 'Sem descrição';
 
     if (_error.isNotEmpty) {
       return Center(child: Text(_error));
@@ -157,12 +162,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         ),
                         SizedBox(height: 5),
                         Text(
-                          (bookData!['description'] != null &&
-                                  bookData!['description']
-                                      .toString()
-                                      .isNotEmpty)
-                              ? bookData!['description']
-                              : 'Sem descrição',
+                          description ?? 'Sem descrição',
                           maxLines: 5,
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
@@ -208,15 +208,15 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
             ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: chapters.length,
+              itemCount: chapters?.length,
               itemBuilder: (context, index) {
-                final chapter = chapters[index];
-                final chapterNumber = chapter['number'] ?? '-';
-                final chapterId = chapter['id'] ?? '-';
+                final chapter = chapters?[index];
+                final chapterNumber = chapter?.number ?? '-';
+                final chapterId = chapter?.id ?? '-';
 
                 return ListTile(
                   title: Text('Capítulo $chapterNumber'),
-                  subtitle: Text(chapter['title'] ?? 'Sem título'),
+                  subtitle: Text(chapter?.title ?? 'Sem título'),
                   onTap: () {
                     if (type == 'MANGA') {
                       Navigator.push(

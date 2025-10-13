@@ -1,3 +1,4 @@
+import 'package:androidapp/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:androidapp/presentation/settings/settings_page.dart';
@@ -35,13 +36,11 @@ class _FavoritesPage extends State<FavoritesPage> {
     });
     final favorites = await favoritesService.getFavoritesSet();
 
-    List<dynamic> booksDataList = [];
+    List<Book> booksDataList = [];
     for (var bookId in favorites) {
       try {
         final data = await bookService.getTitle(bookId);
-        if (data != null) {
-          booksDataList.add(data['book']);
-        }
+        booksDataList.add(data);
       } catch (e) {
         // Do nothing
       }

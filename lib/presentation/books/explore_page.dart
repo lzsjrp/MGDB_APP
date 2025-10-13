@@ -1,3 +1,4 @@
+import 'package:androidapp/models/book_model.dart';
 import 'package:androidapp/presentation/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +27,7 @@ class _ExplorePageState extends State<ExplorePage> {
 
   int currentPage = 1;
   bool canLoadMore = false;
-  List<dynamic> newBooksList = [];
+  List<Book> newBooksList = [];
 
   Future<void> fetchBooks(int page, bool isConnected) async {
     if (!mounted) return;
@@ -37,11 +38,11 @@ class _ExplorePageState extends State<ExplorePage> {
 
     try {
       if (isConnected) {
-        var data = await bookService.getList(page.toString());
+        var bookList = await bookService.getList(page.toString());
         if (!mounted) return;
         setState(() {
-          newBooksList = data['data'] ?? [];
-          if (data['totalPages'] > 1) {
+          newBooksList = bookList.data;
+          if (bookList.totalPages > 1) {
             canLoadMore = true;
           }
         });
@@ -65,12 +66,12 @@ class _ExplorePageState extends State<ExplorePage> {
     });
     try {
       final nextPage = currentPage + 1;
-      var newData = await bookService.getList(nextPage.toString());
+      var bookList = await bookService.getList(nextPage.toString());
       if (!mounted) return;
       setState(() {
-        currentPage = newData['page'] ?? nextPage;
-        newBooksList.addAll(newData['data']);
-        if (currentPage >= newData['totalPages']) {
+        currentPage = bookList.page;
+        newBooksList.addAll(bookList.data);
+        if (currentPage >= bookList.totalPages) {
           canLoadMore = false;
         }
       });
@@ -104,7 +105,7 @@ class _ExplorePageState extends State<ExplorePage> {
   Widget build(BuildContext context) {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
-    Map<String, List<dynamic>> categorizedBooks = {'Novos': newBooksList};
+    Map<String, List<Book>> categorizedBooks = {'Novos': newBooksList};
 
     if (!isConnected && !_loading) {
       return Center(

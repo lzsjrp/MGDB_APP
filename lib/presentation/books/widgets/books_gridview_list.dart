@@ -1,9 +1,10 @@
+import 'package:androidapp/models/book_model.dart';
 import 'package:flutter/material.dart';
 
 import './book_card.dart';
 
 class BooksGridView extends StatelessWidget {
-  final List<dynamic> books;
+  final List<Book> books;
   final void Function(String bookId) onBookTap;
 
   const BooksGridView({
@@ -28,7 +29,7 @@ class BooksGridView extends StatelessWidget {
         return BookCard(
           book: book,
           onTap: () {
-            onBookTap(book['id']);
+            onBookTap(book.id);
           },
         );
       },

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
+import '../models/book_model.dart';
 import '../providers/api_config_provider.dart';
 import 'package:androidapp/core/constants/app_constants.dart';
 import 'package:androidapp/services/session_service.dart';
@@ -13,7 +14,7 @@ class BookService {
 
   BookService(this.sessionService, this.apiConfigProvider) : _dio = Dio();
 
-  Future<dynamic> getList(String page) async {
+  Future<BookListResponse> getList(String page) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
 
     final url =
@@ -21,13 +22,13 @@ class BookService {
 
     try {
       final response = await _dio.get(url, queryParameters: {'page': page});
-      return response.data;
+      return BookListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> getTitle(String titleId) async {
+  Future<Book> getTitle(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
 
     final url =
@@ -35,13 +36,20 @@ class BookService {
 
     try {
       final response = await _dio.get(url);
-      return response.data;
+      final data = response.data;
+      final bookJson = data['book'];
+      final book = Book.fromJson(bookJson);
+      return book;
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> createTitle(String title, String author, String type) async {
+  Future<BookDefaultResponse> createTitle(
+    String title,
+    String author,
+    String type,
+  ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
@@ -60,13 +68,13 @@ class BookService {
         ),
         data: {'title': title, 'author': author, 'type': type},
       );
-      return response.data;
+      return BookDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> deleteTitle(String titleId) async {
+  Future<BookDefaultResponse> deleteTitle(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
@@ -84,7 +92,23 @@ class BookService {
           },
         ),
       );
-      return response.data;
+      return BookDefaultResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+    }
+  }
+
+  Future<Cover> getCover(String titleId) async {
+    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    final url =
+        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleCover(titleId)}';
+
+    try {
+      final response = await _dio.get(url);
+      final data = response.data;
+      final coverJson = data['cover'];
+      final cover = Cover.fromJson(coverJson);
+      return cover;
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }

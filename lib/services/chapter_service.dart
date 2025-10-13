@@ -1,3 +1,4 @@
+import 'package:androidapp/models/chapter_model.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
@@ -13,33 +14,36 @@ class ChapterService {
 
   ChapterService(this.sessionService, this.apiConfigProvider) : _dio = Dio();
 
-  Future<dynamic> getChapters(String titleId) async {
+  Future<ChapterListResponse> getChapters(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url =
         'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapters(titleId)}';
 
     try {
       final response = await _dio.get(url);
-      return response.data;
+      return ChapterListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> getChapter(String titleId, String chapterId) async {
+  Future<Chapter> getChapter(String titleId, String chapterId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url =
         'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapterById(titleId, chapterId)}';
 
     try {
       final response = await _dio.get(url);
-      return response.data;
+      final data = response.data;
+      final chapterJson = data['chapter'];
+      final chapter = Chapter.fromJson(chapterJson);
+      return chapter;
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> createChapter(
+  Future<ChapterCreateResponse> createChapter(
     String titleId,
     String titleText,
     int chapterNumber,
@@ -69,13 +73,16 @@ class ChapterService {
           'volumeTitle': volumeTitle,
         },
       );
-      return response.data;
+      return ChapterCreateResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> deleteChapter(String titleId, String chapterId) async {
+  Future<ChapterDefaultResponse> deleteChapter(
+    String titleId,
+    String chapterId,
+  ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final jwt = await sessionService.readToken();
     if (jwt == null) throw Exception('Não Autenticado');
@@ -93,20 +100,7 @@ class ChapterService {
           },
         ),
       );
-      return response.data;
-    } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
-    }
-  }
-
-  Future<dynamic> getCover(String titleId) async {
-    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleCover(titleId)}';
-
-    try {
-      final response = await _dio.get(url);
-      return response.data;
+      return ChapterDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }

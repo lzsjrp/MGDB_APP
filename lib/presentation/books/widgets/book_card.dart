@@ -1,10 +1,11 @@
+import 'package:androidapp/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../core/theme/custom/gridview_theme.dart';
 
 class BookCard extends StatelessWidget {
-  final dynamic book;
+  final Book book;
   final VoidCallback? onTap;
 
   const BookCard({super.key, required this.book, this.onTap});
@@ -22,10 +23,9 @@ class BookCard extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child:
-                  (book['cover'] != null && book['cover']['imageUrl'] != null)
+              child: (book.cover?.imageUrl != null)
                   ? CachedNetworkImage(
-                      imageUrl: book['cover']['imageUrl'],
+                      imageUrl: book.cover!.imageUrl,
                       fit: BoxFit.cover,
                       progressIndicatorBuilder: (context, url, progress) =>
                           Container(
@@ -83,7 +83,7 @@ class BookCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    book['title'] ?? '',
+                    book.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.titleStyle.copyWith(
