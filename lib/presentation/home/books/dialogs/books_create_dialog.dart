@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/injectable.dart';
+import '../../../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
 
 class CreateBookDialog extends StatefulWidget {

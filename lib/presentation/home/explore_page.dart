@@ -1,18 +1,14 @@
+import 'package:androidapp/models/book_model.dart';
+import 'package:androidapp/presentation/home/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 
-import 'package:androidapp/presentation/books/details_page.dart';
-import 'package:androidapp/presentation/settings/settings_page.dart';
-import 'package:androidapp/presentation/books/widgets/pagination_widget.dart';
+import 'package:androidapp/presentation/home/books/details_page.dart';
 
 import '../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
 
 import 'package:provider/provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
-
-import 'widgets/books_gridview_list.dart';
-import 'dialogs/books_create_dialog.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -22,13 +18,15 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
+  bool _loading = true;
+  bool _fetching = false;
+  String _error = '';
+
   final bookService = getIt<BookService>();
 
   int currentPage = 1;
-  dynamic booksData;
-  bool _loading = true;
-  String _error = '';
-  bool _fetching = false;
+  bool canLoadMore = false;
+  List<Book> newBooksList = [];
 
   Future<void> fetchBooks(int page, bool isConnected) async {
     if (!mounted) return;
@@ -39,11 +37,13 @@ class _ExplorePageState extends State<ExplorePage> {
 
     try {
       if (isConnected) {
-        var data = await bookService.getList(page.toString());
+        var bookList = await bookService.getList(page.toString());
         if (!mounted) return;
         setState(() {
-          booksData = data;
-          currentPage = data['page'] ?? page;
+          newBooksList = bookList.data;
+          if (bookList.totalPages > 1) {
+            canLoadMore = true;
+          }
         });
       }
     } catch (e) {
@@ -54,6 +54,32 @@ class _ExplorePageState extends State<ExplorePage> {
     }
 
     if (!mounted) return;
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future<void> loadMoreBooks() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      final nextPage = currentPage + 1;
+      var bookList = await bookService.getList(nextPage.toString());
+      if (!mounted) return;
+      setState(() {
+        currentPage = bookList.page;
+        newBooksList.addAll(bookList.data);
+        if (currentPage >= bookList.totalPages) {
+          canLoadMore = false;
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+      });
+    }
     setState(() {
       _loading = false;
     });
@@ -74,24 +100,11 @@ class _ExplorePageState extends State<ExplorePage> {
     }
   }
 
-  Future<void> createTitleOperation() async {
-    final result = await showDialog(
-      context: context,
-      builder: (_) => const CreateBookDialog(),
-    );
-    if (result != null) {
-      final bookId = result['book']['id'];
-      if (!mounted) return;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => BookDetailsPage(bookId: bookId)),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
+
+    Map<String, List<Book>> categorizedBooks = {'Novos': newBooksList};
 
     if (!isConnected && !_loading) {
       return Center(
@@ -110,39 +123,31 @@ class _ExplorePageState extends State<ExplorePage> {
       return Center(child: Text(_error));
     }
 
-    if (_loading) {
+    if (_loading && _fetching) {
       return Center(child: CircularProgressIndicator());
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Explorar'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.library_books),
-            onPressed: () async {
-              createTitleOperation();
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: MaxWidthBox(
-        maxWidth: 1200,
-        child: ResponsiveScaledBox(
-          width: 450,
-          child: Stack(
+      body: ListView(
+        padding: EdgeInsets.only(top: 16),
+        children: categorizedBooks.entries.map((entry) {
+          final categoryTitle = entry.key;
+          final books = entry.value;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              BooksGridView(
-                books: booksData?['data'] ?? [],
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, bottom: 8.0),
+                child: Text(
+                  categoryTitle,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              BooksHorizontalListView(
+                books: books,
+                isLoading: _loading,
+                onLoadMore: canLoadMore ? loadMoreBooks : null,
                 onBookTap: (bookId) {
                   Navigator.push(
                     context,
@@ -152,15 +157,10 @@ class _ExplorePageState extends State<ExplorePage> {
                   );
                 },
               ),
-              PaginationWidget(
-                currentPage: currentPage,
-                totalPages: booksData?['totalPages'] ?? 1,
-                onPrevious: () => fetchBooks(currentPage - 1, isConnected),
-                onNext: () => fetchBooks(currentPage + 1, isConnected),
-              ),
+              SizedBox(height: 24),
             ],
-          ),
-        ),
+          );
+        }).toList(),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:androidapp/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -6,17 +7,23 @@ import '../app/injectable.dart';
 
 import 'package:androidapp/services/session_service.dart';
 
+import '../services/favorites_service.dart';
+
 @injectable
 class UserProvider extends ChangeNotifier {
-  final sessionService = getIt<SessionService>();
+  final SessionService sessionService = getIt<SessionService>();
+  final FavoritesService favoritesService = getIt<FavoritesService>();
 
-  Map<String, dynamic>? _userData;
+  User? _userData;
   String? _errorMessage;
   bool _isLoading = false;
 
-  Map<String, dynamic>? get userData => _userData;
+  User? get userData => _userData;
+
   String? get errorMessage => _errorMessage;
+
   bool get isLoading => _isLoading;
+
   bool get isLoggedIn => _userData != null;
 
   Future<void> login(String email, String password) async {
@@ -26,7 +33,13 @@ class UserProvider extends ChangeNotifier {
 
     try {
       final user = await sessionService.login(email, password);
-      _userData = user;
+      _userData = user.session.user;
+
+      try {
+        await favoritesService.syncFavorites(merge: true);
+      } catch (e) {
+        // do nothing
+      }
     } catch (e) {
       _errorMessage = e.toString();
       _userData = null;

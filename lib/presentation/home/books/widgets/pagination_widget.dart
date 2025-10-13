@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/custom/pagination_theme.dart';
+import '../../../../core/theme/custom/pagination_theme.dart';
 
 class PaginationWidget extends StatelessWidget {
   final int currentPage;

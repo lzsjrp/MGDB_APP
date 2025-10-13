@@ -1,12 +1,13 @@
+import 'package:androidapp/models/book_model.dart';
+import 'package:androidapp/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:androidapp/presentation/settings/settings_page.dart';
-
-import '../../../app/injectable.dart';
-import '../../../services/book_service.dart';
-import '../../../services/favorites_service.dart';
-import '../details_page.dart';
-import '../widgets/books_gridview_list.dart';
+import '../../app/injectable.dart';
+import '../../services/book_service.dart';
+import '../../services/favorites_service.dart';
+import './books/details_page.dart';
+import 'books/widgets/books_gridview_list.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -29,19 +30,24 @@ class _FavoritesPage extends State<FavoritesPage> {
     loadFavorites();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final userProvider = Provider.of<UserProvider>(context);
+    loadFavorites();
+  }
+
   Future<void> loadFavorites() async {
     setState(() {
       isLoading = true;
     });
-    final favorites = await favoritesService.getFavoritesSet();
+    final favorites = await favoritesService.getFavoritesSet(sync: false);
 
-    List<dynamic> booksDataList = [];
+    List<Book> booksDataList = [];
     for (var bookId in favorites) {
       try {
         final data = await bookService.getTitle(bookId);
-        if (data != null) {
-          booksDataList.add(data['book']);
-        }
+        booksDataList.add(data);
       } catch (e) {
         // Do nothing
       }
@@ -62,20 +68,6 @@ class _FavoritesPage extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Favoritos'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          ),
-        ],
-      ),
       body: MaxWidthBox(
         maxWidth: 1200,
         child: ResponsiveScaledBox(

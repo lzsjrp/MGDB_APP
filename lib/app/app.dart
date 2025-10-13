@@ -1,18 +1,19 @@
-import 'package:androidapp/presentation/discuss/discuss_page.dart';
+import 'package:androidapp/presentation/home/discuss_page.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:provider/provider.dart';
 
 import 'package:androidapp/core/theme/app_theme.dart';
-import 'package:androidapp/presentation/books/explore_page.dart';
-import 'package:androidapp/presentation/books/downloads/downloads_page.dart';
-import 'package:androidapp/presentation/books/favorites/favorites_page.dart';
-import '../shared/widgets/bottom_navigation_bar.dart';
+import 'package:androidapp/presentation/home/explore_page.dart';
+import 'package:androidapp/presentation/home/downloads_page.dart';
+import 'package:androidapp/presentation/home/favorites_page.dart';
+import '../shared/widgets/navigation_page.dart';
 
 import '../providers/theme_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/connectivity_provider.dart';
 import '../providers/api_config_provider.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 import 'injectable.dart';
 
@@ -78,27 +79,22 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = [
+  final pages = [
     const FavoritesPage(),
     const ExplorePage(),
     const DownloadsPage(),
     const DiscussPage(),
   ];
 
+  final tabs = const [
+    GButton(icon: Icons.favorite, text: 'Favoritos'),
+    GButton(icon: Icons.explore, text: 'Explorar'),
+    GButton(icon: Icons.download, text: 'Downloads'),
+    GButton(icon: Icons.people, text: 'Forum'),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: AppBottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
+    return NavigationPage(pages: pages, tabs: tabs);
   }
 }

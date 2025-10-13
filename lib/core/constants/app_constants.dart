@@ -5,13 +5,19 @@ class ApiUrls {
 
   String get apiPath => "/api";
 
-  String get versionRoute => "/";
+  String get versionRoute => apiPath;
 
-  String get sessionRoute => "/session";
+  String get sessionRoute => "$apiPath/session";
 
-  String get usersRoute => "/users";
+  String get usersRoute => "$apiPath/users";
 
-  String get titleRoute => "/title";
+  String get titleRoute => "$apiPath/title";
+
+  String get favoritesRoute => "$apiPath/favorites";
+
+  String addOrRemoveFavorite(String titleId) => "$favoritesRoute/book/$titleId";
+
+  String get favoritesSyncRoute => "$favoritesRoute/sync";
 
   String userById(String userId) => "$usersRoute/$userId";
 

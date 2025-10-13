@@ -63,9 +63,6 @@ class _RegisterDialogState extends State<RegisterDialog> {
                   const Spacer(),
                   ElevatedButton(
                     onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF29638A),
-                    ),
                     child: const Text('Registrar'),
                   ),
                 ],

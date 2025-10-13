@@ -1,3 +1,4 @@
+import 'package:androidapp/models/chapter_model.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
@@ -11,35 +12,55 @@ class ChapterService {
   final ApiConfigProvider apiConfigProvider;
   final Dio _dio;
 
-  ChapterService(this.sessionService, this.apiConfigProvider) : _dio = Dio();
+  ChapterService(this.sessionService, this.apiConfigProvider) : _dio = Dio() {
+    _dio.options
+      ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
+      ..headers = {'Content-Type': 'application/json'};
 
-  Future<dynamic> getChapters(String titleId) async {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await sessionService.readToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+        onError: (DioException e, handler) {
+          return handler.next(e);
+        },
+      ),
+    );
+  }
+
+  Future<ChapterListResponse> getChapters(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapters(titleId)}';
+    final url = apiUrls.titleChapters(titleId);
 
     try {
       final response = await _dio.get(url);
-      return response.data;
+      return ChapterListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> getChapter(String titleId, String chapterId) async {
+  Future<Chapter> getChapter(String titleId, String chapterId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapterById(titleId, chapterId)}';
+    final url = apiUrls.titleChapterById(titleId, chapterId);
 
     try {
       final response = await _dio.get(url);
-      return response.data;
+      final data = response.data;
+      final chapterJson = data['chapter'];
+      final chapter = Chapter.fromJson(chapterJson);
+      return chapter;
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> createChapter(
+  Future<ChapterCreateResponse> createChapter(
     String titleId,
     String titleText,
     int chapterNumber,
@@ -47,21 +68,11 @@ class ChapterService {
     String? volumeTitle,
   ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final jwt = await sessionService.readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapters(titleId)}';
+    final url = apiUrls.titleChapters(titleId);
 
     try {
       final response = await _dio.post(
         url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $jwt',
-          },
-        ),
         data: {
           'title': titleText,
           'number': chapterNumber,
@@ -69,44 +80,22 @@ class ChapterService {
           'volumeTitle': volumeTitle,
         },
       );
-      return response.data;
+      return ChapterCreateResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> deleteChapter(String titleId, String chapterId) async {
+  Future<ChapterDefaultResponse> deleteChapter(
+    String titleId,
+    String chapterId,
+  ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final jwt = await sessionService.readToken();
-    if (jwt == null) throw Exception('Não Autenticado');
-
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleChapterById(titleId, chapterId)}';
+    final url = apiUrls.titleChapterById(titleId, chapterId);
 
     try {
-      final response = await _dio.delete(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $jwt',
-          },
-        ),
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
-    }
-  }
-
-  Future<dynamic> getCover(String titleId) async {
-    final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-    final url =
-        'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.titleCover(titleId)}';
-
-    try {
-      final response = await _dio.get(url);
-      return response.data;
+      final response = await _dio.delete(url);
+      return ChapterDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }

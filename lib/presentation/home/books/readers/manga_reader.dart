@@ -1,7 +1,8 @@
+import 'package:androidapp/models/chapter_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../app/injectable.dart';
+import '../../../../app/injectable.dart';
 import 'package:androidapp/services/chapter_service.dart';
 
 class MangaReader extends StatefulWidget {
@@ -21,7 +22,7 @@ class MangaReader extends StatefulWidget {
 class _MangaReaderState extends State<MangaReader> {
   final chapterService = getIt<ChapterService>();
 
-  Map<String, dynamic>? chapterData;
+  Chapter? chapterData;
   bool _loading = true;
   String _error = '';
 
@@ -52,8 +53,8 @@ class _MangaReaderState extends State<MangaReader> {
       );
       if (!mounted) return;
       setState(() {
-        chapterData = data['chapter'];
-        chapterNumber = chapterData?['number'];
+        chapterData = data;
+        chapterNumber = chapterData?.number;
         _loading = false;
       });
     } catch (e) {
@@ -75,7 +76,7 @@ class _MangaReaderState extends State<MangaReader> {
   }
 
   void _goToNextPage() {
-    final images = chapterData?['images'] as List<dynamic>? ?? [];
+    final images = chapterData?.images as List<ChapterImage>;
     if (_currentPage < images.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -99,7 +100,7 @@ class _MangaReaderState extends State<MangaReader> {
       return Scaffold(body: Center(child: Text('Erro: $_error')));
     }
 
-    final images = chapterData?['images'] as List<dynamic>? ?? [];
+    final images = chapterData?.images as List<ChapterImage>;
 
     return Scaffold(
       appBar: _appBarVisible
@@ -134,7 +135,7 @@ class _MangaReaderState extends State<MangaReader> {
               minScale: 1.0,
               maxScale: 5.0,
               child: CachedNetworkImage(
-                imageUrl: image['imageUrl'],
+                imageUrl: image.imageUrl,
                 placeholder: (context, url) =>
                     const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) =>
