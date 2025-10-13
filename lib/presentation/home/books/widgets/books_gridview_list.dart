@@ -1,4 +1,4 @@
-import 'package:androidapp/models/book_model.dart';
+import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
 
 import './book_card.dart';

@@ -1,5 +1,5 @@
-import 'package:androidapp/models/book_model.dart';
-import 'package:androidapp/providers/user_provider.dart';
+import 'package:mgdb/models/book_model.dart';
+import 'package:mgdb/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';

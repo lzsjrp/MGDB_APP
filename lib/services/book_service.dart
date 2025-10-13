@@ -3,8 +3,8 @@ import 'package:injectable/injectable.dart';
 
 import '../models/book_model.dart';
 import '../providers/api_config_provider.dart';
-import 'package:androidapp/core/constants/app_constants.dart';
-import 'package:androidapp/services/session_service.dart';
+import 'package:mgdb/core/constants/app_constants.dart';
+import 'package:mgdb/services/session_service.dart';
 
 @injectable
 class BookService {

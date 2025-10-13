@@ -3,9 +3,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:androidapp/core/constants/app_constants.dart';
+import 'package:mgdb/core/constants/app_constants.dart';
 import '../providers/api_config_provider.dart';
-import 'package:androidapp/services/session_service.dart';
+import 'package:mgdb/services/session_service.dart';
 import '../providers/connectivity_provider.dart';
 
 @injectable

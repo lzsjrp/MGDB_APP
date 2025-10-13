@@ -1,11 +1,11 @@
-import 'package:androidapp/models/user_model.dart';
+import 'package:mgdb/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:injectable/injectable.dart';
 import '../app/injectable.dart';
 
-import 'package:androidapp/services/session_service.dart';
+import 'package:mgdb/services/session_service.dart';
 
 import '../services/favorites_service.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:androidapp/presentation/home/settings/dialogs/register_dialog.dart';
+import 'package:mgdb/presentation/home/settings/dialogs/register_dialog.dart';
 
 import 'package:provider/provider.dart';
 
