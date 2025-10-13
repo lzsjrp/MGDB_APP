@@ -7,17 +7,23 @@ import '../app/injectable.dart';
 
 import 'package:androidapp/services/session_service.dart';
 
+import '../services/favorites_service.dart';
+
 @injectable
 class UserProvider extends ChangeNotifier {
-  final sessionService = getIt<SessionService>();
+  final SessionService sessionService = getIt<SessionService>();
+  final FavoritesService favoritesService = getIt<FavoritesService>();
 
   User? _userData;
   String? _errorMessage;
   bool _isLoading = false;
 
   User? get userData => _userData;
+
   String? get errorMessage => _errorMessage;
+
   bool get isLoading => _isLoading;
+
   bool get isLoggedIn => _userData != null;
 
   Future<void> login(String email, String password) async {
@@ -28,6 +34,12 @@ class UserProvider extends ChangeNotifier {
     try {
       final user = await sessionService.login(email, password);
       _userData = user.session.user;
+
+      try {
+        await favoritesService.updateFavoritesFromServer();
+      } catch (e) {
+        // do nothing
+      }
     } catch (e) {
       _errorMessage = e.toString();
       _userData = null;

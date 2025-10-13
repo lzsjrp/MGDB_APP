@@ -34,13 +34,19 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i517.ConnectivityProvider>(() => _i517.ConnectivityProvider());
     gh.factory<_i522.ThemeProvider>(() => _i522.ThemeProvider());
     gh.factory<_i26.UserProvider>(() => _i26.UserProvider());
-    gh.factory<_i211.FavoritesService>(() => _i211.FavoritesService());
     gh.factory<_i708.DownloadsService>(() => _i708.DownloadsService());
     gh.lazySingleton<_i187.ApiConfigProvider>(
       () => registerModule.apiConfigProvider,
     );
     gh.factory<_i984.SessionService>(
       () => _i984.SessionService(gh<_i187.ApiConfigProvider>()),
+    );
+    gh.factory<_i211.FavoritesService>(
+      () => _i211.FavoritesService(
+        gh<_i984.SessionService>(),
+        gh<_i187.ApiConfigProvider>(),
+        gh<_i517.ConnectivityProvider>(),
+      ),
     );
     gh.factory<_i490.BookService>(
       () => _i490.BookService(

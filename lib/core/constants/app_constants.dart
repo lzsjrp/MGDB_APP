@@ -13,15 +13,15 @@ class ApiUrls {
 
   String get titleRoute => "$apiPath/title";
 
-  String get favoritesRoute => "$titleRoute/favorites";
+  String get favoritesRoute => "$apiPath/favorites";
+
+  String addOrRemoveFavorite(String titleId) => "$favoritesRoute/book/$titleId";
 
   String get favoritesSyncRoute => "$favoritesRoute/sync";
 
   String userById(String userId) => "$usersRoute/$userId";
 
   String titleById(String titleId) => "$titleRoute/$titleId";
-
-  String titleAddFavorite(String titleId) => "$titleRoute/$titleId/favorite";
 
   String titleCover(String titleId) => "$titleRoute/$titleId/cover";
 
