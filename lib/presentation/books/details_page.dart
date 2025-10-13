@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import 'package:androidapp/core/theme/app_colors.dart';
 import 'package:androidapp/presentation/books/readers/manga_reader.dart';
 import 'package:androidapp/presentation/books/readers/web_novel_reader.dart';
 
