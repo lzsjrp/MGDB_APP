@@ -1,10 +1,10 @@
-import 'package:androidapp/models/chapter_model.dart';
+import 'package:mgdb/models/chapter_model.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 import '../providers/api_config_provider.dart';
-import 'package:androidapp/core/constants/app_constants.dart';
-import 'package:androidapp/services/session_service.dart';
+import 'package:mgdb/core/constants/app_constants.dart';
+import 'package:mgdb/services/session_service.dart';
 
 @injectable
 class ChapterService {

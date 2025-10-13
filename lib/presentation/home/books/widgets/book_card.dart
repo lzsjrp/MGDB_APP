@@ -1,4 +1,4 @@
-import 'package:androidapp/models/book_model.dart';
+import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 

@@ -1,14 +1,14 @@
-import 'package:androidapp/models/book_model.dart';
-import 'package:androidapp/presentation/home/books/widgets/books_horizontal_listview.dart';
+import 'package:mgdb/models/book_model.dart';
+import 'package:mgdb/presentation/home/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 
-import 'package:androidapp/presentation/home/books/details_page.dart';
+import 'package:mgdb/presentation/home/books/details_page.dart';
 
 import '../../app/injectable.dart';
-import 'package:androidapp/services/book_service.dart';
+import 'package:mgdb/services/book_service.dart';
 
 import 'package:provider/provider.dart';
-import 'package:androidapp/providers/connectivity_provider.dart';
+import 'package:mgdb/providers/connectivity_provider.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});

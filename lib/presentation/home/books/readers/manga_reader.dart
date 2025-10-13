@@ -1,9 +1,9 @@
-import 'package:androidapp/models/chapter_model.dart';
+import 'package:mgdb/models/chapter_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../app/injectable.dart';
-import 'package:androidapp/services/chapter_service.dart';
+import 'package:mgdb/services/chapter_service.dart';
 
 class MangaReader extends StatefulWidget {
   final String chapterId;

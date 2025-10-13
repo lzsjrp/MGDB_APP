@@ -1,4 +1,4 @@
-import 'package:androidapp/presentation/home/settings/settings_page.dart';
+import 'package:mgdb/presentation/home/settings/settings_page.dart';
 import 'package:flutter/material.dart';
 
 class DownloadsPage extends StatelessWidget {
