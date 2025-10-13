@@ -3,15 +3,15 @@ import 'package:androidapp/models/chapter_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import 'package:androidapp/presentation/books/readers/manga_reader.dart';
-import 'package:androidapp/presentation/books/readers/web_novel_reader.dart';
+import 'package:androidapp/presentation/home/books/readers/manga_reader.dart';
+import './readers/web_novel_reader.dart';
 
-import '../../app/injectable.dart';
+import '../../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
 import 'package:androidapp/services/chapter_service.dart';
-import '../../services/favorites_service.dart';
+import '../../../services/favorites_service.dart';
 
-import '../../core/theme/custom/gridview_theme.dart';
+import '../../../core/theme/custom/gridview_theme.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final String bookId;

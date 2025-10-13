@@ -2,7 +2,7 @@ import 'package:androidapp/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../core/theme/custom/gridview_theme.dart';
+import '../../../../core/theme/custom/gridview_theme.dart';
 
 class BookCard extends StatelessWidget {
   final Book book;

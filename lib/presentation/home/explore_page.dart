@@ -1,9 +1,8 @@
 import 'package:androidapp/models/book_model.dart';
-import 'package:androidapp/presentation/books/widgets/books_horizontal_listview.dart';
+import 'package:androidapp/presentation/home/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 
-import 'package:androidapp/presentation/books/details_page.dart';
-import 'package:androidapp/presentation/settings/settings_page.dart';
+import 'package:androidapp/presentation/home/books/details_page.dart';
 
 import '../../app/injectable.dart';
 import 'package:androidapp/services/book_service.dart';
@@ -129,20 +128,6 @@ class _ExplorePageState extends State<ExplorePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Explorar'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
-              );
-            },
-          ),
-        ],
-      ),
       body: ListView(
         padding: EdgeInsets.only(top: 16),
         children: categorizedBooks.entries.map((entry) {

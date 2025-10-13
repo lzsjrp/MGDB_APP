@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:androidapp/presentation/settings/dialogs/register_dialog.dart';
+import 'package:androidapp/presentation/home/settings/dialogs/register_dialog.dart';
 
 import 'package:provider/provider.dart';
 
-import '../../../providers/user_provider.dart';
+import '../../../../providers/user_provider.dart';
 
 class LoginDialog extends StatefulWidget {
   const LoginDialog({super.key});

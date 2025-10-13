@@ -2,15 +2,15 @@ import 'package:androidapp/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:androidapp/shared/widgets/popup_widget.dart';
-import 'package:androidapp/presentation/settings/widgets/settings_menu_widget.dart';
-import 'package:androidapp/presentation/settings/dialogs/login_dialog.dart';
+import './widgets/settings_menu_widget.dart';
+import './dialogs/login_dialog.dart';
 
 import 'package:androidapp/providers/user_provider.dart';
 import 'package:androidapp/providers/theme_provider.dart';
 import 'package:androidapp/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/api_config_provider.dart';
+import '../../../providers/api_config_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
