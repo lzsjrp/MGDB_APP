@@ -65,8 +65,8 @@ class FavoritesService {
     return true;
   }
 
-  Future<Set<String>> getFavoritesSet() async {
-    if (await _canSync()) {
+  Future<Set<String>> getFavoritesSet({bool sync = false}) async {
+    if (sync && await _canSync()) {
       await syncFavorites();
     }
     return await _readStorageFavorites();
@@ -139,24 +139,39 @@ class FavoritesService {
     }
   }
 
-  Future<void> syncFavorites() async {
+  Future<void> syncFavorites({bool merge = false}) async {
     if (!await _canSync()) return;
+
     try {
       final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
-      final localFavorites = await _readStorageFavorites();
+
+      Set<String> favoritesToSync;
+
+      if (merge) {
+        final serverFavorites = (await getServerFavorites()).toSet();
+        final localFavorites = await _readStorageFavorites();
+
+        favoritesToSync = {...serverFavorites, ...localFavorites};
+      } else {
+        favoritesToSync = await _readStorageFavorites();
+      }
 
       final response = await _dio.post(
         apiUrls.favoritesSyncRoute,
-        data: jsonEncode({'booksIds': localFavorites.toList()}),
+        data: jsonEncode({'booksIds': favoritesToSync.toList()}),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.data is Map && response.data['favorites'] is List) {
-          final serverConfirmed = (response.data['favorites'] as List)
+          final confirmedFavorites = (response.data['favorites'] as List)
               .map((e) => e.toString())
               .toSet();
-          await _writeStorageFavorites(serverConfirmed);
+          await _writeStorageFavorites(confirmedFavorites);
+        } else {
+          await _writeStorageFavorites(favoritesToSync);
         }
+      } else {
+        await _writeStorageFavorites(favoritesToSync);
       }
     } on DioException catch (e) {
       throw Exception('Erro ${e.response?.statusCode ?? e.message}');

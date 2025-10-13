@@ -34,7 +34,7 @@ class _FavoritesPage extends State<FavoritesPage> {
     setState(() {
       isLoading = true;
     });
-    final favorites = await favoritesService.getFavoritesSet();
+    final favorites = await favoritesService.getFavoritesSet(sync: false);
 
     List<Book> booksDataList = [];
     for (var bookId in favorites) {

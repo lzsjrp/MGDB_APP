@@ -36,7 +36,7 @@ class UserProvider extends ChangeNotifier {
       _userData = user.session.user;
 
       try {
-        await favoritesService.updateFavoritesFromServer();
+        await favoritesService.syncFavorites(merge: true);
       } catch (e) {
         // do nothing
       }
