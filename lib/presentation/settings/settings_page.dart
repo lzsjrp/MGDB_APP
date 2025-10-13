@@ -1,3 +1,4 @@
+import 'package:androidapp/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:androidapp/shared/widgets/popup_widget.dart';
@@ -19,7 +20,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  Map<String, dynamic>? userData;
+  User? userData;
   bool _isLoading = true;
 
   @override
@@ -90,10 +91,10 @@ class _SettingsPageState extends State<SettingsPage> {
             buttonText: userData == null ? "Login" : "Desconectar",
             title: userData == null
                 ? "Você não está logado"
-                : (userData['name'] ?? "Usuário"),
+                : (userData.name),
             description: userData == null
                 ? "Descrição"
-                : (userData['email'] ?? "Email"),
+                : (userData.email),
           ),
           SettingsMenu(
             onPressed: () {

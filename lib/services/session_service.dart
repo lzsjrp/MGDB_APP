@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
 import '../core/constants/app_constants.dart';
+import '../models/user_model.dart';
 import '../providers/api_config_provider.dart';
 
 @injectable
@@ -42,19 +43,16 @@ class SessionService {
     await _secureStorage.delete(key: _keyUserData);
   }
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    final response = await createSession(email, password);
-    final token = response['session']?['token'] as String?;
+  Future<SessionResponse> login(String email, String password) async {
+    final sessionResponse = await createSession(email, password);
 
-    if (token == null) throw Exception('Token inválido');
-
+    final token = sessionResponse.session.token;
     await saveToken(token);
-    final userData = await getUser(token);
-    await saveUser(json.encode(userData));
-    return userData;
+    await saveUser(json.encode(sessionResponse.session.user.toJson()));
+    return sessionResponse;
   }
 
-  Future<dynamic> getSession(String jwt) async {
+  Future<SessionResponse> getSession(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url =
         'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.sessionRoute}';
@@ -69,13 +67,13 @@ class SessionService {
           },
         ),
       );
-      return response.data;
+      return SessionResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> createSession(String email, String password) async {
+  Future<SessionResponse> createSession(String email, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url =
         'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.sessionRoute}';
@@ -86,13 +84,13 @@ class SessionService {
         data: {'email': email, 'password': password},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      return response.data;
+      return SessionResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> getUser(String jwt) async {
+  Future<User> getUser(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url =
         'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.usersRoute}';
@@ -108,13 +106,13 @@ class SessionService {
         ),
       );
       await saveUser(json.encode(response.data));
-      return response.data;
+      return User.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
   }
 
-  Future<dynamic> createUser(String email, String name, String password) async {
+  Future<User> createUser(String email, String name, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url =
         'https://${apiUrls.baseUrl}${apiUrls.apiPath}${apiUrls.usersRoute}';
@@ -125,7 +123,7 @@ class SessionService {
         data: {'email': email, 'password': password, 'name': name},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      return response.data;
+      return User.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
     }
