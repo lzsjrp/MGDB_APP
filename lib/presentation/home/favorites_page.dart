@@ -1,5 +1,7 @@
 import 'package:androidapp/models/book_model.dart';
+import 'package:androidapp/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../app/injectable.dart';
 import '../../services/book_service.dart';
@@ -25,6 +27,13 @@ class _FavoritesPage extends State<FavoritesPage> {
   @override
   void initState() {
     super.initState();
+    loadFavorites();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final userProvider = Provider.of<UserProvider>(context);
     loadFavorites();
   }
 

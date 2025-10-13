@@ -56,11 +56,11 @@ class _NavigationPageState extends State<NavigationPage> {
       body: widget.pages[_currentIndex],
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Container(
             decoration: BoxDecoration(
               color: theme.backgroundColor,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(50),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.15),

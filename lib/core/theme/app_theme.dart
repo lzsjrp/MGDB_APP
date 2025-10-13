@@ -33,7 +33,21 @@ class AppTheme {
         unselectedItemColor: colors.unselectedItem,
         type: BottomNavigationBarType.fixed,
       ),
-      inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder()),
+      inputDecorationTheme: InputDecorationTheme(
+        labelStyle: TextStyle(color: colors.onPrimary, fontSize: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: colors.error),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: colors.error),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: colors.error, width: 2),
+        ),
+      ),
       buttonTheme: ButtonThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         buttonColor: colors.surface,
@@ -59,8 +73,8 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: colors.secondary,
-        barrierColor: colors.primary,
+        backgroundColor: colors.primary,
+        barrierColor: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titleTextStyle: TextStyle(
           color: colors.onPrimary,

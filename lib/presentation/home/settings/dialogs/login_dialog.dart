@@ -14,7 +14,13 @@ class LoginDialog extends StatefulWidget {
 }
 
 class _LoginDialogState extends State<LoginDialog> {
+  bool _loading = false;
+  String? _err;
+
   Future<void> _handleLogin(String email, String password) async {
+    setState(() {
+      _loading = true;
+    });
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     await userProvider.login(email, password);
 
@@ -26,9 +32,10 @@ class _LoginDialogState extends State<LoginDialog> {
       ).showSnackBar(const SnackBar(content: Text('Logado com sucesso!')));
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(userProvider.errorMessage!)));
+      setState(() {
+        _loading = false;
+        _err = userProvider.errorMessage;
+      });
     }
   }
 
@@ -44,62 +51,60 @@ class _LoginDialogState extends State<LoginDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Login', style: TextStyle(fontSize: 24)),
-              const SizedBox(height: 30),
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Senha',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => const RegisterDialog(),
-                      );
-                    },
-                    child: const Text('Registrar'),
-                  ),
-                  const Spacer(),
-                  ElevatedButton(
-                    onPressed: () {
-                      final email = emailController.text.trim();
-                      final password = passwordController.text.trim();
-
-                      if (email.isEmpty || password.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Email ou senha inválidos'),
-                          ),
-                        );
-                        return;
-                      }
-                      _handleLogin(email, password);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF29638A),
+            children: _loading
+                ? [Center(child: CircularProgressIndicator())]
+                : [
+                    const Text('Login', style: TextStyle(fontSize: 24)),
+                    const SizedBox(height: 30),
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      keyboardType: TextInputType.emailAddress,
                     ),
-                    child: const Text('Entrar'),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(labelText: 'Senha'),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => const RegisterDialog(),
+                            );
+                          },
+                          child: const Text('Registrar'),
+                        ),
+                        const Spacer(),
+                        ElevatedButton(
+                          onPressed: () {
+                            final email = emailController.text.trim();
+                            final password = passwordController.text.trim();
+
+                            if (email.isEmpty || password.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Email ou senha inválidos'),
+                                ),
+                              );
+                              return;
+                            }
+                            _handleLogin(email, password);
+                          },
+                          child: const Text('Entrar'),
+                        ),
+                      ],
+                    ),
+                    if (_err != null) ...[
+                      const SizedBox(height: 12),
+                      Center(child: Text(_err!)),
+                    ],
+                    const SizedBox(height: 20),
+                  ],
           ),
         ),
       ),
