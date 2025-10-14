@@ -74,7 +74,9 @@ class _SettingsAppState extends State<SettingsApp> {
           ),
           SettingsMenu(
             onPressed: () {
-              popupWidget(context, ":(", "Não implementado");
+              setState(() {
+                _preferences.noCache = !_preferences.noCache;
+              });
             },
             buttonText: _preferences.noCache ? "Ativar" : "Desativar",
             title: "Usar Cache",

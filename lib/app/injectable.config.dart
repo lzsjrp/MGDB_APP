@@ -33,7 +33,6 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i517.ConnectivityProvider>(() => _i517.ConnectivityProvider());
     gh.factory<_i26.UserProvider>(() => _i26.UserProvider());
-    gh.factory<_i802.CacheManager>(() => _i802.CacheManager());
     gh.factory<_i708.DownloadsService>(() => _i708.DownloadsService());
     gh.factory<_i76.AppPreferences>(() => _i76.AppPreferences());
     gh.factory<_i187.ApiConfigProvider>(
@@ -41,6 +40,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i522.ThemeProvider>(
       () => _i522.ThemeProvider(gh<_i76.AppPreferences>()),
+    );
+    gh.factory<_i802.CacheManager>(
+      () => _i802.CacheManager(gh<_i76.AppPreferences>()),
     );
     gh.factory<_i984.SessionService>(
       () => _i984.SessionService(gh<_i187.ApiConfigProvider>()),

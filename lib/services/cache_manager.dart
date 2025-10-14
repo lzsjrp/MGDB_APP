@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:mgdb/shared/preferences.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,12 +12,14 @@ import '../core/constants/app_constants.dart';
 @injectable
 class CacheManager {
   final Dio _dio;
+  final AppPreferences appPreferences;
 
   static const cacheDuration = Duration(hours: 1);
 
-  CacheManager() : _dio = Dio();
+  CacheManager(this.appPreferences) : _dio = Dio();
 
   Future<void> saveCache(String typeKey, String subKey, dynamic data) async {
+    if (appPreferences.noCache) return;
     final prefs = await SharedPreferences.getInstance();
     final cacheString = prefs.getString(typeKey);
 
@@ -35,6 +38,7 @@ class CacheManager {
   }
 
   Future<dynamic> getCache(String typeKey, String subKey) async {
+    if (appPreferences.noCache) return null;
     final prefs = await SharedPreferences.getInstance();
     final cacheString = prefs.getString(typeKey);
     if (cacheString == null) return null;
@@ -70,6 +74,7 @@ class CacheManager {
   }
 
   Future<File?> imageCache(String imageId, String imageUrl) async {
+    if (appPreferences.noCache) return null;
     if (imageUrl.isEmpty) return null;
 
     final cacheEntry =
