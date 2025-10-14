@@ -4,7 +4,6 @@ import 'package:mgdb/shared/preferences.dart';
 
 import '../../../app/injectable.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../shared/widgets/popup_widget.dart';
 import './widgets/settings_menu_widget.dart';
 
 import 'package:mgdb/providers/theme_provider.dart';

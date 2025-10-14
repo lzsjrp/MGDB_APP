@@ -61,6 +61,23 @@ class CacheManager {
 
   Future<void> clearCache(String typeKey) async {
     final prefs = await SharedPreferences.getInstance();
+
+    if (typeKey == AppCacheKeys.imagesCache) {
+      final cacheMap = prefs.getString(typeKey);
+      if (cacheMap != null) {
+        final Map<String, dynamic> imagesCache = json.decode(cacheMap);
+        for (var entry in imagesCache.values) {
+          final filePath = entry['data']['filePath'] as String?;
+          if (filePath != null) {
+            final file = File(filePath);
+            if (await file.exists()) {
+              await file.delete();
+            }
+          }
+        }
+      }
+    }
+
     await prefs.remove(typeKey);
   }
 
@@ -89,8 +106,15 @@ class CacheManager {
 
     if (cacheEntry != null) {
       final timestamp = DateTime.parse(cacheEntry['timestamp'] as String);
-      if (now.difference(timestamp) <= cacheDuration && await file.exists()) {
+      final expired = now.difference(timestamp) > cacheDuration;
+      final fileExists = await file.exists();
+
+      if (!expired && fileExists) {
         return file;
+      }
+
+      if (expired && fileExists) {
+        await file.delete();
       }
     }
 
