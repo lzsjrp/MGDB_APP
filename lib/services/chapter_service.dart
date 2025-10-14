@@ -6,13 +6,17 @@ import '../providers/api_config_provider.dart';
 import 'package:mgdb/core/constants/app_constants.dart';
 import 'package:mgdb/services/session_service.dart';
 
+import 'cache_manager.dart';
+
 @injectable
 class ChapterService {
   final SessionService sessionService;
   final ApiConfigProvider apiConfigProvider;
+  final CacheManager cacheManager;
   final Dio _dio;
 
-  ChapterService(this.sessionService, this.apiConfigProvider) : _dio = Dio() {
+  ChapterService(this.sessionService, this.apiConfigProvider, this.cacheManager)
+    : _dio = Dio() {
     _dio.options
       ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
       ..headers = {'Content-Type': 'application/json'};
@@ -34,11 +38,19 @@ class ChapterService {
   }
 
   Future<ChapterListResponse> getChapters(String titleId) async {
+    final cacheKey = 'cache_chapters-list_$titleId';
+
+    final cachedData = await cacheManager.getCache(cacheKey);
+    if (cachedData != null) {
+      return ChapterListResponse.fromJson(cachedData);
+    }
+
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url = apiUrls.titleChapters(titleId);
 
     try {
       final response = await _dio.get(url);
+      await cacheManager.saveCache(cacheKey, response.data);
       return ChapterListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
@@ -46,6 +58,13 @@ class ChapterService {
   }
 
   Future<Chapter> getChapter(String titleId, String chapterId) async {
+    final cacheKey = 'cache_chapter_$titleId-$chapterId';
+
+    final cachedData = await cacheManager.getCache(cacheKey);
+    if (cachedData != null) {
+      return Chapter.fromJson(cachedData);
+    }
+
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url = apiUrls.titleChapterById(titleId, chapterId);
 
@@ -53,6 +72,7 @@ class ChapterService {
       final response = await _dio.get(url);
       final data = response.data;
       final chapterJson = data['chapter'];
+      await cacheManager.saveCache(cacheKey, chapterJson);
       final chapter = Chapter.fromJson(chapterJson);
       return chapter;
     } on DioException catch (e) {

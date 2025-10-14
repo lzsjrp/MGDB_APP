@@ -68,9 +68,11 @@ class _FavoritesPage extends State<FavoritesPage> {
   Future<Map<String, File?>> loadCoversCached(List<Book> books) async {
     final Map<String, File?> coverFiles = {};
     for (var book in books) {
-      final cover = await bookService.getCover(book.id).catchError((_) => null);
-      final file = await cacheManager.downloadCoverWithCache(book.id, cover);
-      coverFiles[book.id] = file;
+      final cover = book.cover;
+      if (cover != null) {
+        final file = await cacheManager.imageCache(cover.id, cover.imageUrl);
+        coverFiles[book.id] = file;
+      }
     }
     return coverFiles;
   }

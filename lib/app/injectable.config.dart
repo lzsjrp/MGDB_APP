@@ -63,6 +63,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i193.ChapterService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
+        gh<_i802.CacheManager>(),
       ),
     );
     return this;
