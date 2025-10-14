@@ -32,6 +32,7 @@ class _SettingsSyncState extends State<SettingsSync> {
   }
 
   Future<void> _checkUser() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -42,6 +43,7 @@ class _SettingsSyncState extends State<SettingsSync> {
       // Do nothing
     }
 
+    if (!mounted) return;
     setState(() {
       userData = userProvider.userData;
       _isLoading = false;
