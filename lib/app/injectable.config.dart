@@ -22,7 +22,7 @@ import '../services/chapter_service.dart' as _i193;
 import '../services/downloads_service.dart' as _i708;
 import '../services/favorites_service.dart' as _i211;
 import '../services/session_service.dart' as _i984;
-import 'injectable.dart' as _i1027;
+import '../shared/preferences.dart' as _i76;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -31,13 +31,15 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    final registerModule = _$RegisterModule();
     gh.factory<_i517.ConnectivityProvider>(() => _i517.ConnectivityProvider());
-    gh.factory<_i522.ThemeProvider>(() => _i522.ThemeProvider());
     gh.factory<_i26.UserProvider>(() => _i26.UserProvider());
     gh.factory<_i708.DownloadsService>(() => _i708.DownloadsService());
-    gh.lazySingleton<_i187.ApiConfigProvider>(
-      () => registerModule.apiConfigProvider,
+    gh.factory<_i76.AppPreferences>(() => _i76.AppPreferences());
+    gh.factory<_i187.ApiConfigProvider>(
+      () => _i187.ApiConfigProvider(gh<_i76.AppPreferences>()),
+    );
+    gh.factory<_i522.ThemeProvider>(
+      () => _i522.ThemeProvider(gh<_i76.AppPreferences>()),
     );
     gh.factory<_i802.CacheManager>(
       () => _i802.CacheManager(gh<_i187.ApiConfigProvider>()),
@@ -69,5 +71,3 @@ extension GetItInjectableX on _i174.GetIt {
     return this;
   }
 }
-
-class _$RegisterModule extends _i1027.RegisterModule {}

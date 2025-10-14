@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:injectable/injectable.dart';
 
+import '../core/constants/app_constants.dart';
+import '../shared/preferences.dart';
+
+@injectable
 class ApiConfigProvider extends ChangeNotifier {
-  String _baseUrl = "lzsjrp-mgdb.vercel.app";
+  final AppPreferences _preferences;
+
+  String _baseUrl = DefaultPreferences.apiBaseUrl;
 
   String get baseUrl => _baseUrl;
 
+  ApiConfigProvider(this._preferences) {
+    loadBaseUrl();
+  }
+
   Future<void> loadBaseUrl() async {
-    final prefs = await SharedPreferences.getInstance();
-    _baseUrl = prefs.getString('api_base_url') ?? _baseUrl;
+    _baseUrl = _preferences.apiBaseUrl;
     notifyListeners();
   }
 
   Future<void> updateBaseUrl(String newBaseUrl) async {
+    _preferences.apiBaseUrl = newBaseUrl;
     _baseUrl = newBaseUrl;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('api_base_url', newBaseUrl);
     notifyListeners();
   }
 }

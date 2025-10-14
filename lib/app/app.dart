@@ -1,5 +1,6 @@
 import 'package:mgdb/presentation/home/discuss_page.dart';
 import 'package:flutter/material.dart';
+import 'package:mgdb/shared/preferences.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:provider/provider.dart';
 
@@ -22,13 +23,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
 
-  final apiConfigProvider = getIt<ApiConfigProvider>();
-  await apiConfigProvider.loadBaseUrl();
+  await AppPreferences().init();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(getIt<AppPreferences>()),
+        ),
         ChangeNotifierProvider<UserProvider>.value(
           value: getIt<UserProvider>(),
         ),
@@ -36,7 +38,7 @@ void main() async {
           value: getIt<ConnectivityProvider>(),
         ),
         ChangeNotifierProvider<ApiConfigProvider>.value(
-          value: apiConfigProvider,
+          value: getIt<ApiConfigProvider>(),
         ),
       ],
       child: const MyApp(),
@@ -50,11 +52,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final apiConfigProvider = context.watch<ApiConfigProvider>();
 
     return MaterialApp(
       title: 'App',
-      key: ValueKey(apiConfigProvider.baseUrl),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
