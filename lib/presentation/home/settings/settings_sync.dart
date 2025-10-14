@@ -1,5 +1,6 @@
 import 'package:mgdb/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:mgdb/presentation/home/settings/dialogs/change_api_dialog.dart';
 
 import 'package:mgdb/shared/widgets/popup_widget.dart';
 import './widgets/settings_menu_widget.dart';
@@ -95,7 +96,7 @@ class _SettingsSyncState extends State<SettingsSync> {
                   },
                   buttonText: "Sincronizar",
                   title: "Favoritos",
-                  description: "Sincroniza seus favoritos com o servidor",
+                  description: "Sincroniza seus favoritos com o servidor.",
                 ),
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
@@ -106,40 +107,19 @@ class _SettingsSyncState extends State<SettingsSync> {
           ),
           SettingsMenu(
             onPressed: () async {
-              final apiConfigProvider = Provider.of<ApiConfigProvider>(
-                context,
-                listen: false,
-              );
-              final TextEditingController controller = TextEditingController(
-                text: apiConfigProvider.baseUrl,
-              );
-              await showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text("Alterar Servidor"),
-                  content: TextField(
-                    controller: controller,
-                    decoration: InputDecoration(labelText: "URL"),
+              if (isConnected) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (context) => const ChangeApiDialog(),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Você está sem conexão com a internet'),
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text("Cancelar"),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (controller.text.isNotEmpty) {
-                          apiConfigProvider.updateBaseUrl(
-                            controller.text.trim(),
-                          );
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: Text("Salvar"),
-                    ),
-                  ],
-                ),
-              );
+                );
+              }
             },
             buttonText: "Alterar",
             title: "Servidor",
