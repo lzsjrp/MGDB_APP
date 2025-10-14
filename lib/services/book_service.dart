@@ -33,12 +33,15 @@ class BookService {
     );
   }
 
-  Future<BookListResponse> getList(String page) async {
+  Future<BookListResponse> getList({required String page, String? type}) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url = apiUrls.titleRoute;
 
     try {
-      final response = await _dio.get(url, queryParameters: {'page': page});
+      final response = await _dio.get(
+        url,
+        queryParameters: {'page': page, 'type': type},
+      );
       return BookListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');

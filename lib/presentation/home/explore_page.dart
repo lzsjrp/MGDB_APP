@@ -1,8 +1,8 @@
-import 'package:mgdb/models/book_model.dart';
 import 'package:mgdb/presentation/home/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mgdb/presentation/home/books/details_page.dart';
+import 'package:mgdb/presentation/home/states/category.dart';
 
 import '../../app/injectable.dart';
 import 'package:mgdb/services/book_service.dart';
@@ -18,85 +18,100 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-  bool _loading = true;
-  bool _fetching = false;
-  String _error = '';
+  Map<String, CategoryState> categories = {
+    'Novos': CategoryState(),
+    'Mangas': CategoryState(),
+    'Light Novels': CategoryState(),
+  };
+
+  Map<String, String?> categoryType = {
+    'Novos': null,
+    'Mangas': 'MANGA',
+    'Light Novels': 'WEB_NOVEL',
+  };
 
   final bookService = getIt<BookService>();
+  final Set<String> loadedCategories = {};
 
-  int currentPage = 1;
-  bool canLoadMore = false;
-  List<Book> newBooksList = [];
-
-  Future<void> fetchBooks(int page, bool isConnected) async {
+  Future<void> fetchCategory(
+    String category,
+    int page,
+    bool isConnected,
+  ) async {
     if (!mounted) return;
     setState(() {
-      _loading = true;
-      _error = '';
+      categories[category]!.loading = true;
+      categories[category]!.error = '';
     });
 
     try {
       if (isConnected) {
-        var bookList = await bookService.getList(page.toString());
+        var type = categoryType[category];
+        var bookList = await bookService.getList(
+          page: page.toString(),
+          type: type,
+        );
         if (!mounted) return;
         setState(() {
-          newBooksList = bookList.data;
-          if (bookList.totalPages > 1) {
-            canLoadMore = true;
-          }
+          categories[category]!.books = bookList.data;
+          categories[category]!.currentPage = bookList.page;
+          categories[category]!.canLoadMore =
+              bookList.totalPages > bookList.page;
         });
       }
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        categories[category]!.error = e.toString();
       });
     }
 
     if (!mounted) return;
     setState(() {
-      _loading = false;
+      categories[category]!.loading = false;
     });
   }
 
-  Future<void> loadMoreBooks() async {
+  Future<void> loadMoreBooksForCategory(String category) async {
+    final state = categories[category]!;
     setState(() {
-      _loading = true;
+      state.canLoadMore = false;
     });
+
     try {
-      final nextPage = currentPage + 1;
-      var bookList = await bookService.getList(nextPage.toString());
+      var type = categoryType[category];
+      final nextPage = state.currentPage + 1;
+      var bookList = await bookService.getList(
+        page: nextPage.toString(),
+        type: type,
+      );
       if (!mounted) return;
       setState(() {
-        currentPage = bookList.page;
-        newBooksList.addAll(bookList.data);
-        if (currentPage >= bookList.totalPages) {
-          canLoadMore = false;
-        }
+        state.books.addAll(bookList.data);
+        state.currentPage = bookList.page;
+        state.canLoadMore = state.currentPage < bookList.totalPages;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        state.error = e.toString();
       });
     }
-    setState(() {
-      _loading = false;
-    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
-    if (isConnected && !_fetching) {
-      _fetching = true;
-      fetchBooks(
-        currentPage,
-        isConnected,
-      ).whenComplete(() => _fetching = false);
-    } else {
-      _loading = false;
+    if (isConnected) {
+      categories.forEach((key, value) {
+        if (value.books.isEmpty &&
+            !value.loading &&
+            !loadedCategories.contains(key)) {
+          loadedCategories.add(key);
+          fetchCategory(key, 1, isConnected);
+        }
+      });
     }
   }
 
@@ -104,9 +119,7 @@ class _ExplorePageState extends State<ExplorePage> {
   Widget build(BuildContext context) {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
-    Map<String, List<Book>> categorizedBooks = {'Novos': newBooksList};
-
-    if (!isConnected && !_loading) {
+    if (!isConnected) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -119,45 +132,52 @@ class _ExplorePageState extends State<ExplorePage> {
       );
     }
 
-    if (_error.isNotEmpty) {
-      return Center(child: Text(_error));
-    }
-
-    if (_loading && _fetching) {
-      return Center(child: CircularProgressIndicator());
-    }
-
     return Scaffold(
       body: ListView(
-        padding: EdgeInsets.only(top: 16),
-        children: categorizedBooks.entries.map((entry) {
+        children: categories.entries.map((entry) {
           final categoryTitle = entry.key;
-          final books = entry.value;
+          final state = entry.value;
 
+          if (state.error.isNotEmpty) {
+            return Center(child: Text(state.error));
+          }
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(left: 20.0, bottom: 8.0),
+                padding: const EdgeInsets.only(
+                  top: 10.0,
+                  bottom: 10.0,
+                  left: 25.0,
+                ),
                 child: Text(
                   categoryTitle,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-              BooksHorizontalListView(
-                books: books,
-                isLoading: _loading,
-                onLoadMore: canLoadMore ? loadMoreBooks : null,
-                onBookTap: (bookId) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BookDetailsPage(bookId: bookId),
+              state.loading
+                  ? Container(
+                      width: 180,
+                      height: 300,
+                      margin: EdgeInsets.only(right: 0),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : BooksHorizontalListView(
+                      books: state.books,
+                      isLoading: state.loading,
+                      onLoadMore: state.canLoadMore
+                          ? () => loadMoreBooksForCategory(categoryTitle)
+                          : null,
+                      onBookTap: (bookId) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BookDetailsPage(bookId: bookId),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-              SizedBox(height: 24),
             ],
           );
         }).toList(),
