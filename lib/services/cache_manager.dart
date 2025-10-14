@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:injectable/injectable.dart';
 
+import '../core/constants/app_constants.dart';
 import '../providers/api_config_provider.dart';
 
 @injectable
@@ -77,10 +78,8 @@ class CacheManager {
   Future<File?> imageCache(String imageId, String imageUrl) async {
     if (imageUrl.isEmpty) return null;
 
-    const String typeKey = 'images_cache';
-
     final cacheEntry =
-        await getCache(typeKey, imageId) as Map<String, dynamic>?;
+        await getCache(AppCacheKeys.imagesCache, imageId) as Map<String, dynamic>?;
 
     final dir = await getApplicationCacheDirectory();
     final filePath = '${dir.path}/$imageId.jpg';
@@ -97,7 +96,7 @@ class CacheManager {
 
     await _dio.download(imageUrl, filePath);
 
-    await saveCache(typeKey, imageId, {
+    await saveCache(AppCacheKeys.imagesCache, imageId, {
       'timestamp': now.toIso8601String(),
       'filePath': filePath,
     });

@@ -39,7 +39,10 @@ class BookService {
   Future<BookListResponse> getList({required String page, String? type}) async {
     final cacheKey = 'list-data_$page-$type';
 
-    final cachedData = await cacheManager.getCache('books_cache', cacheKey);
+    final cachedData = await cacheManager.getCache(
+      AppCacheKeys.booksCache,
+      cacheKey,
+    );
     if (cachedData != null) {
       return BookListResponse.fromJson(cachedData);
     }
@@ -52,7 +55,11 @@ class BookService {
         url,
         queryParameters: {'page': page, 'type': type},
       );
-      await cacheManager.saveCache('books_cache', cacheKey, response.data);
+      await cacheManager.saveCache(
+        AppCacheKeys.booksCache,
+        cacheKey,
+        response.data,
+      );
       return BookListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
@@ -62,7 +69,10 @@ class BookService {
   Future<Book> getTitle(String titleId) async {
     final cacheKey = 'book-data_$titleId';
 
-    final cachedData = await cacheManager.getCache('books_cache', cacheKey);
+    final cachedData = await cacheManager.getCache(
+      AppCacheKeys.booksCache,
+      cacheKey,
+    );
     if (cachedData != null) {
       return Book.fromJson(cachedData);
     }
@@ -74,7 +84,7 @@ class BookService {
       final response = await _dio.get(url);
       final data = response.data;
       final bookJson = data['book'];
-      await cacheManager.saveCache('books_cache', cacheKey, bookJson);
+      await cacheManager.saveCache(AppCacheKeys.booksCache, cacheKey, bookJson);
       final book = Book.fromJson(bookJson);
       return book;
     } on DioException catch (e) {
@@ -116,7 +126,10 @@ class BookService {
   Future<Cover?> getCover(String titleId) async {
     final cacheKey = 'cover-data_$titleId';
 
-    final cachedData = await cacheManager.getCache('books_cache', cacheKey);
+    final cachedData = await cacheManager.getCache(
+      AppCacheKeys.booksCache,
+      cacheKey,
+    );
     if (cachedData != null) {
       return Cover.fromJson(cachedData);
     }
@@ -128,7 +141,11 @@ class BookService {
       final response = await _dio.get(url);
       final data = response.data;
       final coverJson = data['cover'];
-      await cacheManager.saveCache('books_cache', cacheKey, coverJson);
+      await cacheManager.saveCache(
+        AppCacheKeys.booksCache,
+        cacheKey,
+        coverJson,
+      );
       final cover = Cover.fromJson(coverJson);
       return cover;
     } on DioException {

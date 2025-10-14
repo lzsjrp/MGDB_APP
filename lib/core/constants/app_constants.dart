@@ -30,3 +30,9 @@ class ApiUrls {
   String titleChapterById(String titleId, String chapterId) =>
       "$titleRoute/$titleId/chapters/$chapterId";
 }
+
+class AppCacheKeys {
+  static const String imagesCache = 'images_cache';
+  static const String booksCache = 'books_cache';
+  static const String chaptersCache = 'chapters_cache';
+}

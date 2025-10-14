@@ -40,7 +40,10 @@ class ChapterService {
   Future<ChapterListResponse> getChapters(String titleId) async {
     final cacheKey = 'chapters-list_$titleId';
 
-    final cachedData = await cacheManager.getCache('books_cache', cacheKey);
+    final cachedData = await cacheManager.getCache(
+      AppCacheKeys.chaptersCache,
+      cacheKey,
+    );
     if (cachedData != null) {
       return ChapterListResponse.fromJson(cachedData);
     }
@@ -50,7 +53,11 @@ class ChapterService {
 
     try {
       final response = await _dio.get(url);
-      await cacheManager.saveCache('books_cache', cacheKey, response.data);
+      await cacheManager.saveCache(
+        AppCacheKeys.chaptersCache,
+        cacheKey,
+        response.data,
+      );
       return ChapterListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
@@ -60,7 +67,10 @@ class ChapterService {
   Future<Chapter> getChapter(String titleId, String chapterId) async {
     final cacheKey = 'chapter-data_$titleId-$chapterId';
 
-    final cachedData = await cacheManager.getCache('books_cache', cacheKey);
+    final cachedData = await cacheManager.getCache(
+      AppCacheKeys.chaptersCache,
+      cacheKey,
+    );
     if (cachedData != null) {
       return Chapter.fromJson(cachedData);
     }
@@ -72,7 +82,11 @@ class ChapterService {
       final response = await _dio.get(url);
       final data = response.data;
       final chapterJson = data['chapter'];
-      await cacheManager.saveCache('books_cache', cacheKey, chapterJson);
+      await cacheManager.saveCache(
+        AppCacheKeys.chaptersCache,
+        cacheKey,
+        chapterJson,
+      );
       final chapter = Chapter.fromJson(chapterJson);
       return chapter;
     } on DioException catch (e) {
