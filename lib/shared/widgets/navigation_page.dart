@@ -56,7 +56,7 @@ class _NavigationPageState extends State<NavigationPage> {
       body: widget.pages[_currentIndex],
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          padding: theme.padding,
           child: Container(
             decoration: BoxDecoration(
               color: theme.backgroundColor,
