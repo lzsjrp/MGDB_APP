@@ -37,6 +37,13 @@ class BookService {
   }
 
   Future<BookListResponse> getList({required String page, String? type}) async {
+    final cacheKey = 'booksListData_$page-$type';
+
+    final cachedData = await cacheManager.getCache(cacheKey);
+    if (cachedData != null) {
+      return BookListResponse.fromJson(cachedData);
+    }
+
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
     final url = apiUrls.titleRoute;
 
@@ -45,6 +52,7 @@ class BookService {
         url,
         queryParameters: {'page': page, 'type': type},
       );
+      await cacheManager.saveCache(cacheKey, response.data);
       return BookListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception('Error ${e.response?.statusCode ?? e.message}');
@@ -52,7 +60,7 @@ class BookService {
   }
 
   Future<Book> getTitle(String titleId) async {
-    final cacheKey = 'cache_$titleId';
+    final cacheKey = 'bookData_$titleId';
 
     final cachedData = await cacheManager.getCache(cacheKey);
     if (cachedData != null) {
@@ -106,7 +114,7 @@ class BookService {
   }
 
   Future<Cover?> getCover(String titleId) async {
-    final cacheKey = 'cover_cache_$titleId';
+    final cacheKey = 'coverData_$titleId';
 
     final cachedData = await cacheManager.getCache(cacheKey);
     if (cachedData != null) {
