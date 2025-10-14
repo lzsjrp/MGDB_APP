@@ -88,12 +88,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 : () {
                     popupWidget(context, ":(", "Não implementado");
                   },
-            buttonText: userData == null ? "Login" : "Desconectar",
-            title: userData == null
-                ? "Você não está logado"
-                : (userData.name),
+            buttonText: userData == null ? "Login" : "Sair",
+            title: userData == null ? "Você não está logado" : (userData.name),
             description: userData == null
-                ? "Descrição"
+                ? "Faça login para sincronizar seus favoritos"
                 : (userData.email),
           ),
           SettingsMenu(
@@ -102,7 +100,14 @@ class _SettingsPageState extends State<SettingsPage> {
             },
             buttonText: "Alterar",
             title: "Tema",
-            description: "Alterar o tema do aplicativo",
+            description: "Altere o visual para o tema claro ou escuro.",
+          ),
+          SettingsMenu(
+            onPressed: () {},
+            buttonText: "Limpar",
+            title: "Apagar Caches",
+            description:
+                "Apaga os arquivos temporários que aceleram o app, liberando espaço.",
           ),
           SettingsMenu(
             onPressed: () async {
@@ -116,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
               await showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text("Customizar Servidor"),
+                  title: Text("Alterar Servidor"),
                   content: TextField(
                     controller: controller,
                     decoration: InputDecoration(labelText: "URL"),
@@ -143,7 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
             buttonText: "Alterar",
             title: "Servidor",
-            description: "Endereço do servidor para conexão",
+            description: "Endereço para conexão de dados e sincronização.",
           ),
         ],
       ),
