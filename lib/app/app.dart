@@ -7,6 +7,7 @@ import 'package:mgdb/core/theme/app_theme.dart';
 import 'package:mgdb/presentation/home/explore_page.dart';
 import 'package:mgdb/presentation/home/downloads_page.dart';
 import 'package:mgdb/presentation/home/favorites_page.dart';
+import '../presentation/home/settings/settings_page.dart';
 import '../shared/widgets/navigation_page.dart';
 
 import '../providers/theme_provider.dart';
@@ -95,6 +96,18 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationPage(pages: pages, tabs: tabs);
+    final actions = [
+      IconButton(
+        icon: Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SettingsPage()),
+          );
+        },
+      ),
+    ];
+
+    return NavigationPage(pages: pages, tabs: tabs, actions: actions);
   }
 }

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 import '../../core/theme/custom/bottom_navbar_theme.dart';
-import '../../presentation/home/settings/settings_page.dart';
 
 class NavigationPage extends StatefulWidget {
   final List<Widget> pages;
   final List<GButton> tabs;
+  final List<Widget>? actions;
   final int initialIndex;
 
   const NavigationPage({
@@ -14,6 +14,7 @@ class NavigationPage extends StatefulWidget {
     required this.pages,
     required this.tabs,
     this.initialIndex = 0,
+    this.actions,
   });
 
   @override
@@ -39,36 +40,15 @@ class _NavigationPageState extends State<NavigationPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<BottomNavBarThemeData>()!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('App'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text('App'), actions: widget.actions ?? []),
       body: widget.pages[_currentIndex],
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: theme.padding,
+      bottomNavigationBar: Container(
+        color: theme.backgroundColor,
+        child: SafeArea(
           child: Container(
             decoration: BoxDecoration(
               color: theme.backgroundColor,
               borderRadius: BorderRadius.circular(50),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 5),
-                ),
-              ],
             ),
             child: GNav(
               gap: theme.gap,

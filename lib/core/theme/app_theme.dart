@@ -93,7 +93,7 @@ class AppTheme {
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 25),
           tabBorderRadius: 100.0,
           gap: 7,
           iconSize: 24,
