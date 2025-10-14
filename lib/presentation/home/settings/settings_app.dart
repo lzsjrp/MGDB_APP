@@ -70,7 +70,7 @@ class _SettingsAppState extends State<SettingsApp> {
             onPressed: clearAllCaches,
             buttonText: "Limpar",
             title: "Apagar Caches",
-            description: "Apaga os arquivos temporários, liberando espaço.",
+            description: "Apaga os dados temporários, liberando espaço.",
           ),
           SettingsMenu(
             onPressed: () {
@@ -81,7 +81,7 @@ class _SettingsAppState extends State<SettingsApp> {
             buttonText: _preferences.noCache ? "Ativar" : "Desativar",
             title: "Usar Cache",
             description:
-                "Usa cache para arquivos temporários acelerando o app.",
+                "Armazena dados temporários para melhorar o desempenho, algumas informações podem ficar desatualizadas.",
           ),
         ],
       ),
