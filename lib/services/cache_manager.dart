@@ -14,7 +14,6 @@ class CacheManager {
   final Dio _dio;
 
   static const cacheDuration = Duration(hours: 1);
-  static const String allCacheKey = 'app_cache';
 
   CacheManager(this.apiConfigProvider) : _dio = Dio() {
     _dio.options
@@ -22,47 +21,48 @@ class CacheManager {
       ..headers = {'Content-Type': 'application/json'};
   }
 
-  Future<void> saveCache(String key, Map<String, dynamic> data) async {
+  Future<void> saveCache(String typeKey, String subKey, dynamic data) async {
     final prefs = await SharedPreferences.getInstance();
-    final cacheString = prefs.getString(allCacheKey);
-    Map<String, dynamic> allCache = {};
+    final cacheString = prefs.getString(typeKey);
+
+    Map<String, dynamic> typeCache = {};
 
     if (cacheString != null) {
-      allCache = json.decode(cacheString) as Map<String, dynamic>;
+      typeCache = json.decode(cacheString) as Map<String, dynamic>;
     }
 
-    allCache[key] = {
+    typeCache[subKey] = {
       'timestamp': DateTime.now().toIso8601String(),
       'data': data,
     };
 
-    await prefs.setString(allCacheKey, json.encode(allCache));
+    await prefs.setString(typeKey, json.encode(typeCache));
   }
 
-  Future<Map<String, dynamic>?> getCache(String key) async {
+  Future<dynamic> getCache(String typeKey, String subKey) async {
     final prefs = await SharedPreferences.getInstance();
-    final cacheString = prefs.getString(allCacheKey);
+    final cacheString = prefs.getString(typeKey);
     if (cacheString == null) return null;
 
-    final allCache = json.decode(cacheString) as Map<String, dynamic>;
-    if (!allCache.containsKey(key)) return null;
+    final typeCache = json.decode(cacheString) as Map<String, dynamic>;
+    if (!typeCache.containsKey(subKey)) return null;
 
-    final cacheMap = allCache[key] as Map<String, dynamic>;
+    final cacheMap = typeCache[subKey] as Map<String, dynamic>;
     final timestamp = DateTime.parse(cacheMap['timestamp']);
     final now = DateTime.now();
 
     if (now.difference(timestamp) > cacheDuration) {
-      allCache.remove(key);
-      await prefs.setString(allCacheKey, json.encode(allCache));
+      typeCache.remove(subKey);
+      await prefs.setString(typeKey, json.encode(typeCache));
       return null;
     }
 
-    return (cacheMap['data'] as Map).cast<String, dynamic>();
+    return cacheMap['data'];
   }
 
-  Future<void> clearAllCaches() async {
+  Future<void> clearAllCaches(String typeKey) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(allCacheKey);
+    await prefs.remove(typeKey);
   }
 
   Future<bool> isFileCacheValid(String filePath, Duration cacheDuration) async {
@@ -77,36 +77,31 @@ class CacheManager {
   Future<File?> imageCache(String imageId, String imageUrl) async {
     if (imageUrl.isEmpty) return null;
 
-    final prefs = await SharedPreferences.getInstance();
-    final cacheKey = 'app_cache-image-$imageId';
+    const String typeKey = 'images_cache';
 
-    final cacheEntryString = prefs.getString(cacheKey);
-    Map<String, dynamic>? cacheEntry;
-    if (cacheEntryString != null) {
-      cacheEntry = json.decode(cacheEntryString) as Map<String, dynamic>;
-      final timestamp = DateTime.parse(cacheEntry['timestamp']);
-      final now = DateTime.now();
-
-      if (now.difference(timestamp) > cacheDuration) {
-        await prefs.remove(cacheKey);
-        cacheEntry = null;
-      }
-    }
+    final cacheEntry =
+        await getCache(typeKey, imageId) as Map<String, dynamic>?;
 
     final dir = await getApplicationCacheDirectory();
     final filePath = '${dir.path}/$imageId.jpg';
     final file = File(filePath);
 
-    if (cacheEntry != null && await file.exists()) {
-      return file;
-    } else {
-      await _dio.download(imageUrl, filePath);
-      final newCacheEntry = json.encode({
-        'timestamp': DateTime.now().toIso8601String(),
-        'filePath': filePath,
-      });
-      await prefs.setString(cacheKey, newCacheEntry);
-      return file;
+    final now = DateTime.now();
+
+    if (cacheEntry != null) {
+      final timestamp = DateTime.parse(cacheEntry['timestamp'] as String);
+      if (now.difference(timestamp) <= cacheDuration && await file.exists()) {
+        return file;
+      }
     }
+
+    await _dio.download(imageUrl, filePath);
+
+    await saveCache(typeKey, imageId, {
+      'timestamp': now.toIso8601String(),
+      'filePath': filePath,
+    });
+
+    return file;
   }
 }
