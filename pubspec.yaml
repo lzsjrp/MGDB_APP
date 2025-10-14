@@ -47,6 +47,13 @@ dependencies:
   google_nav_bar: ^5.0.7
   dio: ^5.9.0
   path_provider: ^2.1.5
+  package_info_plus: ^9.0.0
+  version: ^3.0.2
+  install_plugin:
+    git:
+      url: https://github.com/Ujjwal091/flutter_install_plugin.git
+      ref: 2e7da3fe99ed81eed5ef7697135c7c8ff9d25e28
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   injectable_generator: ^2.5.2
