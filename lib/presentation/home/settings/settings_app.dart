@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mgdb/services/cache_manager.dart';
+import 'package:mgdb/shared/preferences.dart';
 
 import '../../../app/injectable.dart';
 import '../../../core/constants/app_constants.dart';
@@ -17,6 +18,7 @@ class SettingsApp extends StatefulWidget {
 
 class _SettingsAppState extends State<SettingsApp> {
   final cacheManager = getIt<CacheManager>();
+  final _preferences = getIt<AppPreferences>();
 
   @override
   void initState() {
@@ -45,7 +47,7 @@ class _SettingsAppState extends State<SettingsApp> {
             onPressed: () {
               themeProvider.toggleTheme();
             },
-            buttonText: "Alterar",
+            buttonText: _preferences.themeMode == 'light' ? 'Claro' : 'Escuro',
             title: "Tema",
             description: "Altere o visual para o tema claro ou escuro.",
           ),
@@ -57,7 +59,7 @@ class _SettingsAppState extends State<SettingsApp> {
           ),
           SettingsMenu(
             onPressed: () {},
-            buttonText: "Desativar",
+            buttonText: _preferences.noCache ? "Ativar" : "Desativar",
             title: "Usar Cache",
             description:
                 "Usa cache para arquivos temporários acelerando o app.",
