@@ -10,8 +10,6 @@ import 'package:mgdb/providers/user_provider.dart';
 import 'package:mgdb/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../../providers/api_config_provider.dart';
-
 class SettingsSync extends StatefulWidget {
   const SettingsSync({super.key});
 
@@ -34,7 +32,11 @@ class _SettingsSyncState extends State<SettingsSync> {
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    await userProvider.loadUser();
+    try {
+      await userProvider.loadUser();
+    } catch (e) {
+      // Do nothing
+    }
 
     setState(() {
       userData = userProvider.userData;
