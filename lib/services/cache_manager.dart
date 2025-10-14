@@ -7,20 +7,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:injectable/injectable.dart';
 
 import '../core/constants/app_constants.dart';
-import '../providers/api_config_provider.dart';
 
 @injectable
 class CacheManager {
-  final ApiConfigProvider apiConfigProvider;
   final Dio _dio;
 
   static const cacheDuration = Duration(hours: 1);
 
-  CacheManager(this.apiConfigProvider) : _dio = Dio() {
-    _dio.options
-      ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
-      ..headers = {'Content-Type': 'application/json'};
-  }
+  CacheManager() : _dio = Dio();
 
   Future<void> saveCache(String typeKey, String subKey, dynamic data) async {
     final prefs = await SharedPreferences.getInstance();
@@ -79,7 +73,8 @@ class CacheManager {
     if (imageUrl.isEmpty) return null;
 
     final cacheEntry =
-        await getCache(AppCacheKeys.imagesCache, imageId) as Map<String, dynamic>?;
+        await getCache(AppCacheKeys.imagesCache, imageId)
+            as Map<String, dynamic>?;
 
     final dir = await getApplicationCacheDirectory();
     final filePath = '${dir.path}/$imageId.jpg';

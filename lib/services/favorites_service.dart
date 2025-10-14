@@ -75,6 +75,7 @@ class FavoritesService {
   Future<void> addFavorite(String bookId) async {
     if (await _canSync()) {
       final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+      _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
       try {
         final url = apiUrls.addOrRemoveFavorite(bookId);
         await _dio.post(url);
@@ -91,6 +92,7 @@ class FavoritesService {
   Future<void> removeFavorite(String bookId) async {
     if (await _canSync()) {
       final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+      _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
       try {
         final url = apiUrls.addOrRemoveFavorite(bookId);
         await _dio.delete(url);
@@ -113,6 +115,7 @@ class FavoritesService {
     if (!await _canSync()) return [];
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.favoritesRoute;
 
     try {
@@ -144,6 +147,7 @@ class FavoritesService {
 
     try {
       final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+      _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
 
       Set<String> favoritesToSync;
 

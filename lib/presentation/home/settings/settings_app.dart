@@ -43,6 +43,13 @@ class _SettingsAppState extends State<SettingsApp> {
     return Scaffold(
       body: ListView(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
+            child: Text(
+              "Customização",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
           SettingsMenu(
             onPressed: () {
               themeProvider.toggleTheme();
@@ -50,6 +57,13 @@ class _SettingsAppState extends State<SettingsApp> {
             buttonText: _preferences.themeMode == 'light' ? 'Claro' : 'Escuro',
             title: "Tema",
             description: "Altere o visual para o tema claro ou escuro.",
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
+            child: Text(
+              "Armazenamento",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
           SettingsMenu(
             onPressed: clearAllCaches,

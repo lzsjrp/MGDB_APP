@@ -54,6 +54,13 @@ class _SettingsSyncState extends State<SettingsSync> {
     return Scaffold(
       body: ListView(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
+            child: Text(
+              "Sincronização",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
           SettingsMenu(
             onPressed: userData == null
                 ? () {
@@ -79,6 +86,23 @@ class _SettingsSyncState extends State<SettingsSync> {
             description: userData == null
                 ? "Faça login para sincronizar seus favoritos"
                 : (userData.email),
+          ),
+          ?userData == null
+              ? null
+              : SettingsMenu(
+                  onPressed: () {
+                    popupWidget(context, ":(", "Não implementado");
+                  },
+                  buttonText: "Sincronizar",
+                  title: "Favoritos",
+                  description: "Sincroniza seus favoritos com o servidor",
+                ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
+            child: Text(
+              "Outros",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
           SettingsMenu(
             onPressed: () async {
