@@ -17,6 +17,7 @@ import '../providers/connectivity_provider.dart' as _i517;
 import '../providers/theme_provider.dart' as _i522;
 import '../providers/user_provider.dart' as _i26;
 import '../services/book_service.dart' as _i490;
+import '../services/cache_manager.dart' as _i802;
 import '../services/chapter_service.dart' as _i193;
 import '../services/downloads_service.dart' as _i708;
 import '../services/favorites_service.dart' as _i211;
@@ -38,6 +39,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i187.ApiConfigProvider>(
       () => registerModule.apiConfigProvider,
     );
+    gh.factory<_i802.CacheManager>(
+      () => _i802.CacheManager(gh<_i187.ApiConfigProvider>()),
+    );
     gh.factory<_i984.SessionService>(
       () => _i984.SessionService(gh<_i187.ApiConfigProvider>()),
     );
@@ -52,12 +56,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i490.BookService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
+        gh<_i802.CacheManager>(),
       ),
     );
     gh.factory<_i193.ChapterService>(
       () => _i193.ChapterService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
+        gh<_i802.CacheManager>(),
       ),
     );
     return this;

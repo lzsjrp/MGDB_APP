@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,13 +8,44 @@ import '../../../../core/theme/custom/gridview_theme.dart';
 
 class BookCard extends StatelessWidget {
   final Book book;
+  final File? localCoverFile;
   final VoidCallback? onTap;
 
-  const BookCard({super.key, required this.book, this.onTap});
+  const BookCard({
+    super.key,
+    required this.book,
+    this.localCoverFile,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
+
+    Widget imageWidget;
+
+    if (localCoverFile != null && localCoverFile!.existsSync()) {
+      imageWidget = Image.file(localCoverFile!, fit: BoxFit.cover);
+    } else if (book.cover?.imageUrl != null) {
+      imageWidget = CachedNetworkImage(
+        imageUrl: book.cover!.imageUrl,
+        fit: BoxFit.cover,
+        progressIndicatorBuilder: (context, url, progress) => Container(
+          color: theme.cardBackgroundColor,
+          child: Icon(Icons.book, color: theme.placeholderIconColor, size: 40),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: theme.cardBackgroundColor,
+          child: Icon(Icons.book, color: theme.placeholderIconColor, size: 40),
+        ),
+      );
+    } else {
+      imageWidget = Container(
+        color: theme.cardBackgroundColor,
+        child: Icon(Icons.book, color: theme.placeholderIconColor, size: 40),
+      );
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -22,38 +55,7 @@ class BookCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            Positioned.fill(
-              child: (book.cover?.imageUrl != null)
-                  ? CachedNetworkImage(
-                      imageUrl: book.cover!.imageUrl,
-                      fit: BoxFit.cover,
-                      progressIndicatorBuilder: (context, url, progress) =>
-                          Container(
-                            color: theme.cardBackgroundColor,
-                            child: Icon(
-                              Icons.book,
-                              color: theme.placeholderIconColor,
-                              size: 40,
-                            ),
-                          ),
-                      errorWidget: (context, url, error) => Container(
-                        color: theme.cardBackgroundColor,
-                        child: Icon(
-                          Icons.book,
-                          color: theme.placeholderIconColor,
-                          size: 40,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      color: theme.cardBackgroundColor,
-                      child: Icon(
-                        Icons.book,
-                        color: theme.placeholderIconColor,
-                        size: 40,
-                      ),
-                    ),
-            ),
+            Positioned.fill(child: imageWidget),
             Positioned(
               left: 0,
               right: 0,

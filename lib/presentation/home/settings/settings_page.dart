@@ -1,7 +1,10 @@
 import 'package:mgdb/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:mgdb/services/cache_manager.dart';
 
 import 'package:mgdb/shared/widgets/popup_widget.dart';
+import '../../../app/injectable.dart';
+import '../../../core/constants/app_constants.dart';
 import './widgets/settings_menu_widget.dart';
 import './dialogs/login_dialog.dart';
 
@@ -20,6 +23,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final cacheManager = getIt<CacheManager>();
+
   User? userData;
   bool _isLoading = true;
 
@@ -40,6 +45,18 @@ class _SettingsPageState extends State<SettingsPage> {
       userData = userProvider.userData;
       _isLoading = false;
     });
+  }
+
+  Future<void> clearAllCaches() async {
+    final keysToClear = [
+      AppCacheKeys.imagesCache,
+      AppCacheKeys.booksCache,
+      AppCacheKeys.chaptersCache,
+    ];
+
+    for (final key in keysToClear) {
+      await cacheManager.clearCache(key);
+    }
   }
 
   @override
@@ -88,12 +105,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 : () {
                     popupWidget(context, ":(", "Não implementado");
                   },
-            buttonText: userData == null ? "Login" : "Desconectar",
-            title: userData == null
-                ? "Você não está logado"
-                : (userData.name),
+            buttonText: userData == null ? "Login" : "Sair",
+            title: userData == null ? "Você não está logado" : (userData.name),
             description: userData == null
-                ? "Descrição"
+                ? "Faça login para sincronizar seus favoritos"
                 : (userData.email),
           ),
           SettingsMenu(
@@ -102,7 +117,14 @@ class _SettingsPageState extends State<SettingsPage> {
             },
             buttonText: "Alterar",
             title: "Tema",
-            description: "Alterar o tema do aplicativo",
+            description: "Altere o visual para o tema claro ou escuro.",
+          ),
+          SettingsMenu(
+            onPressed: clearAllCaches,
+            buttonText: "Limpar",
+            title: "Apagar Caches",
+            description:
+                "Apaga os arquivos temporários que aceleram o app, liberando espaço.",
           ),
           SettingsMenu(
             onPressed: () async {
@@ -116,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
               await showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text("Customizar Servidor"),
+                  title: Text("Alterar Servidor"),
                   content: TextField(
                     controller: controller,
                     decoration: InputDecoration(labelText: "URL"),
@@ -143,7 +165,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
             buttonText: "Alterar",
             title: "Servidor",
-            description: "Endereço do servidor para conexão",
+            description: "Endereço para conexão de dados e sincronização.",
           ),
         ],
       ),

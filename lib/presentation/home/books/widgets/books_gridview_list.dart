@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
 
@@ -5,12 +7,15 @@ import './book_card.dart';
 
 class BooksGridView extends StatelessWidget {
   final List<Book> books;
+  final Map<String, File?> coverFiles;
+
   final void Function(String bookId) onBookTap;
 
   const BooksGridView({
     super.key,
     required this.books,
     required this.onBookTap,
+    required this.coverFiles,
   });
 
   @override
@@ -26,8 +31,10 @@ class BooksGridView extends StatelessWidget {
       itemCount: books.length,
       itemBuilder: (context, index) {
         var book = books[index];
+        var coverFile = coverFiles[book.id];
         return BookCard(
           book: book,
+          localCoverFile: coverFile,
           onTap: () {
             onBookTap(book.id);
           },
