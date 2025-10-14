@@ -4,6 +4,7 @@ import 'package:mgdb/shared/preferences.dart';
 
 import '../../../app/injectable.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../shared/widgets/popup_widget.dart';
 import './widgets/settings_menu_widget.dart';
 
 import 'package:mgdb/providers/theme_provider.dart';
@@ -72,7 +73,9 @@ class _SettingsAppState extends State<SettingsApp> {
             description: "Apaga os arquivos temporários, liberando espaço.",
           ),
           SettingsMenu(
-            onPressed: () {},
+            onPressed: () {
+              popupWidget(context, ":(", "Não implementado");
+            },
             buttonText: _preferences.noCache ? "Ativar" : "Desativar",
             title: "Usar Cache",
             description:
