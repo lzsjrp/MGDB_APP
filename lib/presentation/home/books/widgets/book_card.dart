@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/theme/custom/gridview_theme.dart';
 
@@ -27,14 +26,21 @@ class BookCard extends StatelessWidget {
     if (localCoverFile != null && localCoverFile!.existsSync()) {
       imageWidget = Image.file(localCoverFile!, fit: BoxFit.cover);
     } else if (book.cover?.imageUrl != null) {
-      imageWidget = CachedNetworkImage(
-        imageUrl: book.cover!.imageUrl,
+      imageWidget = Image.network(
+        book.cover!.imageUrl,
         fit: BoxFit.cover,
-        progressIndicatorBuilder: (context, url, progress) => Container(
-          color: theme.cardBackgroundColor,
-          child: Icon(Icons.book, color: theme.placeholderIconColor, size: 40),
-        ),
-        errorWidget: (context, url, error) => Container(
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return Container(
+            color: theme.cardBackgroundColor,
+            child: Icon(
+              Icons.book,
+              color: theme.placeholderIconColor,
+              size: 40,
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => Container(
           color: theme.cardBackgroundColor,
           child: Icon(Icons.book, color: theme.placeholderIconColor, size: 40),
         ),
