@@ -1,7 +1,10 @@
 import 'package:mgdb/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:mgdb/services/cache_manager.dart';
 
 import 'package:mgdb/shared/widgets/popup_widget.dart';
+import '../../../app/injectable.dart';
+import '../../../core/constants/app_constants.dart';
 import './widgets/settings_menu_widget.dart';
 import './dialogs/login_dialog.dart';
 
@@ -20,6 +23,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final cacheManager = getIt<CacheManager>();
+
   User? userData;
   bool _isLoading = true;
 
@@ -40,6 +45,18 @@ class _SettingsPageState extends State<SettingsPage> {
       userData = userProvider.userData;
       _isLoading = false;
     });
+  }
+
+  Future<void> clearAllCaches() async {
+    final keysToClear = [
+      AppCacheKeys.imagesCache,
+      AppCacheKeys.booksCache,
+      AppCacheKeys.chaptersCache,
+    ];
+
+    for (final key in keysToClear) {
+      await cacheManager.clearCache(key);
+    }
   }
 
   @override
@@ -103,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
             description: "Altere o visual para o tema claro ou escuro.",
           ),
           SettingsMenu(
-            onPressed: () {},
+            onPressed: clearAllCaches,
             buttonText: "Limpar",
             title: "Apagar Caches",
             description:

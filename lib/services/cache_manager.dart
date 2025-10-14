@@ -61,7 +61,7 @@ class CacheManager {
     return cacheMap['data'];
   }
 
-  Future<void> clearAllCaches(String typeKey) async {
+  Future<void> clearCache(String typeKey) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(typeKey);
   }
