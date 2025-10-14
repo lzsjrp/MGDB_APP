@@ -1,8 +1,10 @@
 import 'package:mgdb/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mgdb/presentation/home/settings/dialogs/change_api_dialog.dart';
+import 'package:mgdb/services/favorites_service.dart';
 
 import 'package:mgdb/shared/widgets/popup_widget.dart';
+import '../../../app/injectable.dart';
 import './widgets/settings_menu_widget.dart';
 import './dialogs/login_dialog.dart';
 
@@ -18,6 +20,8 @@ class SettingsSync extends StatefulWidget {
 }
 
 class _SettingsSyncState extends State<SettingsSync> {
+  final favoritesService = getIt<FavoritesService>();
+
   User? userData;
   bool _isLoading = true;
 
@@ -93,8 +97,18 @@ class _SettingsSyncState extends State<SettingsSync> {
           ?userData == null
               ? null
               : SettingsMenu(
-                  onPressed: () {
-                    popupWidget(context, ":(", "Não implementado");
+                  onPressed: () async {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    try {
+                      await favoritesService.syncFavorites(merge: true);
+                    } catch (e) {
+                      // do nothing
+                    }
+                    setState(() {
+                      _isLoading = false;
+                    });
                   },
                   buttonText: "Sincronizar",
                   title: "Favoritos",
