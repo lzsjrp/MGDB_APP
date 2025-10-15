@@ -102,13 +102,6 @@ class _SettingsSyncState extends State<SettingsSync> {
                   title: "Favoritos",
                   description: "Sincroniza seus favoritos com o servidor.",
                 ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
-            child: Text(
-              "Outros",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
         ],
       ),
     );
