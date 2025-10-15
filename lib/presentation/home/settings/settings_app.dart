@@ -4,10 +4,13 @@ import 'package:mgdb/shared/preferences.dart';
 
 import '../../../app/injectable.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../providers/connectivity_provider.dart';
 import './widgets/settings_menu_widget.dart';
 
 import 'package:mgdb/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
+
+import 'dialogs/change_api_dialog.dart';
 
 class SettingsApp extends StatefulWidget {
   const SettingsApp({super.key});
@@ -47,6 +50,8 @@ class _SettingsAppState extends State<SettingsApp> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final isConnected = context.watch<ConnectivityProvider>().isConnected;
+
     return Scaffold(
       body: ListView(
         children: [
@@ -89,6 +94,44 @@ class _SettingsAppState extends State<SettingsApp> {
             description:
                 "Armazena dados temporários para melhorar o desempenho, algumas informações podem ficar desatualizadas.",
           ),
+          if (_preferences.earlyAccess)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 20.0,
+                    bottom: 5.0,
+                    left: 20.0,
+                  ),
+                  child: Text(
+                    "Desenvolvedor",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SettingsMenu(
+                  onPressed: () async {
+                    if (isConnected) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => const ChangeApiDialog(),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Você está sem conexão com a internet'),
+                        ),
+                      );
+                    }
+                  },
+                  buttonText: "Alterar",
+                  title: "Servidor",
+                  description:
+                      "Endereço para conexão de dados e sincronização.",
+                ),
+              ],
+            ),
         ],
       ),
     );
