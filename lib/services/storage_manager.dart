@@ -138,7 +138,7 @@ class StorageManager {
     return now.difference(stat.modified) <= cacheDuration;
   }
 
-  Future<File?> imageCache(String imageId, String imageUrl) async {
+  Future<File?> cachedImage(String imageId, String imageUrl) async {
     if (appPreferences.noCache) return null;
     if (imageUrl.isEmpty) return null;
 
@@ -173,5 +173,68 @@ class StorageManager {
     });
 
     return file;
+  }
+
+  Future<File?> getImage(String imageId) async {
+    try {
+      final storageEntry =
+          await getStorage(AppStorageKeys.imagesKey, imageId)
+              as Map<String, dynamic>?;
+
+      final dir = await getDownloadsDirectory();
+      final imgDir = Directory('${dir!.path}/imgs');
+
+      if (!await imgDir.exists()) {
+        await imgDir.create(recursive: true);
+      }
+
+      final filePath = '${imgDir.path}/$imageId.jpg';
+      final file = File(filePath);
+
+      if (storageEntry == null) {
+        return null;
+      }
+
+      final fileExists = await file.exists();
+      if (fileExists) {
+        return file;
+      } else {
+        await saveStorage(AppStorageKeys.imagesKey, imageId, null);
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<File?> saveImage(String imageId, String imageUrl) async {
+    if (imageUrl.isEmpty) return null;
+
+    try {
+      final dir = await getDownloadsDirectory();
+      if (dir == null) return null;
+
+      final imgDir = Directory('${dir.path}/imgs');
+      if (!await imgDir.exists()) {
+        await imgDir.create(recursive: true);
+      }
+
+      final filePath = '${imgDir.path}/$imageId.jpg';
+      final file = File(filePath);
+
+      final dio = Dio();
+      await dio.download(imageUrl, filePath);
+
+      final now = DateTime.now();
+      await saveStorage(AppStorageKeys.imagesKey, imageId, {
+        'timestamp': now.toIso8601String(),
+        'filePath': filePath,
+        'url': imageUrl,
+      });
+
+      return file;
+    } catch (e) {
+      return null;
+    }
   }
 }

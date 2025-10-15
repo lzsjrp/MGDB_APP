@@ -82,10 +82,7 @@ class _FavoritesPage extends State<FavoritesPage> {
       for (var book in books) {
         final cover = book.cover;
         if (cover != null) {
-          final file = await storageManager.imageCache(
-            cover.id,
-            cover.imageUrl,
-          );
+          final file = await storageManager.getImage(cover.id);
           coverFiles[book.id] = file;
         }
       }
