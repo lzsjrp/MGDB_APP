@@ -1,4 +1,3 @@
-import 'package:mgdb/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mgdb/presentation/home/settings/dialogs/change_api_dialog.dart';
 import 'package:mgdb/services/favorites_service.dart';
@@ -22,32 +21,11 @@ class SettingsSync extends StatefulWidget {
 class _SettingsSyncState extends State<SettingsSync> {
   final favoritesService = getIt<FavoritesService>();
 
-  User? userData;
-  bool _isLoading = true;
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => _checkUser());
-  }
-
-  Future<void> _checkUser() async {
-    if (!mounted) return;
-    setState(() => _isLoading = true);
-
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    try {
-      await userProvider.loadUser();
-    } catch (e) {
-      // Do nothing
-    }
-
-    if (!mounted) return;
-    setState(() {
-      userData = userProvider.userData;
-      _isLoading = false;
-    });
   }
 
   @override
@@ -57,9 +35,10 @@ class _SettingsSyncState extends State<SettingsSync> {
 
     final userData = userProvider.userData;
 
-    if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_loading) {
+      return Center(child: CircularProgressIndicator());
     }
+
     return Scaffold(
       body: ListView(
         children: [
@@ -100,17 +79,25 @@ class _SettingsSyncState extends State<SettingsSync> {
               ? null
               : SettingsMenu(
                   onPressed: () async {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    try {
-                      await favoritesService.syncFavorites(merge: true);
-                    } catch (e) {
-                      // do nothing
+                    if (isConnected) {
+                      setState(() {
+                        _loading = true;
+                      });
+                      try {
+                        await favoritesService.syncFavorites(merge: true);
+                      } catch (e) {
+                        // do nothing
+                      }
+                      setState(() {
+                        _loading = false;
+                      });
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Você está sem conexão com a internet'),
+                        ),
+                      );
                     }
-                    setState(() {
-                      _isLoading = false;
-                    });
                   },
                   buttonText: "Sincronizar",
                   title: "Favoritos",

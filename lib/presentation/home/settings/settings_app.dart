@@ -26,14 +26,21 @@ class _SettingsAppState extends State<SettingsApp> {
   }
 
   Future<void> clearAllCaches() async {
-    final keysToClear = [
-      AppCacheKeys.imagesCache,
-      AppCacheKeys.booksCache,
-      AppCacheKeys.chaptersCache,
-    ];
+    try {
+      final keysToClear = [
+        AppCacheKeys.imagesCache,
+        AppCacheKeys.booksCache,
+        AppCacheKeys.chaptersCache,
+      ];
 
-    for (final key in keysToClear) {
-      await storageManager.clearCache(key);
+      for (final key in keysToClear) {
+        await storageManager.clearCache(key);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Falha ao limpar os caches...')),
+      );
     }
   }
 
