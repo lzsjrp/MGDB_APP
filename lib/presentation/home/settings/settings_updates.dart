@@ -23,6 +23,9 @@ class SettingsUpdates extends StatefulWidget {
 class _SettingsUpdatesState extends State<SettingsUpdates> {
   static bool _installPermissions = true;
 
+  String _currentVersion = '';
+  String _latestVersion = '';
+
   bool _loading = false;
   String _progress = '';
   String _err = '';
@@ -79,6 +82,11 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       latestVersion = latestVersion.startsWith('v')
           ? latestVersion.substring(1)
           : latestVersion;
+
+      setState(() {
+        _currentVersion = currentVersion.toString();
+        _latestVersion = latestVersion.toString();
+      });
 
       Version latest = Version.parse(latestVersion);
       Version current = Version.parse(currentVersion);
@@ -204,6 +212,23 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
             title: "Procurar por atualizações",
             description: "Procura e instala novas atualizações do aplicativo",
           ),
+          if (_currentVersion.isNotEmpty && _latestVersion.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Versão Atual: $_currentVersion",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  Text(
+                    "Ultima Versão: $_latestVersion",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
