@@ -6,16 +6,16 @@ import '../providers/api_config_provider.dart';
 import 'package:mgdb/core/constants/app_constants.dart';
 import 'package:mgdb/services/session_service.dart';
 
-import 'cache_manager.dart';
+import 'storage_manager.dart';
 
 @injectable
 class ChapterService {
   final SessionService sessionService;
   final ApiConfigProvider apiConfigProvider;
-  final CacheManager cacheManager;
+  final StorageManager storageManager;
   final Dio _dio;
 
-  ChapterService(this.sessionService, this.apiConfigProvider, this.cacheManager)
+  ChapterService(this.sessionService, this.apiConfigProvider, this.storageManager)
     : _dio = Dio() {
     _dio.options
       ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
@@ -40,7 +40,7 @@ class ChapterService {
   Future<ChapterListResponse> getChapters(String titleId) async {
     final cacheKey = 'chapters-list_$titleId';
 
-    final cachedData = await cacheManager.getCache(
+    final cachedData = await storageManager.getCache(
       AppCacheKeys.chaptersCache,
       cacheKey,
     );
@@ -54,7 +54,7 @@ class ChapterService {
 
     try {
       final response = await _dio.get(url);
-      await cacheManager.saveCache(
+      await storageManager.saveCache(
         AppCacheKeys.chaptersCache,
         cacheKey,
         response.data,
@@ -68,7 +68,7 @@ class ChapterService {
   Future<Chapter> getChapter(String titleId, String chapterId) async {
     final cacheKey = 'chapter-data_$titleId-$chapterId';
 
-    final cachedData = await cacheManager.getCache(
+    final cachedData = await storageManager.getCache(
       AppCacheKeys.chaptersCache,
       cacheKey,
     );
@@ -84,7 +84,7 @@ class ChapterService {
       final response = await _dio.get(url);
       final data = response.data;
       final chapterJson = data['chapter'];
-      await cacheManager.saveCache(
+      await storageManager.saveCache(
         AppCacheKeys.chaptersCache,
         cacheKey,
         chapterJson,

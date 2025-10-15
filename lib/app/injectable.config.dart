@@ -17,11 +17,11 @@ import '../providers/connectivity_provider.dart' as _i517;
 import '../providers/theme_provider.dart' as _i522;
 import '../providers/user_provider.dart' as _i26;
 import '../services/book_service.dart' as _i490;
-import '../services/cache_manager.dart' as _i802;
 import '../services/chapter_service.dart' as _i193;
 import '../services/downloads_service.dart' as _i708;
 import '../services/favorites_service.dart' as _i211;
 import '../services/session_service.dart' as _i984;
+import '../services/storage_manager.dart' as _i1041;
 import '../shared/preferences.dart' as _i76;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -41,8 +41,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i522.ThemeProvider>(
       () => _i522.ThemeProvider(gh<_i76.AppPreferences>()),
     );
-    gh.factory<_i802.CacheManager>(
-      () => _i802.CacheManager(gh<_i76.AppPreferences>()),
+    gh.factory<_i1041.StorageManager>(
+      () => _i1041.StorageManager(gh<_i76.AppPreferences>()),
     );
     gh.factory<_i984.SessionService>(
       () => _i984.SessionService(gh<_i187.ApiConfigProvider>()),
@@ -52,20 +52,21 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
         gh<_i517.ConnectivityProvider>(),
+        gh<_i1041.StorageManager>(),
       ),
     );
     gh.factory<_i490.BookService>(
       () => _i490.BookService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
-        gh<_i802.CacheManager>(),
+        gh<_i1041.StorageManager>(),
       ),
     );
     gh.factory<_i193.ChapterService>(
       () => _i193.ChapterService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
-        gh<_i802.CacheManager>(),
+        gh<_i1041.StorageManager>(),
       ),
     );
     return this;

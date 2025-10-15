@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../app/injectable.dart';
 import '../../services/book_service.dart';
-import '../../services/cache_manager.dart';
+import '../../services/storage_manager.dart';
 import '../../services/favorites_service.dart';
 import './books/details_page.dart';
 import 'books/widgets/books_gridview_list.dart';
@@ -21,7 +21,7 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritesPage extends State<FavoritesPage> {
   final favoritesService = getIt<FavoritesService>();
-  final cacheManager = getIt<CacheManager>();
+  final storageManager = getIt<StorageManager>();
   final bookService = getIt<BookService>();
 
   Set<String> favoriteBookIds = {};
@@ -49,6 +49,8 @@ class _FavoritesPage extends State<FavoritesPage> {
       setState(() => _loading = true);
 
       final favorites = await favoritesService.getFavoritesSet(sync: false);
+
+      debugPrint(favorites.toString());
 
       List<Book> booksDataList = [];
       for (var bookId in favorites) {
@@ -80,7 +82,10 @@ class _FavoritesPage extends State<FavoritesPage> {
       for (var book in books) {
         final cover = book.cover;
         if (cover != null) {
-          final file = await cacheManager.imageCache(cover.id, cover.imageUrl);
+          final file = await storageManager.imageCache(
+            cover.id,
+            cover.imageUrl,
+          );
           coverFiles[book.id] = file;
         }
       }

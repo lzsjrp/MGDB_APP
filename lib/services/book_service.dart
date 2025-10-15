@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'package:mgdb/services/cache_manager.dart';
+import 'package:mgdb/services/storage_manager.dart';
 
 import '../models/book_model.dart';
 import '../providers/api_config_provider.dart';
@@ -11,10 +11,10 @@ import 'package:mgdb/services/session_service.dart';
 class BookService {
   final SessionService sessionService;
   final ApiConfigProvider apiConfigProvider;
-  final CacheManager cacheManager;
+  final StorageManager storageManager;
   final Dio _dio;
 
-  BookService(this.sessionService, this.apiConfigProvider, this.cacheManager)
+  BookService(this.sessionService, this.apiConfigProvider, this.storageManager)
     : _dio = Dio() {
     _dio.options
       ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
@@ -39,7 +39,7 @@ class BookService {
   Future<BookListResponse> getList({required String page, String? type}) async {
     final cacheKey = 'list-data_$page-$type';
 
-    final cachedData = await cacheManager.getCache(
+    final cachedData = await storageManager.getCache(
       AppCacheKeys.booksCache,
       cacheKey,
     );
@@ -56,7 +56,7 @@ class BookService {
         url,
         queryParameters: {'page': page, 'type': type},
       );
-      await cacheManager.saveCache(
+      await storageManager.saveCache(
         AppCacheKeys.booksCache,
         cacheKey,
         response.data,
@@ -70,7 +70,7 @@ class BookService {
   Future<Book> getTitle(String titleId) async {
     final cacheKey = 'book-data_$titleId';
 
-    final cachedData = await cacheManager.getCache(
+    final cachedData = await storageManager.getCache(
       AppCacheKeys.booksCache,
       cacheKey,
     );
@@ -86,7 +86,11 @@ class BookService {
       final response = await _dio.get(url);
       final data = response.data;
       final bookJson = data['book'];
-      await cacheManager.saveCache(AppCacheKeys.booksCache, cacheKey, bookJson);
+      await storageManager.saveCache(
+        AppCacheKeys.booksCache,
+        cacheKey,
+        bookJson,
+      );
       final book = Book.fromJson(bookJson);
       return book;
     } on DioException catch (e) {
@@ -130,7 +134,7 @@ class BookService {
   Future<Cover?> getCover(String titleId) async {
     final cacheKey = 'cover-data_$titleId';
 
-    final cachedData = await cacheManager.getCache(
+    final cachedData = await storageManager.getCache(
       AppCacheKeys.booksCache,
       cacheKey,
     );
@@ -146,7 +150,7 @@ class BookService {
       final response = await _dio.get(url);
       final data = response.data;
       final coverJson = data['cover'];
-      await cacheManager.saveCache(
+      await storageManager.saveCache(
         AppCacheKeys.booksCache,
         cacheKey,
         coverJson,

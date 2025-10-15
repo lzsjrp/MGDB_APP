@@ -1,27 +1,27 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:mgdb/core/constants/app_constants.dart';
 import '../providers/api_config_provider.dart';
 import 'package:mgdb/services/session_service.dart';
 import '../providers/connectivity_provider.dart';
+import 'storage_manager.dart';
 
 @injectable
 class FavoritesService {
   final SessionService sessionService;
   final ApiConfigProvider apiConfigProvider;
   final ConnectivityProvider connectivityProvider;
+  final StorageManager storageManager;
   final Dio _dio;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-
-  static const String _keyFavorites = 'favorite_books';
 
   FavoritesService(
     this.sessionService,
     this.apiConfigProvider,
     this.connectivityProvider,
+    this.storageManager,
   ) : _dio = Dio() {
     _dio.options
       ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
@@ -43,16 +43,25 @@ class FavoritesService {
     );
   }
 
-  Future<Set<String>> _readStorageFavorites() async {
-    final jsonString = await _secureStorage.read(key: _keyFavorites);
-    if (jsonString == null) return <String>{};
-    final List<dynamic> list = jsonDecode(jsonString);
-    return list.map((e) => e.toString()).toSet();
+  Future<void> _writeStorageFavorites(Set<String> favorites) async {
+    await storageManager.saveStorage(
+      AppStorageKeys.favoritesKey,
+      'list',
+      favorites.toList(),
+    );
   }
 
-  Future<void> _writeStorageFavorites(Set<String> favorites) async {
-    final jsonString = jsonEncode(favorites.toList());
-    await _secureStorage.write(key: _keyFavorites, value: jsonString);
+  Future<Set<String>> _readStorageFavorites() async {
+    final favoritesData = await storageManager.getStorage(
+      AppStorageKeys.favoritesKey,
+      'list',
+    );
+    debugPrint(favoritesData.toString());
+    if (favoritesData == null) return <String>{};
+
+    final List<dynamic> list = favoritesData;
+
+    return list.map((e) => e.toString()).toSet();
   }
 
   Future<bool> _canSync() async {

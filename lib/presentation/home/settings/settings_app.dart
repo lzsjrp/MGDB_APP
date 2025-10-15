@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mgdb/services/cache_manager.dart';
+import 'package:mgdb/services/storage_manager.dart';
 import 'package:mgdb/shared/preferences.dart';
 
 import '../../../app/injectable.dart';
@@ -17,7 +17,7 @@ class SettingsApp extends StatefulWidget {
 }
 
 class _SettingsAppState extends State<SettingsApp> {
-  final cacheManager = getIt<CacheManager>();
+  final storageManager = getIt<StorageManager>();
   final _preferences = getIt<AppPreferences>();
 
   @override
@@ -33,7 +33,7 @@ class _SettingsAppState extends State<SettingsApp> {
     ];
 
     for (final key in keysToClear) {
-      await cacheManager.clearCache(key);
+      await storageManager.clearCache(key);
     }
   }
 
