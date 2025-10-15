@@ -95,25 +95,42 @@ class _SettingsAppState extends State<SettingsApp> {
                 "Armazena dados temporários para melhorar o desempenho, algumas informações podem ficar desatualizadas.",
           ),
           if (_preferences.earlyAccess)
-            SettingsMenu(
-              onPressed: () async {
-                if (isConnected) {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (context) => const ChangeApiDialog(),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Você está sem conexão com a internet'),
-                    ),
-                  );
-                }
-              },
-              buttonText: "Alterar",
-              title: "Servidor",
-              description: "Endereço para conexão de dados e sincronização.",
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 20.0,
+                    bottom: 5.0,
+                    left: 20.0,
+                  ),
+                  child: Text(
+                    "Desenvolvedor",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SettingsMenu(
+                  onPressed: () async {
+                    if (isConnected) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => const ChangeApiDialog(),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Você está sem conexão com a internet'),
+                        ),
+                      );
+                    }
+                  },
+                  buttonText: "Alterar",
+                  title: "Servidor",
+                  description:
+                      "Endereço para conexão de dados e sincronização.",
+                ),
+              ],
             ),
         ],
       ),
