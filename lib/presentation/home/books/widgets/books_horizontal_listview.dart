@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +9,7 @@ class BooksHorizontalListView extends StatelessWidget {
   final void Function(String bookId) onBookTap;
   final bool isLoading;
   final VoidCallback? onLoadMore;
+  final Map<String, File?> coverFiles;
 
   const BooksHorizontalListView({
     super.key,
@@ -15,6 +17,7 @@ class BooksHorizontalListView extends StatelessWidget {
     required this.onBookTap,
     this.isLoading = false,
     this.onLoadMore,
+    required this.coverFiles,
   });
 
   @override
@@ -44,11 +47,13 @@ class BooksHorizontalListView extends StatelessWidget {
             );
           }
           var book = books[index];
+          var coverFile = coverFiles[book.id];
           return Container(
             width: 180,
             margin: EdgeInsets.only(right: 5),
             child: BookCard(
               book: book,
+              localCoverFile: coverFile,
               onTap: () {
                 onBookTap(book.id);
               },

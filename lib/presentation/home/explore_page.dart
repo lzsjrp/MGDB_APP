@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:mgdb/presentation/home/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mgdb/presentation/home/books/details_page.dart';
 import 'package:mgdb/presentation/home/states/category.dart';
+import 'package:mgdb/services/storage_manager.dart';
 
 import '../../app/injectable.dart';
 import 'package:mgdb/services/book_service.dart';
@@ -11,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:mgdb/providers/connectivity_provider.dart';
 
 import '../../core/theme/custom/gridview_theme.dart';
+import '../../models/book_model.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -33,6 +37,7 @@ class _ExplorePageState extends State<ExplorePage> {
   };
 
   final bookService = getIt<BookService>();
+  final storageManager = getIt<StorageManager>();
   final Set<String> loadedCategories = {};
 
   Future<void> fetchCategory(
@@ -54,8 +59,12 @@ class _ExplorePageState extends State<ExplorePage> {
           type: type,
         );
         if (!mounted) return;
+
+        final covers = await loadCoversCached(bookList.data);
+
         setState(() {
           categories[category]!.books = bookList.data;
+          categories[category]!.coversFiles = covers;
           categories[category]!.currentPage = bookList.page;
           categories[category]!.canLoadMore =
               bookList.totalPages > bookList.page;
@@ -87,9 +96,13 @@ class _ExplorePageState extends State<ExplorePage> {
         page: nextPage.toString(),
         type: type,
       );
+
+      final covers = await loadCoversCached(bookList.data);
+
       if (!mounted) return;
       setState(() {
         state.books.addAll(bookList.data);
+        state.coversFiles = covers;
         state.currentPage = bookList.page;
         state.canLoadMore = state.currentPage < bookList.totalPages;
       });
@@ -98,6 +111,25 @@ class _ExplorePageState extends State<ExplorePage> {
       setState(() {
         state.error = e.toString();
       });
+    }
+  }
+
+  Future<Map<String, File?>> loadCoversCached(List<Book> books) async {
+    try {
+      final Map<String, File?> coverFiles = {};
+      for (var book in books) {
+        final cover = book.cover;
+        if (cover != null) {
+          final file = await storageManager.cachedImage(
+            cover.id,
+            cover.imageUrl,
+          );
+          coverFiles[book.id] = file;
+        }
+      }
+      return coverFiles;
+    } catch (error) {
+      throw Exception('Error ${error.toString()}');
     }
   }
 
@@ -174,6 +206,7 @@ class _ExplorePageState extends State<ExplorePage> {
                     )
                   : BooksHorizontalListView(
                       books: state.books,
+                      coverFiles: state.coversFiles ?? {},
                       isLoading: state.loading,
                       onLoadMore: state.canLoadMore
                           ? () => loadMoreBooksForCategory(categoryTitle)

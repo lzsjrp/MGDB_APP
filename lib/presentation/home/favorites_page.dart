@@ -60,7 +60,7 @@ class _FavoritesPage extends State<FavoritesPage> {
         } catch (_) {}
       }
 
-      final covers = await loadCoversCached(booksDataList);
+      final covers = await loadLocalCovers(booksDataList);
 
       setState(() {
         favoriteBookIds = favorites;
@@ -76,7 +76,7 @@ class _FavoritesPage extends State<FavoritesPage> {
     }
   }
 
-  Future<Map<String, File?>> loadCoversCached(List<Book> books) async {
+  Future<Map<String, File?>> loadLocalCovers(List<Book> books) async {
     try {
       final Map<String, File?> coverFiles = {};
       for (var book in books) {
