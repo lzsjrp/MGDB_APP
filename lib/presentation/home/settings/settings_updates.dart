@@ -21,7 +21,7 @@ class SettingsUpdates extends StatefulWidget {
 }
 
 class _SettingsUpdatesState extends State<SettingsUpdates> {
-  static bool _installPermissions = false;
+  static bool _installPermissions = true;
   bool _isLoading = false;
 
   @override

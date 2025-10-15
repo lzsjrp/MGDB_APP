@@ -81,7 +81,7 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
-  static bool _storagePermission = false;
+  static bool _storagePermission = true;
 
   @override
   void initState() {

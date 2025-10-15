@@ -42,3 +42,8 @@ class AppCacheKeys {
   static const String booksCache = 'books_cache';
   static const String chaptersCache = 'chapters_cache';
 }
+
+class AppStorageKeys {
+  static const String favoritesKey = 'storage_favorites';
+  static const String imagesKey = 'storage_images';
+}

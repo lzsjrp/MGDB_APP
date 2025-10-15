@@ -10,6 +10,8 @@ import 'package:mgdb/services/book_service.dart';
 import 'package:provider/provider.dart';
 import 'package:mgdb/providers/connectivity_provider.dart';
 
+import '../../core/theme/custom/gridview_theme.dart';
+
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
 
@@ -117,6 +119,7 @@ class _ExplorePageState extends State<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).extension<GridViewThemeData>()!;
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
     if (!isConnected) {
@@ -160,8 +163,14 @@ class _ExplorePageState extends State<ExplorePage> {
                   ? Container(
                       width: 180,
                       height: 300,
-                      margin: EdgeInsets.only(right: 0),
-                      child: Center(child: CircularProgressIndicator()),
+                      margin: EdgeInsets.only(left: 15),
+                      child: Card(
+                        color: theme.cardBackgroundColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
                     )
                   : BooksHorizontalListView(
                       books: state.books,

@@ -1,27 +1,26 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:mgdb/core/constants/app_constants.dart';
 import '../providers/api_config_provider.dart';
 import 'package:mgdb/services/session_service.dart';
 import '../providers/connectivity_provider.dart';
+import 'storage_manager.dart';
 
 @injectable
 class FavoritesService {
   final SessionService sessionService;
   final ApiConfigProvider apiConfigProvider;
   final ConnectivityProvider connectivityProvider;
+  final StorageManager storageManager;
   final Dio _dio;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-
-  static const String _keyFavorites = 'favorite_books';
 
   FavoritesService(
     this.sessionService,
     this.apiConfigProvider,
     this.connectivityProvider,
+    this.storageManager,
   ) : _dio = Dio() {
     _dio.options
       ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
@@ -43,16 +42,24 @@ class FavoritesService {
     );
   }
 
-  Future<Set<String>> _readStorageFavorites() async {
-    final jsonString = await _secureStorage.read(key: _keyFavorites);
-    if (jsonString == null) return <String>{};
-    final List<dynamic> list = jsonDecode(jsonString);
-    return list.map((e) => e.toString()).toSet();
+  Future<void> _writeFavoritesList(Set<String> favorites) async {
+    await storageManager.saveStorage(
+      AppStorageKeys.favoritesKey,
+      'list',
+      favorites.toList(),
+    );
   }
 
-  Future<void> _writeStorageFavorites(Set<String> favorites) async {
-    final jsonString = jsonEncode(favorites.toList());
-    await _secureStorage.write(key: _keyFavorites, value: jsonString);
+  Future<Set<String>> _readFavoritesList() async {
+    final favoritesData = await storageManager.getStorage(
+      AppStorageKeys.favoritesKey,
+      'list',
+    );
+    if (favoritesData == null) return <String>{};
+
+    final List<dynamic> list = favoritesData;
+
+    return list.map((e) => e.toString()).toSet();
   }
 
   Future<bool> _canSync() async {
@@ -69,7 +76,7 @@ class FavoritesService {
     if (sync && await _canSync()) {
       await syncFavorites();
     }
-    return await _readStorageFavorites();
+    return await _readFavoritesList();
   }
 
   Future<void> addFavorite(String bookId) async {
@@ -84,9 +91,9 @@ class FavoritesService {
       }
     }
 
-    final favorites = await _readStorageFavorites();
+    final favorites = await _readFavoritesList();
     favorites.add(bookId);
-    await _writeStorageFavorites(favorites);
+    await _writeFavoritesList(favorites);
   }
 
   Future<void> removeFavorite(String bookId) async {
@@ -101,13 +108,13 @@ class FavoritesService {
       }
     }
 
-    final favorites = await _readStorageFavorites();
+    final favorites = await _readFavoritesList();
     favorites.remove(bookId);
-    await _writeStorageFavorites(favorites);
+    await _writeFavoritesList(favorites);
   }
 
   Future<bool> isFavorite(String bookId) async {
-    final favorites = await _readStorageFavorites();
+    final favorites = await _readFavoritesList();
     return favorites.contains(bookId);
   }
 
@@ -136,7 +143,7 @@ class FavoritesService {
     try {
       final serverFavorites = await getServerFavorites();
       final favoritesSet = serverFavorites.toSet();
-      await _writeStorageFavorites(favoritesSet);
+      await _writeFavoritesList(favoritesSet);
     } catch (e) {
       throw Exception('Erro: $e');
     }
@@ -153,11 +160,11 @@ class FavoritesService {
 
       if (merge) {
         final serverFavorites = (await getServerFavorites()).toSet();
-        final localFavorites = await _readStorageFavorites();
+        final localFavorites = await _readFavoritesList();
 
         favoritesToSync = {...serverFavorites, ...localFavorites};
       } else {
-        favoritesToSync = await _readStorageFavorites();
+        favoritesToSync = await _readFavoritesList();
       }
 
       final response = await _dio.post(
@@ -170,12 +177,12 @@ class FavoritesService {
           final confirmedFavorites = (response.data['favorites'] as List)
               .map((e) => e.toString())
               .toSet();
-          await _writeStorageFavorites(confirmedFavorites);
+          await _writeFavoritesList(confirmedFavorites);
         } else {
-          await _writeStorageFavorites(favoritesToSync);
+          await _writeFavoritesList(favoritesToSync);
         }
       } else {
-        await _writeStorageFavorites(favoritesToSync);
+        await _writeFavoritesList(favoritesToSync);
       }
     } on DioException catch (e) {
       throw Exception('Erro ${e.response?.statusCode ?? e.message}');
