@@ -23,7 +23,11 @@ class ExplorePage extends StatefulWidget {
   State<ExplorePage> createState() => _ExplorePageState();
 }
 
-class _ExplorePageState extends State<ExplorePage> {
+class _ExplorePageState extends State<ExplorePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   Map<String, CategoryState> categories = {
     'Novos': CategoryState(),
     'Mangas': CategoryState(),
@@ -134,23 +138,25 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final isConnected = context.watch<ConnectivityProvider>().isConnected;
-    if (isConnected) {
-      categories.forEach((key, value) {
-        if (value.books.isEmpty &&
-            !value.loading &&
-            !loadedCategories.contains(key)) {
-          loadedCategories.add(key);
-          fetchCategory(key, 1, isConnected);
-        }
-      });
-    }
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isConnected = context.read<ConnectivityProvider>().isConnected;
+      if (isConnected) {
+        categories.forEach((key, value) {
+          if (value.books.isEmpty) {
+            loadedCategories.add(key);
+            fetchCategory(key, 1, isConnected);
+          }
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
