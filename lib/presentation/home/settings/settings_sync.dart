@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mgdb/presentation/home/settings/dialogs/change_api_dialog.dart';
 import 'package:mgdb/services/favorites_service.dart';
 
 import 'package:mgdb/shared/widgets/popup_widget.dart';
@@ -109,26 +108,6 @@ class _SettingsSyncState extends State<SettingsSync> {
               "Outros",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ),
-          SettingsMenu(
-            onPressed: () async {
-              if (isConnected) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (context) => const ChangeApiDialog(),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Você está sem conexão com a internet'),
-                  ),
-                );
-              }
-            },
-            buttonText: "Alterar",
-            title: "Servidor",
-            description: "Endereço para conexão de dados e sincronização.",
           ),
         ],
       ),

@@ -70,6 +70,7 @@ class _FavoritesPage extends State<FavoritesPage> {
       });
     } catch (error) {
       _err = error.toString();
+      if (!mounted) return;
       setState(() {
         _loading = false;
       });

@@ -27,6 +27,10 @@ class AppPreferences {
 
   set noCache(bool value) => _prefs.setBool('no_cache', value);
 
+  bool get earlyAccess => _prefs.getBool('earlyAccess') ?? false;
+
+  set earlyAccess(bool value) => _prefs.setBool('earlyAccess', value);
+
   String get themeMode =>
       _prefs.getString('theme_mode') ?? DefaultPreferences.theme;
 
