@@ -29,9 +29,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
 
   Book? bookData;
   List<ChapterListItem>? chapters;
-  bool _loading = true;
-  String _error = '';
   bool _isFavorite = false;
+
+  bool _loading = true;
+  String _err = '';
 
   @override
   void initState() {
@@ -40,11 +41,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   }
 
   Future<void> _loadBookDetails() async {
-    setState(() {
-      _loading = true;
-      _error = '';
-    });
     try {
+      if (!mounted) return;
+      setState(() {
+        _loading = true;
+      });
       final bookResponse = await bookService.getTitle(widget.bookId);
       final chaptersResponse = await chapterService.getChapters(widget.bookId);
 
@@ -54,27 +55,33 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         bookData = bookResponse;
         chapters = chaptersResponse.chapters;
         _isFavorite = isFav;
+        _loading = false;
       });
-    } catch (e) {
+    } catch (error) {
+      if (!mounted) return;
       setState(() {
-        _error = e.toString();
-      });
-    } finally {
-      setState(() {
+        _err = error.toString();
         _loading = false;
       });
     }
   }
 
   Future<void> _toggleFavorite() async {
-    if (_isFavorite) {
-      await favoritesService.removeFavorite(widget.bookId);
-    } else {
-      await favoritesService.addFavorite(widget.bookId);
+    try {
+      if (_isFavorite) {
+        await favoritesService.removeFavorite(widget.bookId);
+      } else {
+        await favoritesService.addFavorite(widget.bookId);
+      }
+      setState(() {
+        _isFavorite = !_isFavorite;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Falha ao alterar os favoritos')),
+      );
     }
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
   }
 
   @override
@@ -89,12 +96,23 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         ? bookData?.description
         : 'Sem descrição';
 
-    if (_error.isNotEmpty) {
-      return Center(child: Text(_error));
-    }
-
     if (_loading) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_err.isNotEmpty && !_loading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.bug_report, size: 46, color: Colors.grey),
+            const SizedBox(height: 10),
+            Text("Algo deu errado..."),
+            const SizedBox(height: 10),
+            Text('($_err)'),
+          ],
+        ),
+      );
     }
 
     return Scaffold(
@@ -125,7 +143,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                             imageUrl: coverUrl,
                             width: 160,
                             height: 260,
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                             placeholder: (context, url) =>
                                 Center(child: CircularProgressIndicator()),
                             errorWidget: (context, url, error) =>
