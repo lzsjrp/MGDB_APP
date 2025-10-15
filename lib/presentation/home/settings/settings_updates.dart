@@ -78,57 +78,59 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       final currentVersion = packageInfo.version;
 
       final dio = Dio();
+
       String latestVersion = '';
       Response? releaseResponse;
 
-      if (!_preferences.earlyAccess) {
-        releaseResponse = await dio.get(
-          'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
-        );
+      final releaseStableResponse = await dio.get(
+        'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
+      );
+      final latestStableVersionRaw = releaseStableResponse.data['tag_name'];
+      final latestStableVersion = latestStableVersionRaw.startsWith('v')
+          ? latestStableVersionRaw.substring(1)
+          : latestStableVersionRaw;
 
-        latestVersion = releaseResponse.data['tag_name'];
-      } else {
-        final searchReleases = await dio.get(
-          'https://api.github.com/repos/lzsjrp/MGDB_APP/releases',
-        );
+      Map<String, dynamic>? earlyRelease;
+      String? latestEarlyVersion;
 
-        final releases = searchReleases.data as List;
-        final preRelease = releases.firstWhere(
-          (r) => r['prerelease'] == true && r['draft'] == false,
-          orElse: () => null,
-        );
+      final releasesResponse = await dio.get(
+        'https://api.github.com/repos/lzsjrp/MGDB_APP/releases',
+      );
+      final releases = releasesResponse.data as List;
 
-        Map<String, dynamic>? releaseData;
+      final preRelease = releases.firstWhere(
+        (r) => r['prerelease'] == true && r['draft'] == false,
+        orElse: () => null,
+      );
 
-        if (preRelease != null) {
-          latestVersion = preRelease['tag_name'];
-          final assetsUrl = preRelease['assets_url'];
-          final assetsResponse = await dio.get(assetsUrl);
-          releaseData = {...preRelease, 'assets': assetsResponse.data};
-        } else {
-          final stable = releases.firstWhere(
-            (r) => r['prerelease'] == false && r['draft'] == false,
-            orElse: () => null,
-          );
-          if (stable != null) {
-            latestVersion = stable['tag_name'];
-            final assetsUrl = stable['assets_url'];
-            final assetsResponse = await dio.get(assetsUrl);
-            releaseData = {...stable, 'assets': assetsResponse.data};
-          }
-        }
+      if (preRelease != null) {
+        latestEarlyVersion = preRelease['tag_name'];
+        latestEarlyVersion = latestEarlyVersion!.startsWith('v')
+            ? latestEarlyVersion.substring(1)
+            : latestEarlyVersion;
 
-        if (releaseData != null) {
-          releaseResponse = Response(
-            requestOptions: RequestOptions(path: ''),
-            data: releaseData,
-          );
-        }
+        final assetsUrl = preRelease['assets_url'];
+        final assetsResponse = await dio.get(assetsUrl);
+        earlyRelease = {...preRelease, 'assets': assetsResponse.data};
       }
 
-      latestVersion = latestVersion.startsWith('v')
-          ? latestVersion.substring(1)
-          : latestVersion;
+      final stable = Version.parse(latestStableVersion);
+      final early = latestEarlyVersion != null
+          ? Version.parse(latestEarlyVersion)
+          : null;
+
+      bool useEarly = false;
+      if (_preferences.earlyAccess && early != null && early > stable) {
+        useEarly = true;
+      }
+
+      latestVersion = useEarly ? latestEarlyVersion! : latestStableVersion;
+      releaseResponse = useEarly
+          ? Response(
+              requestOptions: RequestOptions(path: ''),
+              data: earlyRelease,
+            )
+          : releaseStableResponse;
 
       setState(() {
         _currentVersion = currentVersion;
@@ -138,7 +140,7 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       final latest = Version.parse(latestVersion);
       final current = Version.parse(currentVersion);
 
-      if (latest > current && releaseResponse != null) {
+      if (latest > current) {
         final assets = releaseResponse.data['assets'] as List;
         if (assets.isEmpty) throw Exception('Nenhum arquivo encontrado.');
 

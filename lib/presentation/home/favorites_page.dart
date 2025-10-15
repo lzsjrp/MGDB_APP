@@ -50,14 +50,14 @@ class _FavoritesPage extends State<FavoritesPage> {
 
       final favorites = await favoritesService.getFavoritesSet(sync: false);
 
-      debugPrint(favorites.toString());
-
       List<Book> booksDataList = [];
       for (var bookId in favorites) {
         try {
           final data = await bookService.getTitle(bookId);
-          booksDataList.add(data);
-        } catch (_) {}
+          if (data != null) booksDataList.add(data);
+        } catch (err) {
+          // Do-nothing
+        }
       }
 
       final covers = await loadLocalCovers(booksDataList);
