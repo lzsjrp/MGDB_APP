@@ -84,13 +84,12 @@ class FavoritesService {
       final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
       _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
       try {
-        final url = apiUrls.addOrRemoveFavorite(bookId);
+        final url = apiUrls.manageFavorite(bookId);
         await _dio.post(url);
       } catch (e) {
-        throw Exception('Error $e');
+        // Do-nothing
       }
     }
-
     final favorites = await _readFavoritesList();
     favorites.add(bookId);
     await _writeFavoritesList(favorites);
@@ -101,13 +100,12 @@ class FavoritesService {
       final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
       _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
       try {
-        final url = apiUrls.addOrRemoveFavorite(bookId);
+        final url = apiUrls.manageFavorite(bookId);
         await _dio.delete(url);
       } catch (e) {
-        throw Exception('Error $e');
+        // Do-nothing
       }
     }
-
     final favorites = await _readFavoritesList();
     favorites.remove(bookId);
     await _writeFavoritesList(favorites);
@@ -134,7 +132,9 @@ class FavoritesService {
           .toList();
       return favoritesData;
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao obter os favoritos: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -145,7 +145,7 @@ class FavoritesService {
       final favoritesSet = serverFavorites.toSet();
       await _writeFavoritesList(favoritesSet);
     } catch (e) {
-      throw Exception('Erro: $e');
+      throw Exception('Falha ao sincronizar os favoritos com o servidor: $e');
     }
   }
 
@@ -185,9 +185,11 @@ class FavoritesService {
         await _writeFavoritesList(favoritesToSync);
       }
     } on DioException catch (e) {
-      throw Exception('Erro ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao sincronizar: ${e.response?.statusCode ?? e.message}',
+      );
     } catch (e) {
-      throw Exception('Erro: $e');
+      throw Exception('Erro na sincronização: $e');
     }
   }
 }

@@ -7,10 +7,12 @@ class NavigationPage extends StatefulWidget {
   final List<Widget> pages;
   final List<GButton> tabs;
   final List<Widget>? actions;
+  final String title;
   final int initialIndex;
 
   const NavigationPage({
     super.key,
+    required this.title,
     required this.pages,
     required this.tabs,
     this.initialIndex = 0,
@@ -41,7 +43,7 @@ class _NavigationPageState extends State<NavigationPage> {
     final theme = Theme.of(context).extension<BottomNavBarThemeData>()!;
 
     return Scaffold(
-      appBar: AppBar(title: Text('App'), actions: widget.actions ?? []),
+      appBar: AppBar(title: Text(widget.title), actions: widget.actions ?? []),
       body: widget.pages[_currentIndex],
       bottomNavigationBar: Container(
         color: theme.backgroundColor,

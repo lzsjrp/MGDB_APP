@@ -22,7 +22,13 @@ class SettingsUpdates extends StatefulWidget {
 
 class _SettingsUpdatesState extends State<SettingsUpdates> {
   static bool _installPermissions = true;
-  bool _isLoading = false;
+
+  String _currentVersion = '';
+  String _latestVersion = '';
+
+  bool _loading = false;
+  String _progress = '';
+  String _err = '';
 
   @override
   void initState() {
@@ -31,77 +37,103 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
   }
 
   Future<void> _checkPermissions() async {
-    final result = await Permission.requestInstallPackages.status;
-
-    if (!mounted) return;
-    setState(() {
-      _installPermissions = result == PermissionStatus.granted;
-    });
+    try {
+      final result = await Permission.requestInstallPackages.status;
+      setState(() {
+        _installPermissions = result == PermissionStatus.granted;
+      });
+    } catch (error) {
+      _err = 'Falha ao verificar as permissões do aplicativo';
+    }
   }
 
   Future<void> _requestPermissions() async {
-    await Permission.requestInstallPackages.request();
+    try {
+      await Permission.requestInstallPackages.request();
 
-    if (!mounted) return;
-    _checkPermissions();
+      if (!mounted) return;
+      _checkPermissions();
+    } catch (error) {
+      _err = 'Falha ao solicitar as permissões do aplicativo';
+
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   Future<void> checkAndUpdate() async {
-    if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-    });
+    try {
+      if (!mounted) return;
+      setState(() {
+        _loading = true;
+      });
 
-    final packageInfo = await PackageInfo.fromPlatform();
-    final currentVersion = packageInfo.version;
+      final packageInfo = await PackageInfo.fromPlatform();
+      final currentVersion = packageInfo.version;
 
-    final dio = Dio();
-    final response = await dio.get(
-      'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
-    );
+      final dio = Dio();
+      final response = await dio.get(
+        'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
+      );
 
-    var latestVersion = response.data['tag_name'];
-    latestVersion = latestVersion.startsWith('v')
-        ? latestVersion.substring(1)
-        : latestVersion;
+      var latestVersion = response.data['tag_name'];
+      latestVersion = latestVersion.startsWith('v')
+          ? latestVersion.substring(1)
+          : latestVersion;
 
-    Version latest = Version.parse(latestVersion);
-    Version current = Version.parse(currentVersion);
+      setState(() {
+        _currentVersion = currentVersion.toString();
+        _latestVersion = latestVersion.toString();
+      });
 
-    if (latest > current) {
-      final asset = response.data['assets'][0];
-      final downloadUrl = asset['browser_download_url'];
-      final fileName = asset['name'];
+      Version latest = Version.parse(latestVersion);
+      Version current = Version.parse(currentVersion);
 
-      final downloadsDir = await getDownloadsDirectory();
-      final savePath = '${downloadsDir!.path}/$fileName';
+      if (latest > current) {
+        final asset = response.data['assets'][0];
+        final downloadUrl = asset['browser_download_url'];
+        final fileName = asset['name'];
 
-      try {
+        final downloadsDir = await getDownloadsDirectory();
+        final savePath = '${downloadsDir!.path}/$fileName';
+
         await dio.download(
           downloadUrl,
           savePath,
           onReceiveProgress: (count, total) {
             if (total != -1) {
               final progress = (count / total * 100).toStringAsFixed(0);
-              debugPrint('Baixando: $progress%');
+              if (!mounted) return;
+              setState(() {
+                _progress = 'Baixando atualização... $progress%';
+              });
             }
           },
         );
 
         await InstallPlugin.installApk(savePath);
-
-      } catch (e) {
-        //
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nenhuma atualização disponível')),
+        );
       }
+
+      setState(() {
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Falha ao verificar por atualizações')),
+      );
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     if (!_installPermissions) {
       return Scaffold(
         body: AlertDialog(
@@ -121,11 +153,37 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
 
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
-    if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_loading) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              if (_progress.isNotEmpty) Text(_progress),
+            ],
+          ),
+        ),
+      );
     }
 
-    if (!isConnected) {
+    if (_err.isNotEmpty && !_loading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.bug_report, size: 46, color: Colors.grey),
+            const SizedBox(height: 10),
+            Text("Algo deu errado..."),
+            const SizedBox(height: 10),
+            Text('($_err)'),
+          ],
+        ),
+      );
+    }
+
+    if (!_loading && !isConnected) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -154,6 +212,23 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
             title: "Procurar por atualizações",
             description: "Procura e instala novas atualizações do aplicativo",
           ),
+          if (_currentVersion.isNotEmpty && _latestVersion.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Versão Atual: $_currentVersion",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  Text(
+                    "Ultima Versão: $_latestVersion",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );

@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:mgdb/presentation/home/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mgdb/presentation/home/books/details_page.dart';
 import 'package:mgdb/presentation/home/states/category.dart';
+import 'package:mgdb/services/storage_manager.dart';
 
 import '../../app/injectable.dart';
 import 'package:mgdb/services/book_service.dart';
@@ -11,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:mgdb/providers/connectivity_provider.dart';
 
 import '../../core/theme/custom/gridview_theme.dart';
+import '../../models/book_model.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -19,7 +23,11 @@ class ExplorePage extends StatefulWidget {
   State<ExplorePage> createState() => _ExplorePageState();
 }
 
-class _ExplorePageState extends State<ExplorePage> {
+class _ExplorePageState extends State<ExplorePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   Map<String, CategoryState> categories = {
     'Novos': CategoryState(),
     'Mangas': CategoryState(),
@@ -33,6 +41,7 @@ class _ExplorePageState extends State<ExplorePage> {
   };
 
   final bookService = getIt<BookService>();
+  final storageManager = getIt<StorageManager>();
   final Set<String> loadedCategories = {};
 
   Future<void> fetchCategory(
@@ -54,8 +63,12 @@ class _ExplorePageState extends State<ExplorePage> {
           type: type,
         );
         if (!mounted) return;
+
+        final covers = await loadCoversCached(bookList.data);
+
         setState(() {
           categories[category]!.books = bookList.data;
+          categories[category]!.coversFiles = covers;
           categories[category]!.currentPage = bookList.page;
           categories[category]!.canLoadMore =
               bookList.totalPages > bookList.page;
@@ -87,9 +100,13 @@ class _ExplorePageState extends State<ExplorePage> {
         page: nextPage.toString(),
         type: type,
       );
+
+      final covers = await loadCoversCached(bookList.data);
+
       if (!mounted) return;
       setState(() {
         state.books.addAll(bookList.data);
+        state.coversFiles = covers;
         state.currentPage = bookList.page;
         state.canLoadMore = state.currentPage < bookList.totalPages;
       });
@@ -101,24 +118,45 @@ class _ExplorePageState extends State<ExplorePage> {
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final isConnected = context.watch<ConnectivityProvider>().isConnected;
-    if (isConnected) {
-      categories.forEach((key, value) {
-        if (value.books.isEmpty &&
-            !value.loading &&
-            !loadedCategories.contains(key)) {
-          loadedCategories.add(key);
-          fetchCategory(key, 1, isConnected);
+  Future<Map<String, File?>> loadCoversCached(List<Book> books) async {
+    try {
+      final Map<String, File?> coverFiles = {};
+      for (var book in books) {
+        final cover = book.cover;
+        if (cover != null) {
+          final file = await storageManager.cachedImage(
+            cover.id,
+            cover.imageUrl,
+          );
+          coverFiles[book.id] = file;
         }
-      });
+      }
+      return coverFiles;
+    } catch (error) {
+      throw Exception('Error ${error.toString()}');
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isConnected = context.read<ConnectivityProvider>().isConnected;
+      if (isConnected) {
+        categories.forEach((key, value) {
+          if (value.books.isEmpty) {
+            loadedCategories.add(key);
+            fetchCategory(key, 1, isConnected);
+          }
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
@@ -142,7 +180,23 @@ class _ExplorePageState extends State<ExplorePage> {
           final state = entry.value;
 
           if (state.error.isNotEmpty) {
-            return Center(child: Text(state.error));
+            return Padding(
+              padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.bug_report, size: 46, color: Colors.grey),
+                    const SizedBox(height: 10),
+                    Text("Falha ao carregar: $categoryTitle"),
+                    const SizedBox(height: 10),
+                    Text(state.error),
+                    const SizedBox(height: 10),
+                    Text('Confira sua conexão ou tente novamente mais tarde.', style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              ),
+            );
           }
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,6 +228,7 @@ class _ExplorePageState extends State<ExplorePage> {
                     )
                   : BooksHorizontalListView(
                       books: state.books,
+                      coverFiles: state.coversFiles ?? {},
                       isLoading: state.loading,
                       onLoadMore: state.canLoadMore
                           ? () => loadMoreBooksForCategory(categoryTitle)

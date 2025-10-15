@@ -15,8 +15,11 @@ class ChapterService {
   final StorageManager storageManager;
   final Dio _dio;
 
-  ChapterService(this.sessionService, this.apiConfigProvider, this.storageManager)
-    : _dio = Dio() {
+  ChapterService(
+    this.sessionService,
+    this.apiConfigProvider,
+    this.storageManager,
+  ) : _dio = Dio() {
     _dio.options
       ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
       ..headers = {'Content-Type': 'application/json'};
@@ -61,7 +64,9 @@ class ChapterService {
       );
       return ChapterListResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao obter a lista de capítulos: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -92,7 +97,9 @@ class ChapterService {
       final chapter = Chapter.fromJson(chapterJson);
       return chapter;
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao obter o capítulo: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -119,7 +126,9 @@ class ChapterService {
       );
       return ChapterCreateResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao criar o capítulo: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -135,7 +144,9 @@ class ChapterService {
       final response = await _dio.delete(url);
       return ChapterDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao deletar o capítulo: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 }

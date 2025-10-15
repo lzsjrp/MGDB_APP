@@ -150,6 +150,11 @@ class _Home extends State<Home> {
       ),
     ];
 
-    return NavigationPage(pages: pages, tabs: tabs, actions: actions);
+    return NavigationPage(
+      title: 'App',
+      pages: pages,
+      tabs: tabs,
+      actions: actions,
+    );
   }
 }

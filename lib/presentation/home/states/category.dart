@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../../../models/book_model.dart';
 
 class CategoryState {
@@ -14,4 +16,8 @@ class CategoryState {
     this.currentPage = 1,
     this.canLoadMore = false,
   });
+
+  Map<String, File?>? get coversFiles => null;
+
+  set coversFiles(Map<String, File?> coversFiles) {}
 }
