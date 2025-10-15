@@ -18,7 +18,6 @@ import '../providers/theme_provider.dart' as _i522;
 import '../providers/user_provider.dart' as _i26;
 import '../services/book_service.dart' as _i490;
 import '../services/chapter_service.dart' as _i193;
-import '../services/downloads_service.dart' as _i708;
 import '../services/favorites_service.dart' as _i211;
 import '../services/session_service.dart' as _i984;
 import '../services/storage_manager.dart' as _i1041;
@@ -33,7 +32,6 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i517.ConnectivityProvider>(() => _i517.ConnectivityProvider());
     gh.factory<_i26.UserProvider>(() => _i26.UserProvider());
-    gh.factory<_i708.DownloadsService>(() => _i708.DownloadsService());
     gh.factory<_i76.AppPreferences>(() => _i76.AppPreferences());
     gh.factory<_i187.ApiConfigProvider>(
       () => _i187.ApiConfigProvider(gh<_i76.AppPreferences>()),
@@ -47,14 +45,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i984.SessionService>(
       () => _i984.SessionService(gh<_i187.ApiConfigProvider>()),
     );
-    gh.factory<_i211.FavoritesService>(
-      () => _i211.FavoritesService(
-        gh<_i984.SessionService>(),
-        gh<_i187.ApiConfigProvider>(),
-        gh<_i517.ConnectivityProvider>(),
-        gh<_i1041.StorageManager>(),
-      ),
-    );
     gh.factory<_i490.BookService>(
       () => _i490.BookService(
         gh<_i984.SessionService>(),
@@ -66,6 +56,15 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i193.ChapterService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
+        gh<_i1041.StorageManager>(),
+      ),
+    );
+    gh.factory<_i211.FavoritesService>(
+      () => _i211.FavoritesService(
+        gh<_i984.SessionService>(),
+        gh<_i187.ApiConfigProvider>(),
+        gh<_i517.ConnectivityProvider>(),
+        gh<_i490.BookService>(),
         gh<_i1041.StorageManager>(),
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mgdb/services/storage_manager.dart';
@@ -69,15 +71,17 @@ class BookService {
     }
   }
 
-  Future<Book> getTitle(String titleId) async {
+  Future<Book> fetchTitle(String titleId, {bool cache = true}) async {
     final cacheKey = 'book-data_$titleId';
 
-    final cachedData = await storageManager.getCache(
-      AppCacheKeys.booksCache,
-      cacheKey,
-    );
-    if (cachedData != null) {
-      return Book.fromJson(cachedData);
+    if (cache) {
+      final cachedData = await storageManager.getCache(
+        AppCacheKeys.booksCache,
+        cacheKey,
+      );
+      if (cachedData != null) {
+        return Book.fromJson(cachedData);
+      }
     }
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
@@ -88,17 +92,55 @@ class BookService {
       final response = await _dio.get(url);
       final data = response.data;
       final bookJson = data['book'];
-      await storageManager.saveCache(
-        AppCacheKeys.booksCache,
-        cacheKey,
-        bookJson,
-      );
+      if (cache) {
+        await storageManager.saveCache(
+          AppCacheKeys.booksCache,
+          cacheKey,
+          bookJson,
+        );
+      }
       final book = Book.fromJson(bookJson);
       return book;
     } on DioException catch (e) {
       throw Exception(
         'Falha ao obter o título: ${e.response?.statusCode ?? e.message}',
       );
+    }
+  }
+
+  Future<Book> saveTitle(String titleId) async {
+    try {
+      final book = await fetchTitle(titleId, cache: false);
+      await storageManager.saveStorage(
+        AppStorageKeys.downloadsKey,
+        titleId,
+        jsonEncode(book),
+      );
+      final cover = book.cover;
+      if (cover != null) {
+        await storageManager.saveImage(cover.id, cover.imageUrl);
+      }
+      return book;
+    } on DioException catch (e) {
+      throw Exception(
+        'Falha ao salvar o título: ${e.response?.statusCode ?? e.message}',
+      );
+    }
+  }
+
+  Future<Book?> getTitle(String titleId) async {
+    try {
+      final storedBookJson = await storageManager.getStorage(
+        AppStorageKeys.downloadsKey,
+        titleId,
+      );
+
+      if (storedBookJson == null) return null;
+
+      final decoded = jsonDecode(storedBookJson);
+      return Book.fromJson(decoded);
+    } catch (e) {
+      throw Exception('Falha ao obter o título: $e');
     }
   }
 

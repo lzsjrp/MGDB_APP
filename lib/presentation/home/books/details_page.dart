@@ -46,7 +46,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       setState(() {
         _loading = true;
       });
-      final bookResponse = await bookService.getTitle(widget.bookId);
+      final bookResponse = await bookService.fetchTitle(widget.bookId);
       final chaptersResponse = await chapterService.getChapters(widget.bookId);
 
       bool isFav = await favoritesService.isFavorite(widget.bookId);

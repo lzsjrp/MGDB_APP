@@ -56,6 +56,7 @@ class _FavoritesPage extends State<FavoritesPage> {
       for (var bookId in favorites) {
         try {
           final data = await bookService.getTitle(bookId);
+          if (data == null) return;
           booksDataList.add(data);
         } catch (_) {}
       }

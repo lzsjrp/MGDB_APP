@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:mgdb/core/constants/app_constants.dart';
+import 'package:mgdb/services/book_service.dart';
 import '../providers/api_config_provider.dart';
 import 'package:mgdb/services/session_service.dart';
 import '../providers/connectivity_provider.dart';
@@ -14,12 +15,14 @@ class FavoritesService {
   final ApiConfigProvider apiConfigProvider;
   final ConnectivityProvider connectivityProvider;
   final StorageManager storageManager;
+  final BookService bookService;
   final Dio _dio;
 
   FavoritesService(
     this.sessionService,
     this.apiConfigProvider,
     this.connectivityProvider,
+    this.bookService,
     this.storageManager,
   ) : _dio = Dio() {
     _dio.options
@@ -80,6 +83,7 @@ class FavoritesService {
   }
 
   Future<void> addFavorite(String bookId) async {
+    await connectivityProvider.initialized;
     if (await _canSync()) {
       final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
       _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
@@ -89,6 +93,9 @@ class FavoritesService {
       } catch (e) {
         // Do-nothing
       }
+    }
+    if (connectivityProvider.isConnected) {
+      await bookService.saveTitle(bookId);
     }
     final favorites = await _readFavoritesList();
     favorites.add(bookId);
@@ -144,6 +151,14 @@ class FavoritesService {
       final serverFavorites = await getServerFavorites();
       final favoritesSet = serverFavorites.toSet();
       await _writeFavoritesList(favoritesSet);
+
+      for (final bookId in favoritesSet) {
+        try {
+          await bookService.saveTitle(bookId);
+        } catch (e) {
+          // Do-nothing
+        }
+      }
     } catch (e) {
       throw Exception('Falha ao sincronizar os favoritos com o servidor: $e');
     }
@@ -161,7 +176,6 @@ class FavoritesService {
       if (merge) {
         final serverFavorites = (await getServerFavorites()).toSet();
         final localFavorites = await _readFavoritesList();
-
         favoritesToSync = {...serverFavorites, ...localFavorites};
       } else {
         favoritesToSync = await _readFavoritesList();
@@ -172,17 +186,28 @@ class FavoritesService {
         data: jsonEncode({'booksIds': favoritesToSync.toList()}),
       );
 
+      Set<String> confirmedFavorites;
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.data is Map && response.data['favorites'] is List) {
-          final confirmedFavorites = (response.data['favorites'] as List)
+          confirmedFavorites = (response.data['favorites'] as List)
               .map((e) => e.toString())
               .toSet();
-          await _writeFavoritesList(confirmedFavorites);
         } else {
-          await _writeFavoritesList(favoritesToSync);
+          confirmedFavorites = favoritesToSync;
         }
       } else {
-        await _writeFavoritesList(favoritesToSync);
+        confirmedFavorites = favoritesToSync;
+      }
+
+      await _writeFavoritesList(confirmedFavorites);
+
+      for (final bookId in confirmedFavorites) {
+        try {
+          await bookService.saveTitle(bookId);
+        } catch (e) {
+          // Do-nothing
+        }
       }
     } on DioException catch (e) {
       throw Exception(
