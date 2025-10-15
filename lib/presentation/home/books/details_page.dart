@@ -127,7 +127,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                             height: 260,
                             fit: BoxFit.fill,
                             placeholder: (context, url) =>
-                                CircularProgressIndicator(),
+                                Center(child: CircularProgressIndicator()),
                             errorWidget: (context, url, error) =>
                                 Icon(Icons.error),
                           )
