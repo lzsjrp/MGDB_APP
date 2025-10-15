@@ -39,6 +39,7 @@ class _NavigationPageState extends State<NavigationPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<BottomNavBarThemeData>()!;
+
     return Scaffold(
       appBar: AppBar(title: Text('App'), actions: widget.actions ?? []),
       body: widget.pages[_currentIndex],
