@@ -21,7 +21,7 @@ class ApiUrls {
 
   String get favoritesRoute => "$apiPath/favorites";
 
-  String addOrRemoveFavorite(String titleId) => "$favoritesRoute/book/$titleId";
+  String manageFavorite(String titleId) => "$favoritesRoute/book/$titleId";
 
   String get favoritesSyncRoute => "$favoritesRoute/sync";
 

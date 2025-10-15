@@ -63,7 +63,9 @@ class BookService {
       );
       return BookListResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao obter a lista de títulos: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -94,7 +96,9 @@ class BookService {
       final book = Book.fromJson(bookJson);
       return book;
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao obter o título: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -114,7 +118,9 @@ class BookService {
       );
       return BookDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao criar o título: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -127,7 +133,9 @@ class BookService {
       final response = await _dio.delete(url);
       return BookDefaultResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao deletar o título: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 

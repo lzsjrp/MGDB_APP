@@ -81,7 +81,9 @@ class SessionService {
       final response = await _dio.get(url);
       return SessionResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao obter a sessão: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -99,7 +101,9 @@ class SessionService {
       );
       return SessionResponse.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao criar a sessão: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -113,7 +117,9 @@ class SessionService {
       await saveUser(json.encode(response.data));
       return User.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao obter o usuário: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 
@@ -129,7 +135,9 @@ class SessionService {
       );
       return User.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Error ${e.response?.statusCode ?? e.message}');
+      throw Exception(
+        'Falha ao criar o usuário: ${e.response?.statusCode ?? e.message}',
+      );
     }
   }
 }

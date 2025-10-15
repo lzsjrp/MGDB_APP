@@ -180,7 +180,23 @@ class _ExplorePageState extends State<ExplorePage>
           final state = entry.value;
 
           if (state.error.isNotEmpty) {
-            return Center(child: Text(state.error));
+            return Padding(
+              padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.bug_report, size: 46, color: Colors.grey),
+                    const SizedBox(height: 10),
+                    Text("Falha ao carregar: $categoryTitle"),
+                    const SizedBox(height: 10),
+                    Text(state.error),
+                    const SizedBox(height: 10),
+                    Text('Confira sua conexão ou tente novamente mais tarde.', style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              ),
+            );
           }
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
