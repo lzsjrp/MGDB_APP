@@ -22,9 +22,15 @@ import 'injectable.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final appPrefs = AppPreferences();
+  await appPrefs.init();
+
   configureDependencies();
 
-  await AppPreferences().init();
+  final userProvider = getIt<UserProvider>();
+
+  await userProvider.loadUser();
 
   runApp(
     MultiProvider(
@@ -32,9 +38,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(getIt<AppPreferences>()),
         ),
-        ChangeNotifierProvider<UserProvider>.value(
-          value: getIt<UserProvider>(),
-        ),
+        ChangeNotifierProvider<UserProvider>.value(value: userProvider),
         ChangeNotifierProvider<ConnectivityProvider>.value(
           value: getIt<ConnectivityProvider>(),
         ),
