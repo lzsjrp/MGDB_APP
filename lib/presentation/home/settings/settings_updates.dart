@@ -1,0 +1,161 @@
+import 'package:dio/dio.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:version/version.dart';
+import 'package:install_plugin/install_plugin.dart';
+
+import 'package:path_provider/path_provider.dart';
+
+import 'package:flutter/material.dart';
+
+import './widgets/settings_menu_widget.dart';
+
+import 'package:mgdb/providers/connectivity_provider.dart';
+import 'package:provider/provider.dart';
+
+class SettingsUpdates extends StatefulWidget {
+  const SettingsUpdates({super.key});
+
+  @override
+  State<SettingsUpdates> createState() => _SettingsUpdatesState();
+}
+
+class _SettingsUpdatesState extends State<SettingsUpdates> {
+  static bool _installPermissions = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    final result = await Permission.requestInstallPackages.status;
+
+    if (!mounted) return;
+    setState(() {
+      _installPermissions = result == PermissionStatus.granted;
+    });
+  }
+
+  Future<void> _requestPermissions() async {
+    await Permission.requestInstallPackages.request();
+
+    if (!mounted) return;
+    _checkPermissions();
+  }
+
+  Future<void> checkAndUpdate() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    final packageInfo = await PackageInfo.fromPlatform();
+    final currentVersion = packageInfo.version;
+
+    final dio = Dio();
+    final response = await dio.get(
+      'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
+    );
+
+    var latestVersion = response.data['tag_name'];
+    latestVersion = latestVersion.startsWith('v')
+        ? latestVersion.substring(1)
+        : latestVersion;
+
+    Version latest = Version.parse(latestVersion);
+    Version current = Version.parse(currentVersion);
+
+    if (latest > current) {
+      final asset = response.data['assets'][0];
+      final downloadUrl = asset['browser_download_url'];
+      final fileName = asset['name'];
+
+      final downloadsDir = await getDownloadsDirectory();
+      final savePath = '${downloadsDir!.path}/$fileName';
+
+      try {
+        await dio.download(
+          downloadUrl,
+          savePath,
+          onReceiveProgress: (count, total) {
+            if (total != -1) {
+              final progress = (count / total * 100).toStringAsFixed(0);
+              debugPrint('Baixando: $progress%');
+            }
+          },
+        );
+
+        await InstallPlugin.installApk(savePath);
+
+      } catch (e) {
+        //
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    if (!_installPermissions) {
+      return Scaffold(
+        body: AlertDialog(
+          title: const Text('Permissão necessária'),
+          content: const Text(
+            'Para atualizar, autorize o aplicativo a instalar pacotes nas configurações.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => _requestPermissions(),
+              child: const Text('Abrir configurações'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final isConnected = context.watch<ConnectivityProvider>().isConnected;
+
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (!isConnected) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.wifi_off, size: 40, color: Colors.grey),
+            SizedBox(height: 16),
+            Text('Sem internet'),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
+            child: Text(
+              "Atualizações",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SettingsMenu(
+            onPressed: checkAndUpdate,
+            buttonText: "Atualizar",
+            title: "Procurar por atualizações",
+            description: "Procura e instala novas atualizações do aplicativo",
+          ),
+        ],
+      ),
+    );
+  }
+}

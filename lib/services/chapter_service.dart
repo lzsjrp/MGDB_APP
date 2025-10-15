@@ -49,6 +49,7 @@ class ChapterService {
     }
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleChapters(titleId);
 
     try {
@@ -76,6 +77,7 @@ class ChapterService {
     }
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleChapterById(titleId, chapterId);
 
     try {
@@ -102,6 +104,7 @@ class ChapterService {
     String? volumeTitle,
   ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleChapters(titleId);
 
     try {
@@ -125,6 +128,7 @@ class ChapterService {
     String chapterId,
   ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleChapterById(titleId, chapterId);
 
     try {

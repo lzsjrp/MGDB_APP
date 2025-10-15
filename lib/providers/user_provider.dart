@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:injectable/injectable.dart';
+import 'package:mgdb/providers/connectivity_provider.dart';
 import '../app/injectable.dart';
 
 import 'package:mgdb/services/session_service.dart';
@@ -11,8 +12,9 @@ import '../services/favorites_service.dart';
 
 @injectable
 class UserProvider extends ChangeNotifier {
-  final SessionService sessionService = getIt<SessionService>();
-  final FavoritesService favoritesService = getIt<FavoritesService>();
+  final sessionService = getIt<SessionService>();
+  final favoritesService = getIt<FavoritesService>();
+  final connectivityProvider = getIt<ConnectivityProvider>();
 
   User? _userData;
   String? _errorMessage;
@@ -50,25 +52,30 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> loadUser() async {
-    try {
-      final jwt = await sessionService.readToken();
-      if (jwt == null) {
-        _userData = null;
-        notifyListeners();
-        return;
-      }
-      final user = await sessionService.getUser(jwt);
-      _userData = user;
-      await sessionService.saveUser(json.encode(user));
-      notifyListeners();
-    } catch (e) {
+    await connectivityProvider.initialized;
+    if (!connectivityProvider.isConnected) {
       final savedUserJson = await sessionService.readUser();
       if (savedUserJson != null) {
-        _userData = json.decode(savedUserJson);
+        _userData = User.fromJson(jsonDecode(savedUserJson));
       } else {
         _userData = null;
       }
       notifyListeners();
+    } else {
+      try {
+        final jwt = await sessionService.readToken();
+        if (jwt == null) {
+          _userData = null;
+          notifyListeners();
+          return;
+        }
+        final user = await sessionService.getUser(jwt);
+        _userData = user;
+        await sessionService.saveUser(json.encode(user));
+        notifyListeners();
+      } catch (e) {
+        _userData = null;
+      }
     }
   }
 

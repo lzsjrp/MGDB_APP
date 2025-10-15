@@ -1,3 +1,9 @@
+class DefaultPreferences {
+  static const String apiBaseUrl = "lzsjrp-mgdb.vercel.app";
+  static const String theme = 'light';
+  static const bool noCache = false;
+}
+
 class ApiUrls {
   final String baseUrl;
 

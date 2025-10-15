@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
@@ -73,6 +74,7 @@ class SessionService {
 
   Future<SessionResponse> getSession(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.sessionRoute;
 
     try {
@@ -85,7 +87,10 @@ class SessionService {
 
   Future<SessionResponse> createSession(String email, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.sessionRoute;
+
+    debugPrint(apiConfigProvider.baseUrl);
 
     try {
       final response = await _dio.post(
@@ -100,6 +105,7 @@ class SessionService {
 
   Future<User> getUser(String jwt) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.usersRoute;
 
     try {
@@ -113,6 +119,7 @@ class SessionService {
 
   Future<User> createUser(String email, String name, String password) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.usersRoute;
 
     try {

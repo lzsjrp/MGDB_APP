@@ -48,6 +48,7 @@ class BookService {
     }
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleRoute;
 
     try {
@@ -78,6 +79,7 @@ class BookService {
     }
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleById(titleId);
 
     try {
@@ -98,6 +100,7 @@ class BookService {
     String type,
   ) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleRoute;
 
     try {
@@ -113,6 +116,7 @@ class BookService {
 
   Future<BookDefaultResponse> deleteTitle(String titleId) async {
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleById(titleId);
 
     try {
@@ -135,6 +139,7 @@ class BookService {
     }
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
+    _dio.options.baseUrl = 'https://${apiConfigProvider.baseUrl}';
     final url = apiUrls.titleCover(titleId);
 
     try {

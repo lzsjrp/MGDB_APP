@@ -1,5 +1,7 @@
 import 'package:mgdb/presentation/home/discuss_page.dart';
 import 'package:flutter/material.dart';
+import 'package:mgdb/shared/preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +9,7 @@ import 'package:mgdb/core/theme/app_theme.dart';
 import 'package:mgdb/presentation/home/explore_page.dart';
 import 'package:mgdb/presentation/home/downloads_page.dart';
 import 'package:mgdb/presentation/home/favorites_page.dart';
+import '../presentation/home/settings/settings_page.dart';
 import '../shared/widgets/navigation_page.dart';
 
 import '../providers/theme_provider.dart';
@@ -21,13 +24,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
 
-  final apiConfigProvider = getIt<ApiConfigProvider>();
-  await apiConfigProvider.loadBaseUrl();
+  await AppPreferences().init();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(getIt<AppPreferences>()),
+        ),
         ChangeNotifierProvider<UserProvider>.value(
           value: getIt<UserProvider>(),
         ),
@@ -35,7 +39,7 @@ void main() async {
           value: getIt<ConnectivityProvider>(),
         ),
         ChangeNotifierProvider<ApiConfigProvider>.value(
-          value: apiConfigProvider,
+          value: getIt<ApiConfigProvider>(),
         ),
       ],
       child: const MyApp(),
@@ -49,11 +53,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final apiConfigProvider = context.watch<ApiConfigProvider>();
 
     return MaterialApp(
       title: 'App',
-      key: ValueKey(apiConfigProvider.baseUrl),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
@@ -79,6 +81,30 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
+  static bool _storagePermission = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    final result = await Permission.manageExternalStorage.status;
+
+    if (!mounted) return;
+    setState(() {
+      _storagePermission = result == PermissionStatus.granted;
+    });
+  }
+
+  Future<void> _requestPermissions() async {
+    await Permission.manageExternalStorage.request();
+
+    if (!mounted) return;
+    _checkPermissions();
+  }
+
   final pages = [
     const FavoritesPage(),
     const ExplorePage(),
@@ -95,6 +121,35 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationPage(pages: pages, tabs: tabs);
+    if (!_storagePermission) {
+      return Scaffold(
+        body: AlertDialog(
+          title: const Text('Permissão necessária'),
+          content: const Text(
+            'Para continuar, autorize a permissão de armazenamento nas configurações.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => _requestPermissions(),
+              child: const Text('Abrir configurações'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final actions = [
+      IconButton(
+        icon: Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SettingsPage()),
+          );
+        },
+      ),
+    ];
+
+    return NavigationPage(pages: pages, tabs: tabs, actions: actions);
   }
 }

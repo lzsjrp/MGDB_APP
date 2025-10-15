@@ -1,4 +1,3 @@
-import 'package:mgdb/presentation/home/settings/settings_page.dart';
 import 'package:flutter/material.dart';
 
 class DiscussPage extends StatelessWidget {

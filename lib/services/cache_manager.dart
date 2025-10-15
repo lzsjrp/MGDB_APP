@@ -1,28 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:mgdb/shared/preferences.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:injectable/injectable.dart';
 
 import '../core/constants/app_constants.dart';
-import '../providers/api_config_provider.dart';
 
 @injectable
 class CacheManager {
-  final ApiConfigProvider apiConfigProvider;
   final Dio _dio;
+  final AppPreferences appPreferences;
 
   static const cacheDuration = Duration(hours: 1);
 
-  CacheManager(this.apiConfigProvider) : _dio = Dio() {
-    _dio.options
-      ..baseUrl = 'https://${apiConfigProvider.baseUrl}'
-      ..headers = {'Content-Type': 'application/json'};
-  }
+  CacheManager(this.appPreferences) : _dio = Dio();
 
   Future<void> saveCache(String typeKey, String subKey, dynamic data) async {
+    if (appPreferences.noCache) return;
     final prefs = await SharedPreferences.getInstance();
     final cacheString = prefs.getString(typeKey);
 
@@ -41,6 +38,7 @@ class CacheManager {
   }
 
   Future<dynamic> getCache(String typeKey, String subKey) async {
+    if (appPreferences.noCache) return null;
     final prefs = await SharedPreferences.getInstance();
     final cacheString = prefs.getString(typeKey);
     if (cacheString == null) return null;
@@ -63,6 +61,23 @@ class CacheManager {
 
   Future<void> clearCache(String typeKey) async {
     final prefs = await SharedPreferences.getInstance();
+
+    if (typeKey == AppCacheKeys.imagesCache) {
+      final cacheMap = prefs.getString(typeKey);
+      if (cacheMap != null) {
+        final Map<String, dynamic> imagesCache = json.decode(cacheMap);
+        for (var entry in imagesCache.values) {
+          final filePath = entry['data']['filePath'] as String?;
+          if (filePath != null) {
+            final file = File(filePath);
+            if (await file.exists()) {
+              await file.delete();
+            }
+          }
+        }
+      }
+    }
+
     await prefs.remove(typeKey);
   }
 
@@ -76,10 +91,12 @@ class CacheManager {
   }
 
   Future<File?> imageCache(String imageId, String imageUrl) async {
+    if (appPreferences.noCache) return null;
     if (imageUrl.isEmpty) return null;
 
     final cacheEntry =
-        await getCache(AppCacheKeys.imagesCache, imageId) as Map<String, dynamic>?;
+        await getCache(AppCacheKeys.imagesCache, imageId)
+            as Map<String, dynamic>?;
 
     final dir = await getApplicationCacheDirectory();
     final filePath = '${dir.path}/$imageId.jpg';
@@ -89,8 +106,15 @@ class CacheManager {
 
     if (cacheEntry != null) {
       final timestamp = DateTime.parse(cacheEntry['timestamp'] as String);
-      if (now.difference(timestamp) <= cacheDuration && await file.exists()) {
+      final expired = now.difference(timestamp) > cacheDuration;
+      final fileExists = await file.exists();
+
+      if (!expired && fileExists) {
         return file;
+      }
+
+      if (expired && fileExists) {
+        await file.delete();
       }
     }
 

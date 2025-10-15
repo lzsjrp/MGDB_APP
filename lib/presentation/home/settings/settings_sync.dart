@@ -1,0 +1,150 @@
+import 'package:mgdb/models/user_model.dart';
+import 'package:flutter/material.dart';
+import 'package:mgdb/presentation/home/settings/dialogs/change_api_dialog.dart';
+import 'package:mgdb/services/favorites_service.dart';
+
+import 'package:mgdb/shared/widgets/popup_widget.dart';
+import '../../../app/injectable.dart';
+import './widgets/settings_menu_widget.dart';
+import './dialogs/login_dialog.dart';
+
+import 'package:mgdb/providers/user_provider.dart';
+import 'package:mgdb/providers/connectivity_provider.dart';
+import 'package:provider/provider.dart';
+
+class SettingsSync extends StatefulWidget {
+  const SettingsSync({super.key});
+
+  @override
+  State<SettingsSync> createState() => _SettingsSyncState();
+}
+
+class _SettingsSyncState extends State<SettingsSync> {
+  final favoritesService = getIt<FavoritesService>();
+
+  User? userData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => _checkUser());
+  }
+
+  Future<void> _checkUser() async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      await userProvider.loadUser();
+    } catch (e) {
+      // Do nothing
+    }
+
+    if (!mounted) return;
+    setState(() {
+      userData = userProvider.userData;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final isConnected = context.watch<ConnectivityProvider>().isConnected;
+
+    final userData = userProvider.userData;
+
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    return Scaffold(
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
+            child: Text(
+              "Sincronização",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SettingsMenu(
+            onPressed: userData == null
+                ? () {
+                    if (isConnected) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => const LoginDialog(),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Você está sem conexão com a internet'),
+                        ),
+                      );
+                    }
+                  }
+                : () {
+                    popupWidget(context, ":(", "Não implementado");
+                  },
+            buttonText: userData == null ? "Login" : "Sair",
+            title: userData == null ? "Você não está logado" : (userData.name),
+            description: userData == null
+                ? "Faça login para sincronizar seus favoritos"
+                : (userData.email),
+          ),
+          ?userData == null
+              ? null
+              : SettingsMenu(
+                  onPressed: () async {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    try {
+                      await favoritesService.syncFavorites(merge: true);
+                    } catch (e) {
+                      // do nothing
+                    }
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
+                  buttonText: "Sincronizar",
+                  title: "Favoritos",
+                  description: "Sincroniza seus favoritos com o servidor.",
+                ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
+            child: Text(
+              "Outros",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SettingsMenu(
+            onPressed: () async {
+              if (isConnected) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (context) => const ChangeApiDialog(),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Você está sem conexão com a internet'),
+                  ),
+                );
+              }
+            },
+            buttonText: "Alterar",
+            title: "Servidor",
+            description: "Endereço para conexão de dados e sincronização.",
+          ),
+        ],
+      ),
+    );
+  }
+}
