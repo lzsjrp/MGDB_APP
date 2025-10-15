@@ -1,5 +1,7 @@
 branches:
   - main
+  - name: pre-release
+    prerelease: true
 
 plugins:
   - "@semantic-release/commit-analyzer"

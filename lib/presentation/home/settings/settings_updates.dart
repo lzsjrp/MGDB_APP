@@ -8,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter/material.dart';
 
+import '../../../app/injectable.dart';
+import '../../../shared/preferences.dart';
 import './widgets/settings_menu_widget.dart';
 
 import 'package:mgdb/providers/connectivity_provider.dart';
@@ -21,6 +23,8 @@ class SettingsUpdates extends StatefulWidget {
 }
 
 class _SettingsUpdatesState extends State<SettingsUpdates> {
+  final _preferences = getIt<AppPreferences>();
+
   static bool _installPermissions = true;
 
   String _currentVersion = '';
@@ -74,25 +78,75 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       final currentVersion = packageInfo.version;
 
       final dio = Dio();
-      final response = await dio.get(
-        'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
-      );
+      String latestVersion = '';
+      Response? releaseResponse;
 
-      var latestVersion = response.data['tag_name'];
+      if (!_preferences.earlyAccess) {
+        releaseResponse = await dio.get(
+          'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
+        );
+
+        latestVersion = releaseResponse.data['tag_name'];
+      } else {
+        final searchReleases = await dio.get(
+          'https://api.github.com/repos/lzsjrp/MGDB_APP/releases',
+        );
+
+        final releases = searchReleases.data as List;
+        final preRelease = releases.firstWhere(
+          (r) => r['prerelease'] == true && r['draft'] == false,
+          orElse: () => null,
+        );
+
+        Map<String, dynamic>? releaseData;
+
+        if (preRelease != null) {
+          latestVersion = preRelease['tag_name'];
+          final assetsUrl = preRelease['assets_url'];
+          final assetsResponse = await dio.get(assetsUrl);
+          releaseData = {...preRelease, 'assets': assetsResponse.data};
+        } else {
+          final stable = releases.firstWhere(
+            (r) => r['prerelease'] == false && r['draft'] == false,
+            orElse: () => null,
+          );
+          if (stable != null) {
+            latestVersion = stable['tag_name'];
+            final assetsUrl = stable['assets_url'];
+            final assetsResponse = await dio.get(assetsUrl);
+            releaseData = {...stable, 'assets': assetsResponse.data};
+          }
+        }
+
+        if (releaseData != null) {
+          releaseResponse = Response(
+            requestOptions: RequestOptions(path: ''),
+            data: releaseData,
+          );
+        }
+      }
+
       latestVersion = latestVersion.startsWith('v')
           ? latestVersion.substring(1)
           : latestVersion;
 
       setState(() {
-        _currentVersion = currentVersion.toString();
-        _latestVersion = latestVersion.toString();
+        _currentVersion = currentVersion;
+        _latestVersion = latestVersion;
       });
 
-      Version latest = Version.parse(latestVersion);
-      Version current = Version.parse(currentVersion);
+      final latest = Version.parse(latestVersion);
+      final current = Version.parse(currentVersion);
 
-      if (latest > current) {
-        final asset = response.data['assets'][0];
+      if (latest > current && releaseResponse != null) {
+        final assets = releaseResponse.data['assets'] as List;
+        if (assets.isEmpty) throw Exception('Nenhum arquivo encontrado.');
+
+        final asset = assets.firstWhere(
+          (a) => a['name'].endsWith('.apk'),
+          orElse: () => assets.first,
+        );
+
         final downloadUrl = asset['browser_download_url'];
         final fileName = asset['name'];
 
@@ -126,6 +180,9 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       });
     } catch (error) {
       if (!mounted) return;
+      setState(() {
+        _loading = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Falha ao verificar por atualizações')),
       );
@@ -229,6 +286,18 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
                 ],
               ),
             ),
+          SizedBox(height: 10),
+          SettingsMenu(
+            onPressed: () {
+              setState(() {
+                _preferences.earlyAccess = !_preferences.earlyAccess;
+              });
+            },
+            buttonText: !_preferences.earlyAccess ? "Ativar" : "Desativar",
+            title: "Acesso Antecipado",
+            description:
+                "Permite instalar versões em teste e ativa recursos experimentais",
+          ),
         ],
       ),
     );
