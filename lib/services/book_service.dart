@@ -128,6 +128,16 @@ class BookService {
     }
   }
 
+  Future<List<String>> getLocalBooksList() async {
+    try {
+      return await storageManager.getStorageKeys(
+        AppStorageKeys.downloadsBookKey,
+      );
+    } catch (e) {
+      throw Exception('Falha ao obter lista de títulos locais: $e');
+    }
+  }
+
   Future<Book?> getLocalTitle(String titleId) async {
     try {
       final storedBookJson = await storageManager.getStorage(

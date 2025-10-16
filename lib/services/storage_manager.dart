@@ -105,6 +105,18 @@ class StorageManager {
     }
   }
 
+  Future<List<String>> getStorageKeys(String typeKey) async {
+    try {
+      final value = await _secureStorage.read(key: typeKey);
+      if (value == null) return [];
+
+      final storageMap = json.decode(value) as Map<String, dynamic>;
+      return storageMap.keys.toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
   Future<void> clearCache(String typeKey) async {
     try {
       if (typeKey == AppCacheKeys.imagesCache) {
