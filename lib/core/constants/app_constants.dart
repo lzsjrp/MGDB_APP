@@ -19,6 +19,8 @@ class ApiUrls {
 
   String get titleRoute => "$apiPath/title";
 
+  String get categoriesRoute => "$apiPath/categories";
+
   String get favoritesRoute => "$apiPath/favorites";
 
   String manageFavorite(String titleId) => "$favoritesRoute/book/$titleId";
@@ -35,9 +37,15 @@ class ApiUrls {
 
   String titleChapterById(String titleId, String chapterId) =>
       "$titleRoute/$titleId/chapters/$chapterId";
+
+  String categoryById(String categoryId) => "$categoriesRoute/$categoryId";
+
+  String categoryManageBooks(String categoryId) =>
+      "$categoriesRoute/$categoryId/book";
 }
 
 class AppCacheKeys {
+  static const String defaultCache = 'app_cache';
   static const String imagesCache = 'images_cache';
   static const String booksCache = 'books_cache';
   static const String chaptersCache = 'chapters_cache';

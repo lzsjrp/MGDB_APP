@@ -17,6 +17,7 @@ import '../providers/connectivity_provider.dart' as _i517;
 import '../providers/theme_provider.dart' as _i522;
 import '../providers/user_provider.dart' as _i26;
 import '../services/book_service.dart' as _i490;
+import '../services/categories_service.dart' as _i678;
 import '../services/chapter_service.dart' as _i193;
 import '../services/favorites_service.dart' as _i211;
 import '../services/session_service.dart' as _i984;
@@ -54,6 +55,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i193.ChapterService>(
       () => _i193.ChapterService(
+        gh<_i984.SessionService>(),
+        gh<_i187.ApiConfigProvider>(),
+        gh<_i1041.StorageManager>(),
+      ),
+    );
+    gh.factory<_i678.CategoriesService>(
+      () => _i678.CategoriesService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
         gh<_i1041.StorageManager>(),
