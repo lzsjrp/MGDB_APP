@@ -108,7 +108,7 @@ class BookService {
     }
   }
 
-  Future<Book> saveTitle(String titleId) async {
+  Future<Book> saveLocalTitle(String titleId) async {
     try {
       final book = await fetchTitle(titleId, cache: false);
       await storageManager.saveStorage(
@@ -128,7 +128,7 @@ class BookService {
     }
   }
 
-  Future<Book?> getTitle(String titleId) async {
+  Future<Book?> getLocalTitle(String titleId) async {
     try {
       final storedBookJson = await storageManager.getStorage(
         AppStorageKeys.downloadsBookKey,

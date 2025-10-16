@@ -95,7 +95,7 @@ class FavoritesService {
       }
     }
     if (connectivityProvider.isConnected) {
-      await bookService.saveTitle(bookId);
+      await bookService.saveLocalTitle(bookId);
     }
     final favorites = await _readFavoritesList();
     favorites.add(bookId);
@@ -154,7 +154,7 @@ class FavoritesService {
 
       for (final bookId in favoritesSet) {
         try {
-          await bookService.saveTitle(bookId);
+          await bookService.saveLocalTitle(bookId);
         } catch (e) {
           // Do-nothing
         }
@@ -204,7 +204,7 @@ class FavoritesService {
 
       for (final bookId in confirmedFavorites) {
         try {
-          await bookService.saveTitle(bookId);
+          await bookService.saveLocalTitle(bookId);
         } catch (e) {
           // Do-nothing
         }

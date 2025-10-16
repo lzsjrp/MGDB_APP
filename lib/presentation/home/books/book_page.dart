@@ -55,7 +55,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         _loading = true;
       });
 
-      final storageBook = await bookService.getTitle(widget.bookId);
+      final storageBook = await bookService.getLocalTitle(widget.bookId);
       if (storageBook != null) {
         book = storageBook;
       } else {
