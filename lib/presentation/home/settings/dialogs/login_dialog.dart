@@ -72,6 +72,7 @@ class _LoginDialogState extends State<LoginDialog> {
                       children: [
                         TextButton(
                           onPressed: () {
+                            Navigator.pop(context);
                             showDialog(
                               context: context,
                               builder: (context) => const RegisterDialog(),
