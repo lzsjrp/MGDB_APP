@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:mgdb/presentation/home/books/widgets/books_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 
-import 'package:mgdb/presentation/home/books/details_page.dart';
+import 'package:mgdb/presentation/home/books/book_page.dart';
 import 'package:mgdb/presentation/home/states/category.dart';
 import 'package:mgdb/services/storage_manager.dart';
 
@@ -204,7 +204,7 @@ class _ExplorePageState extends State<ExplorePage>
               SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(
-                  top: 10.0,
+                  top: 8.0,
                   bottom: 10.0,
                   left: 25.0,
                 ),

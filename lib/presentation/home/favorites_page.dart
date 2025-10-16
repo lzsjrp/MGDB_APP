@@ -9,7 +9,7 @@ import '../../app/injectable.dart';
 import '../../services/book_service.dart';
 import '../../services/storage_manager.dart';
 import '../../services/favorites_service.dart';
-import './books/details_page.dart';
+import './books/book_page.dart';
 import 'books/widgets/books_gridview_list.dart';
 
 class FavoritesPage extends StatefulWidget {
