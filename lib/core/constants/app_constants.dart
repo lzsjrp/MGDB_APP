@@ -1,5 +1,6 @@
 class DefaultPreferences {
   static const String apiBaseUrl = "lzsjrp-mgdb.vercel.app";
+  static const String releasesRepo = "lzsjrp/MGDB_APP";
   static const String theme = 'light';
   static const bool noCache = false;
 }

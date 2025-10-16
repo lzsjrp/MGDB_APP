@@ -82,6 +82,7 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
         _loading = true;
       });
 
+      final releasesRepo = _preferences.releasesRepo;
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version;
 
@@ -91,7 +92,7 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       Response? releaseResponse;
 
       final releaseStableResponse = await dio.get(
-        'https://api.github.com/repos/lzsjrp/MGDB_APP/releases/latest',
+        'https://api.github.com/repos/$releasesRepo/releases/latest',
       );
       final latestStableVersionRaw = releaseStableResponse.data['tag_name'];
       final latestStableVersion = latestStableVersionRaw.startsWith('v')
@@ -102,7 +103,7 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       String? latestEarlyVersion;
 
       final releasesResponse = await dio.get(
-        'https://api.github.com/repos/lzsjrp/MGDB_APP/releases',
+        'https://api.github.com/repos/$releasesRepo/releases',
       );
       final releases = releasesResponse.data as List;
 
