@@ -13,7 +13,6 @@ import '../../../shared/preferences.dart';
 import './widgets/settings_menu_widget.dart';
 
 import 'package:mgdb/providers/connectivity_provider.dart';
-import 'package:provider/provider.dart';
 
 class SettingsUpdates extends StatefulWidget {
   const SettingsUpdates({super.key});
@@ -24,6 +23,7 @@ class SettingsUpdates extends StatefulWidget {
 
 class _SettingsUpdatesState extends State<SettingsUpdates> {
   final _preferences = getIt<AppPreferences>();
+  final connectivityProvider = getIt<ConnectivityProvider>();
 
   static bool _installPermissions = true;
 
@@ -69,6 +69,14 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
 
   Future<void> checkAndUpdate() async {
     try {
+      await connectivityProvider.initialized;
+      if (!connectivityProvider.isConnected) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sem conexão com a internet.')),
+        );
+      }
+
       if (!mounted) return;
       setState(() {
         _loading = true;
@@ -210,8 +218,6 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
       );
     }
 
-    final isConnected = context.watch<ConnectivityProvider>().isConnected;
-
     if (_loading) {
       return Scaffold(
         body: Center(
@@ -237,19 +243,6 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
             Text("Algo deu errado..."),
             const SizedBox(height: 10),
             Text('($_err)'),
-          ],
-        ),
-      );
-    }
-
-    if (!_loading && !isConnected) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.wifi_off, size: 40, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Sem internet'),
           ],
         ),
       );
