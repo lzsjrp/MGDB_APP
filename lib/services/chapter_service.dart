@@ -1,6 +1,7 @@
 import 'package:mgdb/models/chapter_model.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:mgdb/models/response_model.dart';
 
 import '../providers/api_config_provider.dart';
 import 'package:mgdb/core/constants/app_constants.dart';
@@ -40,7 +41,7 @@ class ChapterService {
     );
   }
 
-  Future<ChapterListResponse> getChapters(String titleId) async {
+  Future<ChaptersList> getChapters(String titleId) async {
     final cacheKey = 'chapters-list_$titleId';
 
     final cachedData = await storageManager.getCache(
@@ -48,7 +49,7 @@ class ChapterService {
       cacheKey,
     );
     if (cachedData != null) {
-      return ChapterListResponse.fromJson(cachedData);
+      return ChaptersList.fromJson(cachedData);
     }
 
     final apiUrls = ApiUrls(baseUrl: apiConfigProvider.baseUrl);
@@ -62,7 +63,7 @@ class ChapterService {
         cacheKey,
         response.data,
       );
-      return ChapterListResponse.fromJson(response.data);
+      return ChaptersList.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception(
         'Falha ao obter a lista de capítulos: ${e.response?.statusCode ?? e.message}',
