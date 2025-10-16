@@ -28,6 +28,12 @@ class _ExplorePageState extends State<ExplorePage>
   @override
   bool get wantKeepAlive => true;
 
+  final bookService = getIt<BookService>();
+  final storageManager = getIt<StorageManager>();
+  final Set<String> loadedCategories = {};
+
+  bool? _isConnected;
+
   Map<String, CategoryState> categories = {
     'Novos': CategoryState(),
     'Mangas': CategoryState(),
@@ -40,9 +46,28 @@ class _ExplorePageState extends State<ExplorePage>
     'Light Novels': 'WEB_NOVEL',
   };
 
-  final bookService = getIt<BookService>();
-  final storageManager = getIt<StorageManager>();
-  final Set<String> loadedCategories = {};
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final connectivity = context.read<ConnectivityProvider>();
+      _isConnected = connectivity.isConnected;
+      if (_isConnected == true) {
+        await _fetchAllCategories();
+      }
+      if (mounted) setState(() {});
+    });
+  }
+
+  Future<void> _fetchAllCategories() async {
+    final isConnected = _isConnected ?? false;
+    for (final entry in categories.entries) {
+      if (entry.value.books.isEmpty) {
+        loadedCategories.add(entry.key);
+        await fetchCategory(entry.key, 1, isConnected);
+      }
+    }
+  }
 
   Future<void> fetchCategory(
     String category,
@@ -57,21 +82,25 @@ class _ExplorePageState extends State<ExplorePage>
 
     try {
       if (isConnected) {
-        var type = categoryType[category];
-        var bookList = await bookService.getList(
+        final type = categoryType[category];
+        final bookList = await bookService.getList(
           page: page.toString(),
           type: type,
         );
-        if (!mounted) return;
 
         final covers = await loadCoversCached(bookList.data);
 
+        if (!mounted) return;
         setState(() {
-          categories[category]!.books = bookList.data;
-          categories[category]!.coversFiles = covers;
-          categories[category]!.currentPage = bookList.page;
-          categories[category]!.canLoadMore =
-              bookList.totalPages > bookList.page;
+          categories[category]!
+            ..books = bookList.data
+            ..coversFiles = covers
+            ..currentPage = bookList.page
+            ..canLoadMore = bookList.totalPages > bookList.page;
+        });
+      } else {
+        setState(() {
+          categories[category]!.error = "Sem conexão com a internet.";
         });
       }
     } catch (e) {
@@ -81,10 +110,11 @@ class _ExplorePageState extends State<ExplorePage>
       });
     }
 
-    if (!mounted) return;
-    setState(() {
-      categories[category]!.loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        categories[category]!.loading = false;
+      });
+    }
   }
 
   Future<void> loadMoreBooksForCategory(String category) async {
@@ -94,9 +124,9 @@ class _ExplorePageState extends State<ExplorePage>
     });
 
     try {
-      var type = categoryType[category];
+      final type = categoryType[category];
       final nextPage = state.currentPage + 1;
-      var bookList = await bookService.getList(
+      final bookList = await bookService.getList(
         page: nextPage.toString(),
         type: type,
       );
@@ -119,38 +149,15 @@ class _ExplorePageState extends State<ExplorePage>
   }
 
   Future<Map<String, File?>> loadCoversCached(List<Book> books) async {
-    try {
-      final Map<String, File?> coverFiles = {};
-      for (var book in books) {
-        final cover = book.cover;
-        if (cover != null) {
-          final file = await storageManager.cachedImage(
-            cover.id,
-            cover.imageUrl,
-          );
-          coverFiles[book.id] = file;
-        }
+    final Map<String, File?> coverFiles = {};
+    for (final book in books) {
+      final cover = book.cover;
+      if (cover != null) {
+        final file = await storageManager.cachedImage(cover.id, cover.imageUrl);
+        coverFiles[book.id] = file;
       }
-      return coverFiles;
-    } catch (error) {
-      throw Exception('Error ${error.toString()}');
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final isConnected = context.read<ConnectivityProvider>().isConnected;
-      if (isConnected) {
-        categories.forEach((key, value) {
-          if (value.books.isEmpty) {
-            loadedCategories.add(key);
-            fetchCategory(key, 1, isConnected);
-          }
-        });
-      }
-    });
+    return coverFiles;
   }
 
   @override
@@ -158,17 +165,38 @@ class _ExplorePageState extends State<ExplorePage>
     super.build(context);
 
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
-    final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
-    if (!isConnected) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.wifi_off, size: 40, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Sem internet'),
-          ],
+    if (_isConnected == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_isConnected == false) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.wifi_off, size: 50, color: Colors.grey),
+              const SizedBox(height: 12),
+              const Text('Sem conexão com a internet.'),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Tentar novamente'),
+                onPressed: () async {
+                  setState(
+                    () => _isConnected = context
+                        .read<ConnectivityProvider>()
+                        .isConnected,
+                  );
+                  if (_isConnected == true) {
+                    await _fetchAllCategories();
+                  }
+                  if (mounted) setState(() {});
+                },
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -181,49 +209,56 @@ class _ExplorePageState extends State<ExplorePage>
 
           if (state.error.isNotEmpty) {
             return Padding(
-              padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.bug_report, size: 46, color: Colors.grey),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 46,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(height: 10),
                     Text("Falha ao carregar: $categoryTitle"),
                     const SizedBox(height: 10),
-                    Text(state.error),
+                    Text(state.error, textAlign: TextAlign.center),
                     const SizedBox(height: 10),
-                    Text('Confira sua conexão ou tente novamente mais tarde.', style: TextStyle(color: Colors.grey)),
+                    ElevatedButton(
+                      onPressed: () =>
+                          fetchCategory(categoryTitle, 1, _isConnected!),
+                      child: const Text("Recarregar"),
+                    ),
                   ],
                 ),
               ),
             );
           }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(
-                  top: 8.0,
-                  bottom: 10.0,
-                  left: 25.0,
-                ),
+                padding: const EdgeInsets.only(left: 25.0, bottom: 8),
                 child: Text(
                   categoryTitle,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               state.loading
                   ? Container(
                       width: 180,
                       height: 300,
-                      margin: EdgeInsets.only(left: 15),
+                      margin: const EdgeInsets.only(left: 15),
                       child: Card(
                         color: theme.cardBackgroundColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: const Center(child: CircularProgressIndicator()),
                       ),
                     )
                   : BooksHorizontalListView(
