@@ -294,6 +294,18 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
             description:
                 "Permite instalar versões em teste e ativa recursos experimentais",
           ),
+          if (_preferences.earlyAccess)
+            SettingsMenu(
+              onPressed: () async {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Função não implementada.')),
+                );
+              },
+              buttonText: "Alterar",
+              title: "Repositório (Github)",
+              description: "Repositório para procurar e instalar novas atualizações",
+            ),
         ],
       ),
     );
