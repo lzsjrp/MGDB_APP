@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../app/injectable.dart';
+
 import '../../services/book_service.dart';
 import '../../services/storage_manager.dart';
 import '../../services/favorites_service.dart';
@@ -53,8 +54,13 @@ class _FavoritesPage extends State<FavoritesPage> {
       List<Book> booksDataList = [];
       for (var bookId in favorites) {
         try {
-          final data = await bookService.getLocalTitle(bookId);
-          if (data != null) booksDataList.add(data);
+          final localData = await bookService.getLocalTitle(bookId);
+          if (localData == null) {
+            final fetchData = await bookService.fetchTitle(bookId);
+            booksDataList.add(fetchData);
+          } else {
+            booksDataList.add(localData);
+          }
         } catch (err) {
           // Do-nothing
         }
@@ -114,7 +120,20 @@ class _FavoritesPage extends State<FavoritesPage> {
       );
     }
 
-    if (!_loading && favoriteBooksData.isEmpty) {
+    if (!_loading && favoriteBookIds.isNotEmpty && favoriteBooksData.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Text(
+            'Não foi possivel carregar seus favoritos, verifique sua conexão com a internet.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14),
+          ),
+        ),
+      );
+    }
+
+    if (!_loading && favoriteBookIds.isEmpty && favoriteBooksData.isEmpty) {
       return Center(child: Text('Nenhum favorito encontrado'));
     } else {
       return Scaffold(
@@ -122,17 +141,33 @@ class _FavoritesPage extends State<FavoritesPage> {
           maxWidth: 1200,
           child: ResponsiveScaledBox(
             width: 450,
-            child: BooksGridView(
-              books: favoriteBooksData,
-              coverFiles: coverFiles,
-              onBookTap: (bookId) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BookDetailsPage(bookId: bookId),
+            child: Column(
+              children: [
+                if (!_loading &&
+                    favoriteBookIds.length > favoriteBooksData.length)
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      'Não foi possivel carregar todos os seus favoritos, verifique sua conexão.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 14),
+                    ),
                   ),
-                );
-              },
+                Expanded(
+                  child: BooksGridView(
+                    books: favoriteBooksData,
+                    coverFiles: coverFiles,
+                    onBookTap: (bookId) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BookDetailsPage(bookId: bookId),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ),
