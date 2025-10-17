@@ -16,7 +16,7 @@ class Category {
   factory Category.fromJson(Map<String, dynamic> json) => Category(
     id: json['id'],
     name: json['name'],
-    booksIds: json['booksIds'],
+    booksIds: List<String>.from(json['booksIds'] ?? []),
     createdAt: json['createdAt'],
     updatedAt: json['updatedAt'],
   );

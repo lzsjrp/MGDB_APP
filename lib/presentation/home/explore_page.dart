@@ -15,6 +15,7 @@ import 'package:mgdb/providers/connectivity_provider.dart';
 
 import '../../core/theme/custom/gridview_theme.dart';
 import '../../models/book_model.dart';
+import '../../services/categories_service.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -29,16 +30,13 @@ class _ExplorePageState extends State<ExplorePage>
   bool get wantKeepAlive => true;
 
   final bookService = getIt<BookService>();
+  final categoriesService = getIt<CategoriesService>();
   final storageManager = getIt<StorageManager>();
   final Set<String> loadedCategories = {};
 
   bool? _isConnected;
 
-  Map<String, CategoryState> categories = {
-    'Novos': CategoryState(),
-    'Mangas': CategoryState(),
-    'Light Novels': CategoryState(),
-  };
+  Map<String, CategoryState> categories = {};
 
   Map<String, String?> categoryType = {
     'Novos': null,
@@ -53,10 +51,27 @@ class _ExplorePageState extends State<ExplorePage>
       final connectivity = context.read<ConnectivityProvider>();
       _isConnected = connectivity.isConnected;
       if (_isConnected == true) {
-        await _fetchAllCategories();
+        await _fetchCategoriesFromServer();
       }
       if (mounted) setState(() {});
     });
+  }
+
+  Future<void> _fetchCategoriesFromServer() async {
+    try {
+      final list = await categoriesService.getList();
+
+      setState(() {
+        categories = {for (var cat in list) cat.name: CategoryState()};
+      });
+      await _fetchAllCategories();
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isConnected = false;
+        });
+      }
+    }
   }
 
   Future<void> _fetchAllCategories() async {
@@ -70,49 +85,54 @@ class _ExplorePageState extends State<ExplorePage>
   }
 
   Future<void> fetchCategory(
-    String category,
+    String categoryName,
     int page,
     bool isConnected,
   ) async {
     if (!mounted) return;
     setState(() {
-      categories[category]!.loading = true;
-      categories[category]!.error = '';
+      categories[categoryName]!.loading = true;
+      categories[categoryName]!.error = '';
     });
 
     try {
-      if (isConnected) {
-        final type = categoryType[category];
-        final bookList = await bookService.getList(
-          page: page.toString(),
-          type: type,
-        );
+      final list = await categoriesService.getList();
+      final categoryData = list.firstWhere((c) => c.name == categoryName);
 
-        final covers = await loadCoversCached(bookList.data);
+      final categoryDetail = await categoriesService.getCategory(
+        categoryData.id,
+      );
 
-        if (!mounted) return;
-        setState(() {
-          categories[category]!
-            ..books = bookList.data
-            ..coversFiles = covers
-            ..currentPage = bookList.page
-            ..canLoadMore = bookList.totalPages > bookList.page;
-        });
-      } else {
-        setState(() {
-          categories[category]!.error = "Sem conexão com a internet.";
-        });
+      final books = <Book>[];
+
+      for (final bookId in categoryDetail.booksIds) {
+        try {
+          final book = await bookService.fetchTitle(bookId);
+          books.add(book);
+        } catch (_) {
+        }
       }
+
+      final covers = await loadCoversCached(books);
+
+      if (!mounted) return;
+      setState(() {
+        categories[categoryName]!
+          ..books = books
+          ..coversFiles = covers
+          ..currentPage = 1
+          ..canLoadMore = false;
+      });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        categories[category]!.error = e.toString();
+        categories[categoryName]!.error = e.toString();
       });
     }
 
     if (mounted) {
       setState(() {
-        categories[category]!.loading = false;
+        categories[categoryName]!.loading = false;
       });
     }
   }
@@ -239,7 +259,7 @@ class _ExplorePageState extends State<ExplorePage>
             children: [
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(left: 25.0, bottom: 8),
+                padding: const EdgeInsets.only(left: 25.0, bottom: 8, top: 10.0),
                 child: Text(
                   categoryTitle,
                   style: const TextStyle(
