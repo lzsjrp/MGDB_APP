@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
 
-import './book_card.dart';
+import '../../../../shared/widgets/book_card.dart';
 
 class BooksGridView extends StatelessWidget {
   final List<Book> books;

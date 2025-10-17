@@ -5,13 +5,13 @@ import 'package:mgdb/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import '../../app/injectable.dart';
+import '../../../app/injectable.dart';
 
-import '../../services/book_service.dart';
-import '../../services/storage_manager.dart';
-import '../../services/favorites_service.dart';
-import './books/book_page.dart';
-import 'books/widgets/books_gridview_list.dart';
+import '../../../services/book_service.dart';
+import '../../../services/storage_manager.dart';
+import '../../../services/favorites_service.dart';
+import '../books/book_page.dart';
+import 'widgets/vertical_listview.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
