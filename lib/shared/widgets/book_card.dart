@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:mgdb/models/book_model.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/custom/gridview_theme.dart';
+import '../../core/theme/custom/gridview_theme.dart';
 
 class BookCard extends StatelessWidget {
   final Book book;

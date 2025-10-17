@@ -6,9 +6,9 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mgdb/core/theme/app_theme.dart';
-import 'package:mgdb/presentation/home/explore_page.dart';
+import 'package:mgdb/presentation/home/explore/explore_page.dart';
 import 'package:mgdb/presentation/home/downloads_page.dart';
-import 'package:mgdb/presentation/home/favorites_page.dart';
+import 'package:mgdb/presentation/home/favorites/favorites_page.dart';
 import '../presentation/home/settings/settings_page.dart';
 import '../shared/widgets/navigation_page.dart';
 
