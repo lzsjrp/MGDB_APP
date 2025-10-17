@@ -4,7 +4,7 @@ class ScanlatorModel {
   final String? website;
   final String? discord;
   final String? twitter;
-  final List<String?> languages;
+  final List<String> languages;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -26,7 +26,7 @@ class ScanlatorModel {
       website: json['website'],
       discord: json['discord'],
       twitter: json['twitter'],
-      languages: json['languages'],
+      languages: List<String>.from(json['languages'] ?? []),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );

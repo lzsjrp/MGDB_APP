@@ -38,7 +38,9 @@ class Chapter {
       title: chapterJson['title'],
       number: chapterJson['number'],
       content: chapterJson['content'],
-      scanlator: chapterJson['scanlator'],
+      scanlator: json['scanlator'] != null
+          ? ScanlatorModel.fromJson(json['scanlator'])
+          : null,
       scanlatorId: chapterJson['scanlatorId'],
       addedBy: chapterJson['addedBy'],
       createdAt: DateTime.parse(chapterJson['createdAt']),
@@ -132,7 +134,9 @@ class ChapterListItem {
       title: json['title'],
       number: json['number'],
       addedBy: json['addedBy'],
-      scanlator: json['scanlator'],
+      scanlator: json['scanlator'] != null
+          ? ScanlatorModel.fromJson(json['scanlator'])
+          : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );
