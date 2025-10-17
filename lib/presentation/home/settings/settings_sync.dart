@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mgdb/services/favorites_service.dart';
 
-import 'package:mgdb/shared/widgets/popup_widget.dart';
 import '../../../app/injectable.dart';
 import './widgets/settings_menu_widget.dart';
 import './dialogs/login_dialog.dart';
@@ -66,7 +65,11 @@ class _SettingsSyncState extends State<SettingsSync> {
                     }
                   }
                 : () {
-                    popupWidget(context, ":(", "Não implementado");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Função não implementada.'),
+                      ),
+                    );
                   },
             buttonText: userData == null ? "Login" : "Sair",
             title: userData == null ? "Você não está logado" : (userData.name),
