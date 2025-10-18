@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import './widgets_themes/pagination_theme.dart';
+import './widgets_themes/gridview_theme.dart';
+import './widgets_themes/bottom_navbar_theme.dart';
+
 import 'app_colors.dart';
-import './custom/pagination_theme.dart';
-import './custom/gridview_theme.dart';
-import 'custom/bottom_navbar_theme.dart';
+
+import 'package:mgdb/core/theme/dark_theme.dart';
+import 'package:mgdb/core/theme/light_theme.dart';
 
 class AppTheme {
   static ThemeData buildTheme(AppColors colors) {
@@ -125,7 +129,7 @@ class AppTheme {
     );
   }
 
-  static ThemeData get darkTheme => buildTheme(AppColorsDark());
+  static ThemeData get darkTheme => buildTheme(ThemeDark());
 
-  static ThemeData get lightTheme => buildTheme(AppColorsLight());
+  static ThemeData get lightTheme => buildTheme(ThemeLight());
 }

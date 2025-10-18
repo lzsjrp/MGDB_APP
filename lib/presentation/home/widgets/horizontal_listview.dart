@@ -7,7 +7,7 @@ import 'package:mgdb/services/storage_manager.dart';
 import 'package:mgdb/app/injectable.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/custom/gridview_theme.dart';
+import '../../../core/theme/widgets_themes/gridview_theme.dart';
 import '../../../providers/connectivity_provider.dart';
 import '../../../shared/widgets/book_card.dart';
 import '../books/book_page.dart';

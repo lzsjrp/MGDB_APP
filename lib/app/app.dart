@@ -1,3 +1,4 @@
+import 'package:mgdb/presentation/home/books/book_edit.dart';
 import 'package:mgdb/presentation/home/discuss_page.dart';
 import 'package:flutter/material.dart';
 import 'package:mgdb/shared/preferences.dart';
@@ -6,9 +7,9 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mgdb/core/theme/app_theme.dart';
-import 'package:mgdb/presentation/home/explore/explore_page.dart';
+import 'package:mgdb/presentation/home/explore_page.dart';
 import 'package:mgdb/presentation/home/downloads_page.dart';
-import 'package:mgdb/presentation/home/favorites/favorites_page.dart';
+import 'package:mgdb/presentation/home/favorites_page.dart';
 import '../presentation/home/settings/settings_page.dart';
 import '../shared/widgets/navigation_page.dart';
 
@@ -149,6 +150,15 @@ class _Home extends State<Home> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const SettingsPage()),
+          );
+        },
+      ),
+      IconButton(
+        icon: Icon(Icons.my_library_books),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const EditBookPage()),
           );
         },
       ),

@@ -12,7 +12,7 @@ import 'package:mgdb/services/book_service.dart';
 import 'package:mgdb/services/chapter_service.dart';
 import '../../../services/favorites_service.dart';
 
-import '../../../core/theme/custom/gridview_theme.dart';
+import '../../../core/theme/widgets_themes/gridview_theme.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final String bookId;
@@ -266,10 +266,13 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 ChapterListItem chapter = chaptersData![index];
                 final title = chapter.title;
                 final number = chapter.number;
+                final scanlator = chapter.scanlator?.name;
 
                 return ListTile(
                   title: Text('Capítulo $number'),
-                  subtitle: Text(title),
+                  subtitle: scanlator != null
+                      ? Text('$title - $scanlator')
+                      : Text(title),
                   onTap: () {
                     if (bookData.type == 'MANGA') {
                       Navigator.push(
