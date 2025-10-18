@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final tabs = const [
     GButton(icon: Icons.settings, text: 'Geral'),
     GButton(icon: Icons.book, text: 'Leitura'),
-    GButton(icon: Icons.sync, text: 'Sincronização'),
+    GButton(icon: Icons.account_box, text: 'Usuário'),
     GButton(icon: Icons.update, text: 'Atualizações'),
   ];
 

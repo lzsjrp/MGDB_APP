@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mgdb/providers/connectivity_provider.dart';
+import 'package:mgdb/providers/user_provider.dart';
 import 'package:mgdb/services/favorites_service.dart';
+import 'package:provider/provider.dart';
 
 import '../../../app/injectable.dart';
-import './widgets/settings_menu_widget.dart';
 import './dialogs/login_dialog.dart';
-
-import 'package:mgdb/providers/user_provider.dart';
-import 'package:mgdb/providers/connectivity_provider.dart';
-import 'package:provider/provider.dart';
+import './widgets/settings_menu_widget.dart';
 
 class SettingsSync extends StatefulWidget {
   const SettingsSync({super.key});
@@ -43,7 +42,7 @@ class _SettingsSyncState extends State<SettingsSync> {
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 5.0, left: 20.0),
             child: Text(
-              "Sincronização",
+              "Usuário",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -66,44 +65,64 @@ class _SettingsSyncState extends State<SettingsSync> {
                   }
                 : () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Função não implementada.'),
-                      ),
+                      const SnackBar(content: Text('Função não implementada.')),
                     );
                   },
             buttonText: userData == null ? "Login" : "Sair",
             title: userData == null ? "Você não está logado" : (userData.name),
             description: userData == null
-                ? "Faça login para sincronizar seus favoritos"
+                ? "Entre ou crie uma nova conta para sincronizar seus favoritos"
                 : (userData.email),
           ),
           ?userData == null
               ? null
-              : SettingsMenu(
-                  onPressed: () async {
-                    if (isConnected) {
-                      setState(() {
-                        _loading = true;
-                      });
-                      try {
-                        await favoritesService.syncFavorites(merge: true);
-                      } catch (e) {
-                        // do nothing
-                      }
-                      setState(() {
-                        _loading = false;
-                      });
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Você está sem conexão com a internet'),
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 10.0,
+                        bottom: 10.0,
+                        left: 20.0,
+                      ),
+                      child: Text(
+                        "Sincronização",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    }
-                  },
-                  buttonText: "Sincronizar",
-                  title: "Favoritos",
-                  description: "Sincroniza seus favoritos com o servidor.",
+                      ),
+                    ),
+                    SettingsMenu(
+                      onPressed: () async {
+                        if (isConnected) {
+                          setState(() {
+                            _loading = true;
+                          });
+                          try {
+                            await favoritesService.syncFavorites(merge: true);
+                          } catch (e) {
+                            // Do-nothing
+                          }
+                          setState(() {
+                            _loading = false;
+                          });
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Você está sem conexão com a internet',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      buttonText: "Sincronizar",
+                      title: "Favoritos",
+                      description:
+                          "Realiza manualmente a sincronização dos seus favoritos",
+                    ),
+                  ],
                 ),
         ],
       ),

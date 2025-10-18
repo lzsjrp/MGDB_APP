@@ -1,45 +1,44 @@
-
 import 'package:flutter/material.dart';
+
 import '../../app/injectable.dart';
-import '../../services/book_service.dart';
-import '../../services/storage_manager.dart';
-import './books/book_page.dart';
+
+import '../../services/favorites_service.dart';
+import 'books/book_page.dart';
 import 'widgets/vertical_listview.dart';
 
-class DownloadsPage extends StatefulWidget {
-  const DownloadsPage({super.key});
+class FavoritesPage extends StatefulWidget {
+  const FavoritesPage({super.key});
 
   @override
-  State<DownloadsPage> createState() => _DownloadsPage();
+  State<FavoritesPage> createState() => _FavoritesPage();
 }
 
-class _DownloadsPage extends State<DownloadsPage> {
-  final storageManager = getIt<StorageManager>();
-  final bookService = getIt<BookService>();
+class _FavoritesPage extends State<FavoritesPage> {
+  final favoritesService = getIt<FavoritesService>();
 
-  List<String> downloadsBooksId = [];
-
+  Set<String> favoriteBookIds = {};
   bool _loading = true;
   String _error = '';
 
   @override
   void initState() {
     super.initState();
-    loadDownloads();
+    loadFavoriteIds();
   }
 
-  Future<void> loadDownloads() async {
+  Future<void> loadFavoriteIds() async {
     try {
       setState(() => _loading = true);
-      final downloads = await bookService.getLocalBooksList();
-      setState(() {
-        downloadsBooksId = downloads;
-        _loading = false;
-      });
-    } catch (error) {
-      _error = error.toString();
+      final ids = await favoritesService.getFavoritesSet(sync: false);
       if (!mounted) return;
       setState(() {
+        favoriteBookIds = ids;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
         _loading = false;
       });
     }
@@ -64,12 +63,12 @@ class _DownloadsPage extends State<DownloadsPage> {
         ),
       );
     }
-    if (downloadsBooksId.isEmpty) {
-      return Center(child: Text('Nenhum download encontrado'));
+    if (favoriteBookIds.isEmpty) {
+      return const Center(child: Text('Nenhum favorito encontrado'));
     }
     return Scaffold(
       body: BooksGridView(
-        bookIds: downloadsBooksId.toList(),
+        bookIds: favoriteBookIds.toList(),
         onBookTap: (bookId) {
           Navigator.push(
             context,

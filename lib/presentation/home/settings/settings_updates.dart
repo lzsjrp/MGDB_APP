@@ -5,6 +5,7 @@ import 'package:version/version.dart';
 import 'package:install_plugin/install_plugin.dart';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,8 @@ import '../../../shared/preferences.dart';
 import './widgets/settings_menu_widget.dart';
 
 import 'package:mgdb/providers/connectivity_provider.dart';
+
+import 'dialogs/change_api_dialog.dart';
 
 class SettingsUpdates extends StatefulWidget {
   const SettingsUpdates({super.key});
@@ -69,6 +72,12 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
 
   Future<void> checkAndUpdate() async {
     try {
+      if (!_installPermissions) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sem permissão para instalar pacotes')),
+        );
+      }
       await connectivityProvider.initialized;
       if (!connectivityProvider.isConnected) {
         if (!mounted) return;
@@ -202,21 +211,30 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
 
   @override
   Widget build(BuildContext context) {
+    final isConnected = context.watch<ConnectivityProvider>().isConnected;
+
     if (!_installPermissions) {
-      return Scaffold(
-        body: AlertDialog(
-          title: const Text('Permissão necessária'),
-          content: const Text(
-            'Para atualizar, autorize o aplicativo a instalar pacotes nas configurações.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => _requestPermissions(),
-              child: const Text('Abrir configurações'),
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Permissão necessária'),
+            content: const Text(
+              'Para atualizar, autorize o aplicativo a instalar pacotes nas configurações.',
             ),
-          ],
-        ),
-      );
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _requestPermissions();
+                },
+                child: const Text('Abrir configurações'),
+              ),
+            ],
+          ),
+        );
+      });
     }
 
     if (_loading) {
@@ -263,7 +281,8 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
             onPressed: checkAndUpdate,
             buttonText: "Atualizar",
             title: "Procurar por atualizações",
-            description: "Procura e instala novas atualizações do aplicativo",
+            description:
+                "Procura por novas atualizações e instala se disponível",
           ),
           if (_currentVersion.isNotEmpty && _latestVersion.isNotEmpty)
             Padding(
@@ -292,19 +311,57 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
             buttonText: !_preferences.earlyAccess ? "Ativar" : "Desativar",
             title: "Acesso Antecipado",
             description:
-                "Permite instalar versões em teste e ativa recursos experimentais",
+                "Permite atualizações de versões em testes e ativa recursos experimentais",
           ),
           if (_preferences.earlyAccess)
-            SettingsMenu(
-              onPressed: () async {
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Função não implementada.')),
-                );
-              },
-              buttonText: "Alterar",
-              title: "Repositório (Github)",
-              description: "Repositório para procurar e instalar novas atualizações",
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 10.0,
+                    bottom: 10.0,
+                    left: 20.0,
+                  ),
+                  child: Text(
+                    "Desenvolvimento",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SettingsMenu(
+                  onPressed: () async {
+                    if (isConnected) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) => const ChangeApiDialog(),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Você está sem conexão com a internet'),
+                        ),
+                      );
+                    }
+                  },
+                  buttonText: "Alterar",
+                  title: "Servidor",
+                  description:
+                      "Endereço usado para dados de títulos, autenticação e sincronização",
+                ),
+                SettingsMenu(
+                  onPressed: () async {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Função não implementada.')),
+                    );
+                  },
+                  buttonText: "Alterar",
+                  title: "Repositório (GitHub)",
+                  description:
+                      "Repositório do GitHub para procurar e instalar novas atualizações",
+                ),
+              ],
             ),
         ],
       ),

@@ -12,7 +12,7 @@ import 'package:mgdb/services/book_service.dart';
 import 'package:mgdb/services/chapter_service.dart';
 import '../../../services/favorites_service.dart';
 
-import '../../../core/theme/custom/gridview_theme.dart';
+import '../../../core/theme/widgets_themes/gridview_theme.dart';
 
 class BookDetailsPage extends StatefulWidget {
   final String bookId;
@@ -168,8 +168,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     child: bookData.cover != null
                         ? CachedNetworkImage(
                             imageUrl: bookData.cover!.imageUrl,
-                            width: 160,
-                            height: 260,
+                            width: 170,
+                            height: 270,
                             fit: BoxFit.cover,
                             placeholder: (context, url) =>
                                 Center(child: CircularProgressIndicator()),
@@ -266,10 +266,14 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 ChapterListItem chapter = chaptersData![index];
                 final title = chapter.title;
                 final number = chapter.number;
+                final scanlator = chapter.scanlator?.name;
+                final language = chapter.language;
 
                 return ListTile(
-                  title: Text('Capítulo $number'),
-                  subtitle: Text(title),
+                  title: Text('Capítulo $number ($language)'),
+                  subtitle: scanlator != null
+                      ? Text('$title - $scanlator')
+                      : Text(title),
                   onTap: () {
                     if (bookData.type == 'MANGA') {
                       Navigator.push(

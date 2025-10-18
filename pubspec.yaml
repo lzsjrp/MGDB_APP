@@ -54,6 +54,7 @@ dependencies:
       url: https://github.com/Ujjwal091/flutter_install_plugin.git
       ref: 2e7da3fe99ed81eed5ef7697135c7c8ff9d25e28
   permission_handler: ^12.0.1
+  image_picker: ^1.2.0
 
 dev_dependencies:
   injectable_generator: ^2.5.2

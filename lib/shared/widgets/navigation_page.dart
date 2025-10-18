@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
-import '../../core/theme/custom/bottom_navbar_theme.dart';
+import '../../core/theme/widgets_themes/bottom_navbar_theme.dart';
 
 class NavigationPage extends StatefulWidget {
   final List<Widget> pages;

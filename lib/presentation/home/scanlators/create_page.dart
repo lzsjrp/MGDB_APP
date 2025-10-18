@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 
-class EditBookPage extends StatelessWidget {
+class EditBookPage extends StatefulWidget {
   const EditBookPage({super.key});
+
+  @override
+  State<EditBookPage> createState() => _EditBookPage();
+}
+
+class _EditBookPage extends State<EditBookPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Submit'),
+        title: Text('Registrar Scanlator'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -18,7 +28,7 @@ class EditBookPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(child: Text("Body")),
+      body: Center(child: Text("Não implementado")),
     );
   }
 }

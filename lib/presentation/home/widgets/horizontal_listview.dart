@@ -5,10 +5,12 @@ import 'package:mgdb/models/book_model.dart';
 import 'package:mgdb/services/book_service.dart';
 import 'package:mgdb/services/storage_manager.dart';
 import 'package:mgdb/app/injectable.dart';
+import 'package:provider/provider.dart';
 
-import '../../../../core/theme/custom/gridview_theme.dart';
-import '../../../../shared/widgets/book_card.dart';
-import '../../books/book_page.dart';
+import '../../../core/theme/widgets_themes/gridview_theme.dart';
+import '../../../providers/connectivity_provider.dart';
+import '../../../shared/widgets/book_card.dart';
+import '../books/book_page.dart';
 
 class ExploreListView extends StatefulWidget {
   final List<String> bookIds;
@@ -46,18 +48,30 @@ class _ExploreListView extends State<ExploreListView> {
   }
 
   Future<void> _fetchBookData(String id) async {
+    Book? book;
     try {
-      final book = await bookService.fetchTitle(id);
+      final localData = await bookService.getLocalTitle(id);
+      if (localData == null) {
+        final fetchData = await bookService.fetchTitle(id);
+        book = fetchData;
+      } else {
+        book = localData;
+      }
       File? cover;
       if (book.cover != null) {
-        cover = await storageManager.cachedImage(
-          book.cover!.id,
-          book.cover!.imageUrl,
-        );
+        final localCover = await storageManager.getImage(book.cover!.id);
+        if (localCover != null) {
+          cover = await storageManager.cachedImage(
+            book.cover!.id,
+            book.cover!.imageUrl,
+          );
+        } else {
+          cover = localCover;
+        }
       }
       if (!mounted) return;
       setState(() {
-        booksData[id] = book;
+        booksData[id] = book!;
         coverFiles[id] = cover;
       });
     } catch (_) {}
@@ -75,6 +89,7 @@ class _ExploreListView extends State<ExploreListView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
+    final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
     return SizedBox(
       height: 300,
@@ -86,7 +101,7 @@ class _ExploreListView extends State<ExploreListView> {
           final id = widget.bookIds[index];
           final book = booksData[id];
           final cover = coverFiles[id];
-          if (book == null) {
+          if (isConnected && book == null) {
             return Container(
               key: ValueKey('book-skeleton-$id'),
               width: 180,
@@ -98,6 +113,26 @@ class _ExploreListView extends State<ExploreListView> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          } else if (book == null) {
+            return Container(
+              key: ValueKey('book-offline-$id'),
+              width: 180,
+              height: 300,
+              margin: const EdgeInsets.only(right: 8),
+              child: Card(
+                color: theme.cardBackgroundColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.signal_wifi_statusbar_connected_no_internet_4,
+                    size: 30,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
             );
           }

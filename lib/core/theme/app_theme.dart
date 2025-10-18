@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import './widgets_themes/pagination_theme.dart';
+import './widgets_themes/gridview_theme.dart';
+import './widgets_themes/bottom_navbar_theme.dart';
+
 import 'app_colors.dart';
-import './custom/pagination_theme.dart';
-import './custom/gridview_theme.dart';
-import 'custom/bottom_navbar_theme.dart';
+
+import 'package:mgdb/core/theme/dark_theme.dart';
+import 'package:mgdb/core/theme/light_theme.dart';
 
 class AppTheme {
   static ThemeData buildTheme(AppColors colors) {
@@ -26,26 +30,54 @@ class AppTheme {
         refreshBackgroundColor: colors.primary,
       ),
       scaffoldBackgroundColor: colors.surface,
-      appBarTheme: AppBarTheme(backgroundColor: colors.secondary),
+      appBarTheme: AppBarTheme(backgroundColor: colors.surface),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colors.secondary,
         selectedItemColor: colors.selectedItem,
         unselectedItemColor: colors.unselectedItem,
         type: BottomNavigationBarType.fixed,
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: colors.surface,
+        selectedColor: colors.secondary,
+        labelStyle: TextStyle(color: colors.onPrimary),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+          side: BorderSide(color: colors.accent, width: 2),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         labelStyle: TextStyle(color: colors.onPrimary, fontSize: 16),
+        hintStyle: TextStyle(color: colors.onSecondary),
+        filled: true,
+        fillColor: colors.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colors.accent),
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colors.accent),
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
           borderSide: BorderSide(color: colors.accent, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
       ),
       buttonTheme: ButtonThemeData(
@@ -73,7 +105,7 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: colors.primary,
+        backgroundColor: colors.secondary,
         barrierColor: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titleTextStyle: TextStyle(
@@ -102,7 +134,7 @@ class AppTheme {
           cardColor: colors.secondary,
           cardBackgroundColor: colors.secondary,
           titleStyle: TextStyle(
-            color: colors.onPrimary,
+            color: Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
@@ -125,7 +157,7 @@ class AppTheme {
     );
   }
 
-  static ThemeData get darkTheme => buildTheme(AppColorsDark());
+  static ThemeData get darkTheme => buildTheme(ThemeDark());
 
-  static ThemeData get lightTheme => buildTheme(AppColorsLight());
+  static ThemeData get lightTheme => buildTheme(ThemeLight());
 }

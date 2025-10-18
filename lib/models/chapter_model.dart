@@ -9,6 +9,7 @@ class Chapter {
   final String? content;
   final String? scanlatorId;
   final ScanlatorModel? scanlator;
+  final String language;
   final String addedBy;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -23,6 +24,7 @@ class Chapter {
     this.content,
     this.scanlator,
     this.scanlatorId,
+    required this.language,
     required this.addedBy,
     required this.createdAt,
     required this.updatedAt,
@@ -38,6 +40,7 @@ class Chapter {
       title: chapterJson['title'],
       number: chapterJson['number'],
       content: chapterJson['content'],
+      language: chapterJson['language'],
       scanlator: json['scanlator'] != null
           ? ScanlatorModel.fromJson(json['scanlator'])
           : null,
@@ -111,6 +114,7 @@ class ChapterListItem {
   final int number;
   final String addedBy;
   final ScanlatorModel? scanlator;
+  final String language;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -119,6 +123,7 @@ class ChapterListItem {
     required this.bookId,
     this.volumeId,
     this.scanlator,
+    required this.language,
     required this.title,
     required this.number,
     required this.addedBy,
@@ -134,6 +139,7 @@ class ChapterListItem {
       title: json['title'],
       number: json['number'],
       addedBy: json['addedBy'],
+      language: json['language'],
       scanlator: json['scanlator'] != null
           ? ScanlatorModel.fromJson(json['scanlator'])
           : null,
