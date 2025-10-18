@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/injectable.dart';
+import '../../app/injectable.dart';
 
-import '../../../services/favorites_service.dart';
-import '../books/book_page.dart';
+import '../../services/favorites_service.dart';
+import 'books/book_page.dart';
 import 'widgets/vertical_listview.dart';
 
 class FavoritesPage extends StatefulWidget {

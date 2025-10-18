@@ -4,7 +4,7 @@ import '../../app/injectable.dart';
 import '../../services/book_service.dart';
 import '../../services/storage_manager.dart';
 import './books/book_page.dart';
-import 'favorites/widgets/vertical_listview.dart';
+import 'widgets/vertical_listview.dart';
 
 class DownloadsPage extends StatefulWidget {
   const DownloadsPage({super.key});

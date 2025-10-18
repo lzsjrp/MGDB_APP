@@ -7,9 +7,9 @@ import 'package:mgdb/services/storage_manager.dart';
 import 'package:mgdb/app/injectable.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/theme/custom/gridview_theme.dart';
-import '../../../../providers/connectivity_provider.dart';
-import '../../../../shared/widgets/book_card.dart';
+import '../../../core/theme/custom/gridview_theme.dart';
+import '../../../providers/connectivity_provider.dart';
+import '../../../shared/widgets/book_card.dart';
 
 class BooksGridView extends StatefulWidget {
   final List<String> bookIds;

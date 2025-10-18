@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:mgdb/providers/connectivity_provider.dart';
 import 'package:mgdb/app/injectable.dart';
 import 'package:mgdb/services/categories_service.dart';
-import 'package:mgdb/presentation/home/explore/widgets/horizontal_listview.dart';
+import 'package:mgdb/presentation/home/widgets/horizontal_listview.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
