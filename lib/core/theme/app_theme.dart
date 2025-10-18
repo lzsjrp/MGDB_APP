@@ -134,7 +134,7 @@ class AppTheme {
           cardColor: colors.secondary,
           cardBackgroundColor: colors.secondary,
           titleStyle: TextStyle(
-            color: colors.onPrimary,
+            color: Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
