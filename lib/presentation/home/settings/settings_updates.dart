@@ -72,6 +72,12 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
 
   Future<void> checkAndUpdate() async {
     try {
+      if (!_installPermissions) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sem permissão para instalar pacotes')),
+        );
+      }
       await connectivityProvider.initialized;
       if (!connectivityProvider.isConnected) {
         if (!mounted) return;
@@ -208,20 +214,27 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
     final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
     if (!_installPermissions) {
-      return Scaffold(
-        body: AlertDialog(
-          title: const Text('Permissão necessária'),
-          content: const Text(
-            'Para atualizar, autorize o aplicativo a instalar pacotes nas configurações.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => _requestPermissions(),
-              child: const Text('Abrir configurações'),
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Permissão necessária'),
+            content: const Text(
+              'Para atualizar, autorize o aplicativo a instalar pacotes nas configurações.',
             ),
-          ],
-        ),
-      );
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _requestPermissions();
+                },
+                child: const Text('Abrir configurações'),
+              ),
+            ],
+          ),
+        );
+      });
     }
 
     if (_loading) {
@@ -268,7 +281,8 @@ class _SettingsUpdatesState extends State<SettingsUpdates> {
             onPressed: checkAndUpdate,
             buttonText: "Atualizar",
             title: "Procurar por atualizações",
-            description: "Procura por novas atualizações e instala se disponível",
+            description:
+                "Procura por novas atualizações e instala se disponível",
           ),
           if (_currentVersion.isNotEmpty && _latestVersion.isNotEmpty)
             Padding(

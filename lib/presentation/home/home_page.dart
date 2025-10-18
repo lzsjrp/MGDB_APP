@@ -5,11 +5,13 @@ import 'package:mgdb/presentation/home/explore_page.dart';
 import 'package:mgdb/presentation/home/downloads_page.dart';
 import 'package:mgdb/presentation/home/favorites_page.dart';
 import 'package:mgdb/presentation/home/settings/settings_page.dart';
-import 'package:mgdb/presentation/home/books/book_edit.dart';
+import 'package:mgdb/presentation/home/books/create_page.dart';
 import 'package:mgdb/presentation/home/discuss_page.dart';
 
 import 'package:google_nav_bar/google_nav_bar.dart';
 
+import '../../app/injectable.dart';
+import '../../shared/preferences.dart';
 import '../../shared/widgets/navigation_page.dart';
 
 class Home extends StatefulWidget {
@@ -20,6 +22,7 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
+  final _preferences = getIt<AppPreferences>();
   static bool _storagePermission = true;
 
   @override
@@ -61,25 +64,32 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     if (!_storagePermission) {
-      return Scaffold(
-        body: AlertDialog(
-          title: const Text('Permissão necessária'),
-          content: const Text(
-            'Para continuar, autorize a permissão de armazenamento nas configurações.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => _requestPermissions(),
-              child: const Text('Abrir configurações'),
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Permissão necessária'),
+            content: const Text(
+              'Para continuar, autorize a permissão de armazenamento nas configurações.',
             ),
-          ],
-        ),
-      );
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _requestPermissions();
+                },
+                child: const Text('Abrir configurações'),
+              ),
+            ],
+          ),
+        );
+      });
     }
 
     final actions = [
       IconButton(
-        icon: Icon(Icons.settings),
+        icon: const Icon(Icons.settings),
         onPressed: () {
           Navigator.push(
             context,
@@ -87,15 +97,16 @@ class _Home extends State<Home> {
           );
         },
       ),
-      IconButton(
-        icon: Icon(Icons.my_library_books),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const EditBookPage()),
-          );
-        },
-      ),
+      if (_preferences.earlyAccess)
+        IconButton(
+          icon: const Icon(Icons.my_library_books),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const EditBookPage()),
+            );
+          },
+        ),
     ];
 
     return NavigationPage(
