@@ -46,8 +46,15 @@ class _ExploreListView extends State<ExploreListView> {
   }
 
   Future<void> _fetchBookData(String id) async {
+    Book? book;
     try {
-      final book = await bookService.fetchTitle(id);
+      final localData = await bookService.getLocalTitle(id);
+      if (localData == null) {
+        final fetchData = await bookService.fetchTitle(id);
+        book = fetchData;
+      } else {
+        book = localData;
+      }
       File? cover;
       if (book.cover != null) {
         cover = await storageManager.cachedImage(
@@ -57,7 +64,7 @@ class _ExploreListView extends State<ExploreListView> {
       }
       if (!mounted) return;
       setState(() {
-        booksData[id] = book;
+        booksData[id] = book!;
         coverFiles[id] = cover;
       });
     } catch (_) {}
