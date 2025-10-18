@@ -30,7 +30,7 @@ class AppTheme {
         refreshBackgroundColor: colors.primary,
       ),
       scaffoldBackgroundColor: colors.surface,
-      appBarTheme: AppBarTheme(backgroundColor: colors.secondary),
+      appBarTheme: AppBarTheme(backgroundColor: colors.surface),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colors.secondary,
         selectedItemColor: colors.selectedItem,
