@@ -5,8 +5,10 @@ import 'package:mgdb/models/book_model.dart';
 import 'package:mgdb/services/book_service.dart';
 import 'package:mgdb/services/storage_manager.dart';
 import 'package:mgdb/app/injectable.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/theme/custom/gridview_theme.dart';
+import '../../../../providers/connectivity_provider.dart';
 import '../../../../shared/widgets/book_card.dart';
 import '../../books/book_page.dart';
 
@@ -87,6 +89,7 @@ class _ExploreListView extends State<ExploreListView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
+    final isConnected = context.watch<ConnectivityProvider>().isConnected;
 
     return SizedBox(
       height: 300,
@@ -98,7 +101,7 @@ class _ExploreListView extends State<ExploreListView> {
           final id = widget.bookIds[index];
           final book = booksData[id];
           final cover = coverFiles[id];
-          if (book == null) {
+          if (isConnected && book == null) {
             return Container(
               key: ValueKey('book-skeleton-$id'),
               width: 180,
@@ -110,6 +113,26 @@ class _ExploreListView extends State<ExploreListView> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          } else if (book == null) {
+            return Container(
+              key: ValueKey('book-offline-$id'),
+              width: 180,
+              height: 300,
+              margin: const EdgeInsets.only(right: 8),
+              child: Card(
+                color: theme.cardBackgroundColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.signal_wifi_statusbar_connected_no_internet_4,
+                    size: 30,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
             );
           }
