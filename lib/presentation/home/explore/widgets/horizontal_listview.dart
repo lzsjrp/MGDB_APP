@@ -57,10 +57,15 @@ class _ExploreListView extends State<ExploreListView> {
       }
       File? cover;
       if (book.cover != null) {
-        cover = await storageManager.cachedImage(
-          book.cover!.id,
-          book.cover!.imageUrl,
-        );
+        final localCover = await storageManager.getImage(book.cover!.id);
+        if (localCover != null) {
+          cover = await storageManager.cachedImage(
+            book.cover!.id,
+            book.cover!.imageUrl,
+          );
+        } else {
+          cover = localCover;
+        }
       }
       if (!mounted) return;
       setState(() {
