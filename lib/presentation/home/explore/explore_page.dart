@@ -62,11 +62,19 @@ class _ExplorePageState extends State<ExplorePage>
       if (!mounted) return;
       setState(() {
         for (var cat in list) {
-          categoriesIds[cat.name] = [];
+          if (cat.id == 'recently-added') {
+            categoriesIds["Adicionados Recentemente"] = [];
+          } else {
+            categoriesIds[cat.name] = [];
+          }
         }
       });
       for (var cat in list) {
-        await _fetchCategory(cat.id, cat.name);
+        if (cat.id == 'recently-added') {
+          await _fetchCategory(cat.id, "Adicionados Recentemente");
+        } else {
+          await _fetchCategory(cat.id, cat.name);
+        }
       }
     } catch (e) {
       throw Exception('Falha ao obter as categorias ${e.toString()}');
