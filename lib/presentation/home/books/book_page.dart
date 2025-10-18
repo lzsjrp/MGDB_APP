@@ -168,8 +168,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                     child: bookData.cover != null
                         ? CachedNetworkImage(
                             imageUrl: bookData.cover!.imageUrl,
-                            width: 160,
-                            height: 260,
+                            width: 170,
+                            height: 270,
                             fit: BoxFit.cover,
                             placeholder: (context, url) =>
                                 Center(child: CircularProgressIndicator()),
@@ -267,9 +267,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 final title = chapter.title;
                 final number = chapter.number;
                 final scanlator = chapter.scanlator?.name;
+                final language = chapter.language;
 
                 return ListTile(
-                  title: Text('Capítulo $number'),
+                  title: Text('Capítulo $number ($language)'),
                   subtitle: scanlator != null
                       ? Text('$title - $scanlator')
                       : Text(title),

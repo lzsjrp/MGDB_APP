@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ThemeDark implements AppColors {
   @override
-  Color primary = const Color(0xFF282a36);
+  Color primary = const Color(0xFF2c3952);
   @override
   Color secondary = const Color(0xff232e42);
   @override

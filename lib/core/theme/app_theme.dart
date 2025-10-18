@@ -37,19 +37,47 @@ class AppTheme {
         unselectedItemColor: colors.unselectedItem,
         type: BottomNavigationBarType.fixed,
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: colors.surface,
+        selectedColor: colors.secondary,
+        labelStyle: TextStyle(color: colors.onPrimary),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+          side: BorderSide(color: colors.accent, width: 2),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         labelStyle: TextStyle(color: colors.onPrimary, fontSize: 16),
+        hintStyle: TextStyle(color: colors.onSecondary),
+        filled: true,
+        fillColor: colors.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colors.accent),
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colors.accent),
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
           borderSide: BorderSide(color: colors.accent, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
       ),
       buttonTheme: ButtonThemeData(
@@ -77,7 +105,7 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: colors.primary,
+        backgroundColor: colors.secondary,
         barrierColor: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titleTextStyle: TextStyle(

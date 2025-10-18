@@ -7,7 +7,7 @@ class ThemeLight implements AppColors {
   @override
   Color secondary = Colors.grey.shade300;
   @override
-  Color accent = Colors.red;
+  Color accent = Colors.blue.shade300;
   @override
   Brightness brightness = Brightness.light;
   @override

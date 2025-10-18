@@ -53,15 +53,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1041.StorageManager>(),
       ),
     );
-    gh.factory<_i193.ChapterService>(
-      () => _i193.ChapterService(
+    gh.factory<_i678.CategoriesService>(
+      () => _i678.CategoriesService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
         gh<_i1041.StorageManager>(),
       ),
     );
-    gh.factory<_i678.CategoriesService>(
-      () => _i678.CategoriesService(
+    gh.factory<_i193.ChapterService>(
+      () => _i193.ChapterService(
         gh<_i984.SessionService>(),
         gh<_i187.ApiConfigProvider>(),
         gh<_i1041.StorageManager>(),
