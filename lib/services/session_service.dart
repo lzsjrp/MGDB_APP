@@ -133,7 +133,8 @@ class SessionService {
         url,
         data: {'email': email, 'password': password, 'name': name},
       );
-      return User.fromJson(response.data);
+      final userJson = response.data['user'];
+      return User.fromJson(userJson);
     } on DioException catch (e) {
       throw Exception(
         'Falha ao criar o usuário: ${e.response?.statusCode ?? e.message}',

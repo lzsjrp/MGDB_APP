@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:mgdb/presentation/home/books/readers/manga_reader.dart';
+import '../../../providers/connectivity_provider.dart';
 import './readers/web_novel_reader.dart';
 
 import '../../../app/injectable.dart';
@@ -26,9 +27,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   final bookService = getIt<BookService>();
   final chapterService = getIt<ChapterService>();
   final favoritesService = getIt<FavoritesService>();
+  final connectivityProvider = getIt<ConnectivityProvider>();
 
-  Book? bookData;
-  List<ChapterListItem>? chapters;
+  late Book bookData;
+  List<ChapterListItem>? chaptersData;
   bool _isFavorite = false;
 
   bool _loading = true;
@@ -42,18 +44,49 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
 
   Future<void> _loadBookDetails() async {
     try {
+      await connectivityProvider.initialized;
+      final isConnected = connectivityProvider.isConnected;
+
+      Book book;
+      List<ChapterListItem>? chapters;
+
       if (!mounted) return;
       setState(() {
         _loading = true;
       });
-      final bookResponse = await bookService.fetchTitle(widget.bookId);
-      final chaptersResponse = await chapterService.getChapters(widget.bookId);
+
+      final storageBook = await bookService.getLocalTitle(widget.bookId);
+      if (storageBook != null) {
+        book = storageBook;
+      } else {
+        if (!isConnected) {
+          if (!mounted) return;
+          setState(() {
+            _err = 'Sem conexão com a internet';
+            _loading = false;
+          });
+          return;
+        } else {
+          final bookResponse = await bookService.fetchTitle(widget.bookId);
+          book = bookResponse;
+        }
+      }
+
+      // To-do: Offline chapters list
+      if (isConnected) {
+        final chaptersResponse = await chapterService.getChapters(
+          widget.bookId,
+        );
+        chapters = chaptersResponse.chapters;
+      } else {
+        chapters = [];
+      }
 
       bool isFav = await favoritesService.isFavorite(widget.bookId);
 
       setState(() {
-        bookData = bookResponse;
-        chapters = chaptersResponse.chapters;
+        bookData = book;
+        chaptersData = chapters;
         _isFavorite = isFav;
         _loading = false;
       });
@@ -87,37 +120,31 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<GridViewThemeData>()!;
-    final coverUrl = bookData?.cover?.imageUrl ?? '';
-    final title = bookData?.title ?? 'Sem título';
-    final author = bookData?.author ?? 'Autor desconhecido';
-    final titleId = bookData?.id ?? '';
-    final type = bookData?.type ?? '';
-    final description = bookData?.description.isNotEmpty == true
-        ? bookData?.description
-        : 'Sem descrição';
 
     if (_loading) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_err.isNotEmpty && !_loading) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.bug_report, size: 46, color: Colors.grey),
-            const SizedBox(height: 10),
-            Text("Algo deu errado..."),
-            const SizedBox(height: 10),
-            Text('($_err)'),
-          ],
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.bug_report, size: 46, color: Colors.grey),
+              const SizedBox(height: 10),
+              Text("Algo deu errado..."),
+              const SizedBox(height: 10),
+              Text(_err),
+            ],
+          ),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(bookData.title),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -138,9 +165,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: coverUrl.isNotEmpty
+                    child: bookData.cover != null
                         ? CachedNetworkImage(
-                            imageUrl: coverUrl,
+                            imageUrl: bookData.cover!.imageUrl,
                             width: 160,
                             height: 260,
                             fit: BoxFit.cover,
@@ -162,7 +189,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          title,
+                          bookData.title,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
@@ -172,7 +199,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                           ),
                         ),
                         Text(
-                          author,
+                          bookData.author,
+                          maxLines: 1,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -180,13 +208,12 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                         ),
                         SizedBox(height: 5),
                         Text(
-                          description ?? 'Sem descrição',
+                          bookData.description ?? 'Sem descrição',
                           maxLines: 5,
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
                             color: Colors.grey[400],
                           ),
                         ),
@@ -223,36 +250,44 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
+            if (chaptersData!.isEmpty)
+              Padding(
+                padding: EdgeInsets.only(left: 13, top: 5),
+                child: Text(
+                  'Nenhum capítulo encontrado.',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ),
             ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: chapters?.length,
+              itemCount: chaptersData?.length,
               itemBuilder: (context, index) {
-                final chapter = chapters?[index];
-                final chapterNumber = chapter?.number ?? '-';
-                final chapterId = chapter?.id ?? '-';
+                ChapterListItem chapter = chaptersData![index];
+                final title = chapter.title;
+                final number = chapter.number;
 
                 return ListTile(
-                  title: Text('Capítulo $chapterNumber'),
-                  subtitle: Text(chapter?.title ?? 'Sem título'),
+                  title: Text('Capítulo $number'),
+                  subtitle: Text(title),
                   onTap: () {
-                    if (type == 'MANGA') {
+                    if (bookData.type == 'MANGA') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MangaReader(
-                            chapterId: chapterId,
-                            titleId: titleId,
+                            chapterId: chapter.id,
+                            titleId: bookData.id,
                           ),
                         ),
                       );
-                    } else if (type == 'WEB_NOVEL') {
+                    } else if (bookData.type == 'WEB_NOVEL') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => WebNovelReader(
-                            chapterId: chapterId,
-                            titleId: titleId,
+                            chapterId: chapter.id,
+                            titleId: bookData.id,
                           ),
                         ),
                       );

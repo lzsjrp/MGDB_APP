@@ -2,7 +2,7 @@ class Book {
   final String id;
   final String title;
   final String author;
-  final String description;
+  final String? description;
   final String type;
   final String status;
   final String addedBy;

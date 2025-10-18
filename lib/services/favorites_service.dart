@@ -94,9 +94,6 @@ class FavoritesService {
         // Do-nothing
       }
     }
-    if (connectivityProvider.isConnected) {
-      await bookService.saveTitle(bookId);
-    }
     final favorites = await _readFavoritesList();
     favorites.add(bookId);
     await _writeFavoritesList(favorites);
@@ -151,14 +148,6 @@ class FavoritesService {
       final serverFavorites = await getServerFavorites();
       final favoritesSet = serverFavorites.toSet();
       await _writeFavoritesList(favoritesSet);
-
-      for (final bookId in favoritesSet) {
-        try {
-          await bookService.saveTitle(bookId);
-        } catch (e) {
-          // Do-nothing
-        }
-      }
     } catch (e) {
       throw Exception('Falha ao sincronizar os favoritos com o servidor: $e');
     }
@@ -202,13 +191,6 @@ class FavoritesService {
 
       await _writeFavoritesList(confirmedFavorites);
 
-      for (final bookId in confirmedFavorites) {
-        try {
-          await bookService.saveTitle(bookId);
-        } catch (e) {
-          // Do-nothing
-        }
-      }
     } on DioException catch (e) {
       throw Exception(
         'Falha ao sincronizar: ${e.response?.statusCode ?? e.message}',

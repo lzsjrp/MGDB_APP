@@ -51,6 +51,30 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> register({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await sessionService.createUser(email, name, password);
+
+      final user = await sessionService.login(email, password);
+
+      _userData = user.session.user;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _userData = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> loadUser() async {
     await connectivityProvider.initialized;
     if (!connectivityProvider.isConnected) {

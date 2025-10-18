@@ -1,3 +1,5 @@
+import 'package:mgdb/models/scanlator_model.dart';
+
 class Chapter {
   final String id;
   final String bookId;
@@ -5,6 +7,8 @@ class Chapter {
   final String title;
   final int number;
   final String? content;
+  final String? scanlatorId;
+  final ScanlatorModel? scanlator;
   final String addedBy;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -17,6 +21,8 @@ class Chapter {
     required this.title,
     required this.number,
     this.content,
+    this.scanlator,
+    this.scanlatorId,
     required this.addedBy,
     required this.createdAt,
     required this.updatedAt,
@@ -32,6 +38,10 @@ class Chapter {
       title: chapterJson['title'],
       number: chapterJson['number'],
       content: chapterJson['content'],
+      scanlator: json['scanlator'] != null
+          ? ScanlatorModel.fromJson(json['scanlator'])
+          : null,
+      scanlatorId: chapterJson['scanlatorId'],
       addedBy: chapterJson['addedBy'],
       createdAt: DateTime.parse(chapterJson['createdAt']),
       updatedAt: DateTime.parse(chapterJson['updatedAt']),
@@ -77,14 +87,14 @@ class ChapterImage {
   );
 }
 
-class ChapterListResponse {
+class ChaptersList {
   final String bookId;
   final List<ChapterListItem> chapters;
 
-  ChapterListResponse({required this.bookId, required this.chapters});
+  ChaptersList({required this.bookId, required this.chapters});
 
-  factory ChapterListResponse.fromJson(Map<String, dynamic> json) {
-    return ChapterListResponse(
+  factory ChaptersList.fromJson(Map<String, dynamic> json) {
+    return ChaptersList(
       bookId: json['bookId'],
       chapters: (json['chapters'] as List)
           .map((chapterJson) => ChapterListItem.fromJson(chapterJson))
@@ -100,6 +110,7 @@ class ChapterListItem {
   final String title;
   final int number;
   final String addedBy;
+  final ScanlatorModel? scanlator;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -107,6 +118,7 @@ class ChapterListItem {
     required this.id,
     required this.bookId,
     this.volumeId,
+    this.scanlator,
     required this.title,
     required this.number,
     required this.addedBy,
@@ -122,31 +134,11 @@ class ChapterListItem {
       title: json['title'],
       number: json['number'],
       addedBy: json['addedBy'],
+      scanlator: json['scanlator'] != null
+          ? ScanlatorModel.fromJson(json['scanlator'])
+          : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-    );
-  }
-}
-
-class ChapterCreateResponse {
-  final String id;
-  final String message;
-  final Chapter chapter;
-  final Volume updatedVolume;
-
-  ChapterCreateResponse({
-    required this.id,
-    required this.message,
-    required this.chapter,
-    required this.updatedVolume,
-  });
-
-  factory ChapterCreateResponse.fromJson(Map<String, dynamic> json) {
-    return ChapterCreateResponse(
-      id: json['id'],
-      message: json['message'],
-      chapter: Chapter.fromJson({'chapter': json['chapter']}),
-      updatedVolume: Volume.fromJson(json['updatedVolume']),
     );
   }
 }
@@ -179,26 +171,6 @@ class Volume {
       addedBy: json['addedBy'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-    );
-  }
-}
-
-class ChapterDefaultResponse {
-  final int id;
-  final int message;
-  final Chapter chapter;
-
-  ChapterDefaultResponse({
-    required this.id,
-    required this.message,
-    required this.chapter,
-  });
-
-  factory ChapterDefaultResponse.fromJson(Map<String, dynamic> json) {
-    return ChapterDefaultResponse(
-      id: json['id'],
-      message: json['message'],
-      chapter: Chapter.fromJson(json['chapter']),
     );
   }
 }

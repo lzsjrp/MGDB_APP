@@ -65,21 +65,21 @@ class AppColorsLight implements AppColors {
   @override
   Color primary = Colors.white;
   @override
-  Color secondary = Colors.grey.shade200;
+  Color secondary = Colors.grey.shade300;
   @override
   Color accent = Colors.red;
   @override
   Brightness brightness = Brightness.light;
   @override
-  Color surface = Colors.white;
+  Color surface = Colors.grey.shade200;
   @override
-  Color selectedItem = Colors.redAccent;
+  Color selectedItem = Colors.blue.shade300;
   @override
   Color unselectedItem = Colors.grey;
   @override
   Color onPrimary = Colors.black87;
   @override
-  Color progress = Colors.redAccent;
+  Color progress = Colors.blue.shade300;
   @override
   Color textButtonDisabled = Colors.grey.shade400;
   @override
@@ -89,5 +89,5 @@ class AppColorsLight implements AppColors {
   @override
   Color onSurface = Colors.black87;
   @override
-  Color onError = Colors.red;
+  Color onError = const Color(0xFFC24E60);
 }

@@ -36,6 +36,11 @@ class AppPreferences {
 
   set themeMode(String value) => _prefs.setString('theme_mode', value);
 
+  String get releasesRepo =>
+      _prefs.getString('releasesRepo') ?? DefaultPreferences.releasesRepo;
+
+  set releasesRepo(String value) => _prefs.setString('releasesRepo', value);
+
   String get apiBaseUrl =>
       _prefs.getString('api_url') ?? DefaultPreferences.apiBaseUrl;
 
